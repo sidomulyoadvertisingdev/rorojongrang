@@ -36,17 +36,17 @@
 
 <!-- Stats -->
 <div class="container">
-    <div class="stats-bar fade-in">
+        <div class="stats-bar fade-in">
         <div class="stat-item">
             <div class="stat-number">110+</div>
             <div class="stat-label">{% if lang == 'id' %}Data Terscraping{% else %}Data Scraped{% endif %}</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">10</div>
-            <div class="stat-label">{% if lang == 'id' %}Lokasi Target{% else %}Target Locations{% endif %}</div>
+            <div class="stat-number">38</div>
+            <div class="stat-label">{% if lang == 'id' %}Provinsi{% else %}Provinces{% endif %}</div>
         </div>
         <div class="stat-item">
-            <div class="stat-number">6</div>
+            <div class="stat-number">20+</div>
             <div class="stat-label">{% if lang == 'id' %}Kategori Bisnis{% else %}Business Categories{% endif %}</div>
         </div>
         <div class="stat-item">
@@ -85,14 +85,19 @@
                 <p>{% if lang == 'id' %}Download hasil scraping dalam format CSV atau JSON. Siap diimport ke tools marketing Anda.{% else %}Download scraping results in CSV or JSON format. Ready to import into your marketing tools.{% endif %}</p>
             </div>
             <div class="card fade-in fade-in-delay-1">
-                <div class="card-icon">🌙</div>
-                <h3>{% if lang == 'id' %}Dark & Light Mode{% else %}Dark & Light Mode{% endif %}</h3>
-                <p>{% if lang == 'id' %}Tampilan premium dengan mode malam dan siang. Nyaman digunakan kapan saja, di mana saja.{% else %}Premium interface with night and day modes. Comfortable to use anytime, anywhere.{% endif %}</p>
+                <div class="card-icon">🗺</div>
+                <h3>{% if lang == 'id' %}Peta Interaktif{% else %}Interactive Map{% endif %}</h3>
+                <p>{% if lang == 'id' %}Pilih lokasi secara visual dengan peta interaktif. Atur marker dan radius pencarian langsung pada peta Leaflet.js.{% else %}Select locations visually with an interactive map. Set search markers and radius directly on the Leaflet.js map.{% endif %}</p>
             </div>
             <div class="card fade-in fade-in-delay-2">
+                <div class="card-icon">💬</div>
+                <h3>{% if lang == 'id' %}Template WhatsApp{% else %}WhatsApp Templates{% endif %}</h3>
+                <p>{% if lang == 'id' %}Buat pesan WhatsApp personal dengan placeholder otomatis seperti nama, telepon, dan alamat. Lacak status pengiriman langsung dari tabel.{% else %}Create personalized WhatsApp messages with auto placeholders like name, phone, and address. Track send status directly from the table.{% endif %}</p>
+            </div>
+            <div class="card fade-in">
                 <div class="card-icon">🔒</div>
                 <h3>{% if lang == 'id' %}Aman & Privat{% else %}Safe & Private{% endif %}</h3>
-                <p>{% if lang == 'id' %}Data Anda tersimpan aman di server lokal. Tidak ada data yang dikirim ke pihak ketiga.{% else %}Your data is securely stored on a local server. No data is sent to third parties.{% endif %}</p>
+                <p>{% if lang == 'id' %}Data Anda tersimpan aman di server kami. Tidak ada data yang dikirim ke pihak ketiga.{% else %}Your data is securely stored on our server. No data is sent to third parties.{% endif %}</p>
             </div>
         </div>
     </div>
@@ -110,7 +115,7 @@
                 <div class="step-number">1</div>
                 <div class="step-content">
                     <h3>{% if lang == 'id' %}Pilih Keyword & Lokasi{% else %}Choose Keyword & Location{% endif %}</h3>
-                    <p>{% if lang == 'id' %}Masukkan keyword bisnis yang ingin dicari (contoh: "toko besi") dan pilih lokasi target (contoh: "Kabupaten Bandung"). Atur radius jika diperlukan.{% else %}Enter the business keyword you want to search (e.g., "toko besi") and choose a target location (e.g., "Kabupaten Bandung"). Set the radius if needed.{% endif %}</p>
+                    <p>{% if lang == 'id' %}Masukkan keyword bisnis yang ingin dicari (contoh: "toko besi"), lalu pilih lokasi melalui dropdown cascading Provinsi → Kabupaten → Kecamatan. Atur radius pada peta interaktif.{% else %}Enter the business keyword you want to search (e.g., "toko besi"), then choose location through cascading dropdowns Province → Regency → District. Set the radius on the interactive map.{% endif %}</p>
                 </div>
             </div>
             <div class="step fade-in fade-in-delay-1">
@@ -147,7 +152,7 @@
             <div class="card fade-in fade-in-delay-1">
                 <div class="card-icon">📞</div>
                 <h3>{% if lang == 'id' %}Sales & Telemarketing{% else %}Sales & Telemarketing{% endif %}</h3>
-                <p>{% if lang == 'id' %}Dapatkan daftar nomor telepon bisnis lokal untuk cold calling dan WhatsApp blast.{% else %}Get local business phone numbers for cold calling and WhatsApp blasts.{% endif %}</p>
+                <p>{% if lang == 'id' %}Dapatkan daftar nomor telepon bisnis lokal untuk cold calling dan kirim pesan WhatsApp personal dengan template otomatis.{% else %}Get local business phone numbers for cold calling and send personalized WhatsApp messages with automatic templates.{% endif %}</p>
             </div>
             <div class="card fade-in fade-in-delay-2">
                 <div class="card-icon">📈</div>

@@ -8,7 +8,7 @@ redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=T
 
 
 @shared_task(bind=True, name="services.scraping_service.run_scraping")
-def run_scraping(self, task_id, radius=5):
+def run_scraping(self, task_id, radius=5, center_lat=0, center_lng=0):
     from app import create_app
     from models import db
     from models.task import ScrapingTask
@@ -30,7 +30,7 @@ def run_scraping(self, task_id, radius=5):
         task.search_radius = radius
         db.session.commit()
 
-        _publish_log(task_id, "info", "Connecting to Google Maps...")
+        _publish_log(task_id, "info", "Menyambungkan ke Google Maps...")
         _publish_progress(task_id, task)
 
         browser = BrowserManager()
@@ -42,29 +42,27 @@ def run_scraping(self, task_id, radius=5):
             browser.create_driver(headless=True)
             navigator = MapNavigator(browser.driver, rate_limiter)
 
-            url = build_search_url(task.keyword, task.location, radius)
+            url = build_search_url(task.keyword, task.location, radius, center_lat, center_lng)
             _publish_log(task_id, "info", f"URL: {url}")
-            navigator.handle_consent_dialog()
             navigator.open_search(url)
-            time.sleep(3)
-            navigator.handle_consent_dialog()
 
-            _publish_log(task_id, "success", "Connected to Google Maps")
-            _publish_log(task_id, "info", f"Searching: {task.keyword} {task.location}")
+            _publish_log(task_id, "success", "Terhubung ke Google Maps")
+            _publish_log(task_id, "info", f"Mencari: {task.keyword} di {task.location}")
 
             if not navigator.wait_for_results():
-                _publish_log(task_id, "error", "No results found on Google Maps")
+                _publish_log(task_id, "error", "Tidak ada hasil ditemukan di Google Maps")
                 task.status = "failed"
                 task.error_message = "No results found"
                 db.session.commit()
                 _publish_progress(task_id, task)
                 return {"error": "No results found"}
 
+            _publish_log(task_id, "info", "Menggulir halaman hasil...")
             total = navigator.scroll_results_panel()
             links = navigator.get_result_links()
 
             if not links:
-                _publish_log(task_id, "error", "No links found after scrolling")
+                _publish_log(task_id, "error", "Tidak ada link ditemukan setelah scroll")
                 task.status = "failed"
                 task.error_message = "No links found"
                 db.session.commit()
@@ -73,14 +71,15 @@ def run_scraping(self, task_id, radius=5):
 
             task.total_results = len(links)
             db.session.commit()
-            _publish_log(task_id, "success", f"Found {len(links)} results")
+            _publish_log(task_id, "success", f"Ditemukan {len(links)} hasil")
             _publish_progress(task_id, task)
 
             scraped_count = 0
+            error_count = 0
             for idx, link in enumerate(links):
                 task = ScrapingTask.query.get(task_id)
                 if task.status == "cancelled":
-                    _publish_log(task_id, "warning", "Task cancelled by user")
+                    _publish_log(task_id, "warning", "Task dibatalkan oleh user")
                     break
 
                 try:
@@ -93,32 +92,42 @@ def run_scraping(self, task_id, radius=5):
                     detail["task_id"] = task_id
 
                     if detail.get("name"):
-                        existing = Business.query.filter_by(place_id=detail.get("place_id")).first() if detail.get("place_id") else None
+                        pid = detail.get("place_id", "")
+                        existing = None
+                        if pid:
+                            existing = Business.query.filter_by(place_id=pid).first()
+
                         if existing:
-                            for key in ["phone", "website", "rating", "review_count", "operating_hours"]:
+                            for key in ["phone", "website", "rating", "review_count", "operating_hours", "address"]:
                                 if detail.get(key) and not getattr(existing, key, None):
                                     setattr(existing, key, detail[key])
+                            _publish_log(task_id, "info", f"[{idx+1}/{len(links)}] Update: {detail.get('name', '')}")
                         else:
-                            biz = Business(**{k: v for k, v in detail.items() if hasattr(Business, k)})
+                            filtered = {k: v for k, v in detail.items() if hasattr(Business, k) and v is not None and v != ""}
+                            biz = Business(**filtered)
                             db.session.add(biz)
+                            _publish_log(task_id, "data", f"[{idx+1}/{len(links)}] {detail.get('name', '')} | ☎ {detail.get('phone', '-')} | ⭐ {detail.get('rating', '-')}")
 
                         db.session.commit()
                         scraped_count += 1
-
-                        log_entry = f"[{scraped_count}/{len(links)}] {detail.get('name', 'Unknown')}"
-                        if detail.get("phone"):
-                            log_entry += f" | ☎ {detail['phone']}"
-                        _publish_log(task_id, "data", log_entry)
+                    else:
+                        _publish_log(task_id, "warning", f"[{idx+1}/{len(links)}] Nama kosong, skip")
+                        error_count += 1
 
                     task.scraped_results = scraped_count
-                    task.progress_percent = (scraped_count / len(links)) * 100
-                    task.current_log = f"[{scraped_count}/{len(links)}] {detail.get('name', '')}"
+                    task.progress_percent = ((idx + 1) / len(links)) * 100
+                    task.current_log = f"[{idx+1}/{len(links)}] {detail.get('name', '')}"
                     db.session.commit()
                     _publish_progress(task_id, task)
 
                     rate_limiter.wait()
                 except Exception as e:
-                    _publish_log(task_id, "warning", f"Error scraping link {idx+1}: {str(e)[:50]}")
+                    error_count += 1
+                    _publish_log(task_id, "warning", f"[{idx+1}/{len(links)}] Error: {str(e)[:80]}")
+                    try:
+                        db.session.rollback()
+                    except:
+                        pass
                     continue
 
             task = ScrapingTask.query.get(task_id)
@@ -128,7 +137,7 @@ def run_scraping(self, task_id, radius=5):
                 task.scraped_results = scraped_count
                 task.progress_percent = 100
                 db.session.commit()
-                _publish_log(task_id, "success", f"Scraping complete! {scraped_count} data saved.")
+                _publish_log(task_id, "success", f"Scraping selesai! {scraped_count} data tersimpan, {error_count} error.")
                 _publish_progress(task_id, task)
 
         except Exception as e:
@@ -140,7 +149,10 @@ def run_scraping(self, task_id, radius=5):
                 _publish_log(task_id, "error", f"Fatal error: {str(e)[:100]}")
                 _publish_progress(task_id, task)
         finally:
-            browser.quit()
+            try:
+                browser.quit()
+            except:
+                pass
 
         return {"task_id": task_id, "scraped": scraped_count}
 

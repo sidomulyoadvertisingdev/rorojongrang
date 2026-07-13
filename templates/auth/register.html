@@ -5,9 +5,10 @@
     <div style="position:absolute; top:-50%; left:-50%; right:-50%; bottom:-50%; background:radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(59,130,246,0.04) 0%, transparent 50%); pointer-events:none;"></div>
     <div style="width:100%; max-width:420px; position:relative;">
         <div style="text-align:center; margin-bottom:32px;">
-            <div style="width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#fff; font-size:28px; font-weight:800;">R</div>
-            <h1 style="font-size:28px; font-weight:800; color:var(--text);">RoroJonggrang</h1>
-            <p style="color:var(--text-sec); margin-top:4px;">Data Scrape Platform</p>
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width:64px; height:64px; border-radius:18px; object-fit:contain; margin:0 auto 16px; display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:none; align-items:center; justify-content:center; margin:0 auto 16px; color:#fff; font-size:28px; font-weight:800;">R</div>
+            <h1 style="font-size:28px; font-weight:900; color:var(--text); letter-spacing:-0.5px;">RoroJonggrang</h1>
+            <p style="color:var(--text-sec); margin-top:4px; font-size:14px; font-weight:500;">Data Scrape Platform</p>
         </div>
         <div class="card" style="padding:32px;">
             <h2 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:24px;">Buat akun baru</h2>

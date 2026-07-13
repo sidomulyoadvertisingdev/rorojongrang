@@ -23,9 +23,9 @@
                 </button>
                 <div class="faq-answer">
                     <p>{% if lang == 'id' %}
-                    Ya, RoroJonggrang dirancang dengan fitur anti-detection yang membuat aktivitas scraping tidak terdeteksi oleh Google Maps. Sistem menggunakan random delay, rotasi user-agent, dan teknik lainnya untuk menjaga keamanan. Selain itu, semua data tersimpan di server lokal Anda, bukan di cloud eksternal.
+                    Ya, RoroJonggrang dirancang dengan fitur anti-detection yang membuat aktivitas scraping tidak terdeteksi oleh Google Maps. Sistem menggunakan random delay, rotasi user-agent, dan teknik lainnya untuk menjaga keamanan. Selain itu, semua data tersimpan di server kami, bukan di cloud eksternal.
                     {% else %}
-                    Yes, RoroJonggrang is designed with anti-detection features that make scraping activities undetected by Google Maps. The system uses random delays, user-agent rotation, and other techniques to maintain safety. Additionally, all data is stored on your local server, not external clouds.
+                    Yes, RoroJonggrang is designed with anti-detection features that make scraping activities undetected by Google Maps. The system uses random delays, user-agent rotation, and other techniques to maintain safety. Additionally, all data is stored on our server, not external clouds.
                     {% endif %}</p>
                 </div>
             </div>
@@ -98,9 +98,9 @@
                 </button>
                 <div class="faq-answer">
                     <p>{% if lang == 'id' %}
-                    Saat ini RoroJonggrang mendukung 10 lokasi di Jawa Barat: Kabupaten Bandung, Bandung Barat, Cimahi, Sumedang, Garut, Tasikmalaya, Ciamis, Kuningan, Majalengka, dan Indramayu. Kami akan terus menambah lokasi baru sesuai permintaan.
+                    Saat ini RoroJonggrang mendukung seluruh provinsi, kabupaten, dan kecamatan di Indonesia melalui API Wilayah. Anda bisa memilih lokasi secara cascading dari Provinsi → Kabupaten → Kecamatan. total 38 provinsi, 500+ kabupaten, dan 7.000+ kecamatan.
                     {% else %}
-                    Currently RoroJonggrang supports 10 locations in West Java: Kabupaten Bandung, Bandung Barat, Cimahi, Sumedang, Garut, Tasikmalaya, Ciamis, Kuningan, Majalengka, and Indramayu. We will continue to add new locations as requested.
+                    Currently RoroJonggrang supports all provinces, regencies, and districts in Indonesia via the Wilayah API. You can select locations cascading from Province → Regency → District. Total 38 provinces, 500+ regencies, and 7,000+ districts.
                     {% endif %}</p>
                 </div>
             </div>
@@ -151,6 +151,21 @@
             </div>
 
             <!-- FAQ 10 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apa itu Template WhatsApp?{% else %}What are WhatsApp Templates?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Template WhatsApp memungkinkan Anda membuat pesan personal secara otomatis untuk setiap bisnis. Gunakan placeholder seperti {name} (nama bisnis), {phone} (nomor telepon), {address} (alamat), dan {category} (kategori). Anda bisa membuat beberapa template dan melampirkan link yang berbeda. Status pengiriman ditandai dengan centang hijau ✓ di tabel hasil scraping.
+                    {% else %}
+                    WhatsApp Templates allow you to automatically create personalized messages for each business. Use placeholders like {name} (business name), {phone} (phone number), {address} (address), and {category} (category). You can create multiple templates and attach different links. Send status is marked with a green checkmark ✓ in the results table.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 11 -->
             <div class="faq-item fade-in">
                 <button class="faq-question" onclick="toggleFaq(this)">
                     <span>{% if lang == 'id' %}Apakah RoroJonggrang tersedia dalam bahasa Inggris?{% else %}Is RoroJonggrang available in English?{% endif %}</span>

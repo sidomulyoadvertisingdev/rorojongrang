@@ -94,29 +94,37 @@ Password: ********
                     </h3>
                     <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
                         {% if lang == 'id' %}
-                        Buka menu "Scrape Data" dan isi parameter pencarian sesuai kebutuhan Anda.
+                        Buka menu "Scrape Data" dan isi parameter pencarian. Pilih lokasi melalui dropdown cascading Provinsi → Kabupaten → Kecamatan, lalu atur marker dan radius pada peta interaktif.
                         {% else %}
-                        Open the "Scrape Data" menu and fill in search parameters according to your needs.
+                        Open the "Scrape Data" menu and fill in search parameters. Select location through cascading dropdowns Province → Regency → District, then set the marker and radius on the interactive map.
                         {% endif %}
                     </p>
                     <div class="guide-visual">
                         <pre>{% if lang == 'id' %}Keyword:    [toko besi                    ]
-Lokasi:     [Kabupaten Bandung         ▼  ]
-Radius:     [1km] [2km] [5km] [10km] [Semua]
-Kategori:   [Toko Material Bangunan    ▼  ]
+Provinsi:   [Jawa Barat               ▼  ]
+Kabupaten:  [Kabupaten Bandung        ▼  ]
+Kecamatan:  [Cimahi Utara             ▼  ]
+
+Peta Interaktif:
+  📍 Marker: -6.9175, 107.6191
+  ⭕ Radius: 5 km
 
 Contoh kombinasi:
-• "toko besi" di "Kab. Bandung" radius 5km
-• "sekolah" di "Kab. Sumedang" semua area
-• "toko elektronik" di "Kab. Cimahi" radius 2km{% else %}Keyword:    [toko besi                    ]
-Location:   [Kabupaten Bandung         ▼  ]
-Radius:     [1km] [2km] [5km] [10km] [All]
-Category:   [Building Material Store    ▼  ]
+• "toko besi" di Cimahi Utara, radius 5km
+• "sekolah" di Kab. Sumedang, radius 10km
+• "toko elektronik" di Kab. Cimahi, radius 2km{% else %}Keyword:    [toko besi                    ]
+Province:   [Jawa Barat               ▼  ]
+Regency:    [Kabupaten Bandung        ▼  ]
+District:   [Cimahi Utara             ▼  ]
+
+Interactive Map:
+  📍 Marker: -6.9175, 107.6191
+  ⭕ Radius: 5 km
 
 Example combinations:
-• "toko besi" in "Kab. Bandung" radius 5km
-• "sekolah" in "Kab. Sumedang" all areas
-• "toko elektronik" in "Kab. Cimahi" radius 2km{% endif %}</pre>
+• "toko besi" in Cimahi Utara, radius 5km
+• "sekolah" in Kab. Sumedang, radius 10km
+• "toko elektronik" in Kab. Cimahi, radius 2km{% endif %}</pre>
                     </div>
                 </div>
             </div>
@@ -215,6 +223,64 @@ JSON: suitable for API integration, apps
 
 File is saved in your Downloads folder
 with name: toko_besi_kab_bandung_[date].csv{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">6</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Kirim WhatsApp dengan Template{% else %}Send WhatsApp with Templates{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Gunakan fitur Template WhatsApp untuk mengirim pesan personal ke setiap bisnis. Buat template terlebih dahulu di menu "Template WhatsApp", lalu pilih template saat mengirim dari tabel hasil scraping.
+                        {% else %}
+                        Use the WhatsApp Template feature to send personalized messages to each business. Create templates first in the "WhatsApp Templates" menu, then select a template when sending from the results table.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre>{% if lang == 'id' %}1. Buka menu "Template WhatsApp" di sidebar
+2. Klik "Buat Template Baru"
+3. Isi nama template (contoh: "Promosi Toko")
+4. Isi pesan dengan placeholder:
+   Halo {name}! 👋
+   Kami ingin menawarkan layanan untuk
+   bisnis Anda di {address}.
+   Kategori: {category}
+
+5. Tambahkan link (opsional):
+   • Nama: Landing Page
+   • URL: https://example.com/promo
+
+6. Simpan template
+
+→ Di tabel hasil scraping:
+   Klik ikon WhatsApp → pilih template
+   Pesan otomatis terisi dengan data bisnis
+   ✓ Centang hijau = sudah terkirim{% else %}1. Open "WhatsApp Templates" menu in sidebar
+2. Click "Create New Template"
+3. Fill in template name (e.g., "Store Promotion")
+4. Fill in message with placeholders:
+   Hello {name}! 👋
+   We want to offer services for
+   your business in {address}.
+   Category: {category}
+
+5. Add links (optional):
+   • Name: Landing Page
+   • URL: https://example.com/promo
+
+6. Save template
+
+→ In the results table:
+   Click WhatsApp icon → select template
+   Message auto-filled with business data
+   ✓ Green checkmark = already sent{% endif %}</pre>
                     </div>
                 </div>
             </div>

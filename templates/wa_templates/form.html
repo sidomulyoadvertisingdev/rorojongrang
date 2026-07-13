@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if template else 'Buat' }} Template - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:24px;">
+    <a href="{{ url_for('wa_templates.list_templates') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px;">← Kembali ke Templates</a>
+    <h1 style="font-size:24px; font-weight:800; color:var(--text); margin-top:8px;">{{ 'Edit' if template else 'Buat' }} Template WhatsApp</h1>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+    <div>
+        <form method="POST" id="templateForm">
+            <div class="card" style="padding:24px; margin-bottom:16px;">
+                <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:16px;">Detail Template</h2>
+                <div style="margin-bottom:16px;">
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nama Template</label>
+                    <input type="text" name="name" required class="input" placeholder="Contoh: Promo Produk" value="{{ template.name if template else '' }}">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Pesan Template</label>
+                    <textarea name="message" required class="input" rows="6" placeholder="Halo {name}, saya tertarik dengan produk Anda. Kunjungi: {link}" id="messageInput" oninput="updatePreview()">{{ template.message if template else '' }}</textarea>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Gunakan <code>{name}</code>, <code>{phone}</code>, <code>{address}</code>, <code>{link}</code>, atau placeholder custom lainnya</p>
+                </div>
+            </div>
+
+            <div class="card" style="padding:24px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                    <h2 style="font-size:16px; font-weight:700; color:var(--text);">Link</h2>
+                    <button type="button" class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="addLink()">
+                        <svg style="width:14px; height:14px; display:inline; vertical-align:-2px; margin-right:2px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah Link
+                    </button>
+                </div>
+                <div id="links-container">
+                    {% if template %}
+                        {% for link in template.links.all() %}
+                        <div class="link-row" style="display:grid; grid-template-columns:1fr 2fr auto; gap:8px; margin-bottom:8px;">
+                            <input type="text" name="link_name[]" class="input" placeholder="Nama link" value="{{ link.name }}">
+                            <input type="url" name="link_url[]" class="input" placeholder="https://..." value="{{ link.url }}">
+                            <button type="button" class="btn-danger" style="padding:8px;" onclick="this.parentElement.remove()">✕</button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">Link akan dimasukkan ke placeholder <code>{link}</code> dalam pesan</p>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px;">
+                {{ 'Simpan Perubahan' if template else 'Buat Template' }}
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <div class="card" style="padding:24px; position:sticky; top:24px;">
+            <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:16px;">Preview</h2>
+            <div id="preview-box" style="background:rgba(37,211,102,0.06); border:1px solid rgba(37,211,102,0.15); border-radius:12px; padding:16px; font-size:13px; color:var(--text); line-height:1.6; white-space:pre-wrap; min-height:80px;">
+                Ketik pesan di sebelah kiri untuk melihat preview...
+            </div>
+
+            <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--border);">
+                <h3 style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:10px;">Placeholder yang tersedia:</h3>
+                <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{name}</code><span style="color:var(--text-muted);">Nama bisnis</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{phone}</code><span style="color:var(--text-muted);">Nomor telepon</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{address}</code><span style="color:var(--text-muted);">Alamat</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{link}</code><span style="color:var(--text-muted);">Link yang dipilih</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{category}</code><span style="color:var(--text-muted);">Kategori bisnis</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addLink(name, url) {
+    var container = document.getElementById('links-container');
+    var row = document.createElement('div');
+    row.className = 'link-row';
+    row.style.cssText = 'display:grid; grid-template-columns:1fr 2fr auto; gap:8px; margin-bottom:8px;';
+    row.innerHTML = '<input type="text" name="link_name[]" class="input" placeholder="Nama link" value="' + (name || '') + '">' +
+        '<input type="url" name="link_url[]" class="input" placeholder="https://..." value="' + (url || '') + '">' +
+        '<button type="button" class="btn-danger" style="padding:8px;" onclick="this.parentElement.remove()">✕</button>';
+    container.appendChild(row);
+}
+
+function updatePreview() {
+    var msg = document.getElementById('messageInput').value;
+    var preview = msg
+        .replace(/\{name\}/g, '<strong style="color:#25d366;">Nama Bisnis</strong>')
+        .replace(/\{phone\}/g, '<strong style="color:#25d366;">08xxx</strong>')
+        .replace(/\{address\}/g, '<strong style="color:#25d366;">Alamat Bisnis</strong>')
+        .replace(/\{link\}/g, '<strong style="color:#25d366;">https://link-anda.com</strong>')
+        .replace(/\{category\}/g, '<strong style="color:#25d366;">Kategori</strong>')
+        .replace(/\{(\w+)\}/g, '<strong style="color:#25d366;">[$1]</strong>');
+    document.getElementById('preview-box').innerHTML = preview || '<span style="color:var(--text-muted);">Ketik pesan di sebelah kiri untuk melihat preview...</span>';
+}
+</script>
+{% endblock %}

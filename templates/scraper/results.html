@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% block title %}Data {{ task.keyword }} - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+    <div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+            <a href="{{ url_for('scraper.history') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px;">← Kembali</a>
+        </div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text);">{{ task.keyword }}</h1>
+        <p style="color:var(--text-sec); margin-top:2px;">{{ task.location }} · {{ task.created_at.strftime('%d %b %Y %H:%M') }}</p>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+        {% if task.status == 'completed' %}
+        <span class="status-badge" style="background:rgba(16,185,129,0.1); color:#10b981;">Selesai</span>
+        {% elif task.status == 'running' %}
+        <span class="status-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">Berjalan</span>
+        {% elif task.status == 'pending' %}
+        <span class="status-badge" style="background:rgba(245,158,11,0.1); color:#f59e0b;">Menunggu</span>
+        {% else %}
+        <span class="status-badge" style="background:var(--border); color:var(--text-sec);">Gagal</span>
+        {% endif %}
+        <span style="font-size:14px; font-weight:600; color:var(--text);" id="total-count">{{ task.scraped_results }} data</span>
+        <a href="{{ url_for('scraper.download', task_id=task.id, fmt='csv') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px;">↓ CSV</a>
+        <a href="{{ url_for('scraper.download', task_id=task.id, fmt='json') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px;">↓ JSON</a>
+        <button class="btn-danger" style="font-size:12px; padding:6px 12px;" onclick="deleteTask()">Hapus Semua</button>
+    </div>
+</div>
+
+<div id="bulk-toolbar" style="display:none; margin-bottom:16px; padding:12px 20px; border-radius:12px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.15); display:none; align-items:center; justify-content:space-between;">
+    <span style="font-size:13px; font-weight:600; color:#3b82f6;"><span id="selected-count">0</span> data dipilih</span>
+    <button class="btn-danger" style="font-size:12px; padding:6px 14px;" onclick="bulkDelete()">
+        <svg style="width:14px; height:14px; display:inline; vertical-align:-2px; margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Hapus Terpilih
+    </button>
+</div>
+
+<div class="card" style="padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+    <svg style="width:18px; height:18px; color:var(--text-muted); min-width:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <input type="text" id="search-box" class="input" placeholder="Cari nama, telepon, alamat, kategori..." style="border:none; padding:0; font-size:14px; background:transparent;" oninput="debounceSearch()">
+    <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;" id="search-count"></span>
+</div>
+
+<div class="card" style="overflow:hidden;">
+    <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                    <th style="padding:12px 12px 12px 16px; width:40px;">
+                        <input type="checkbox" id="select-all" style="accent-color:#10b981; width:15px; height:15px; cursor:pointer;" onchange="toggleSelectAll(this)">
+                    </th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Nama</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Telepon</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Rating</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Alamat</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Kategori</th>
+                    <th style="padding:12px 16px; text-align:center; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; width:120px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <tr>
+                    <td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">
+                        <div id="loading-indicator">Memuat data...</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="padding:12px 16px; border-top:1px solid var(--border); display:none; align-items:center; justify-content:space-between;" id="pagination-bar">
+        <span style="font-size:12px; color:var(--text-muted);" id="page-info"></span>
+        <div style="display:flex; gap:6px;">
+            <button class="btn-secondary" style="font-size:12px; padding:5px 12px;" id="btn-prev" onclick="changePage(-1)" disabled>Sebelumnya</button>
+            <button class="btn-secondary" style="font-size:12px; padding:5px 12px;" id="btn-next" onclick="changePage(1)" disabled>Selanjutnya</button>
+        </div>
+    </div>
+</div>
+
+{% if task.status == 'running' or task.status == 'pending' %}
+<div style="margin-top:16px; padding:12px 16px; border-radius:10px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.15); display:flex; align-items:center; gap:8px;">
+    <div style="width:8px; height:8px; border-radius:50%; background:#3b82f6; animation:pulse 1.5s infinite;"></div>
+    <span style="font-size:13px; color:#3b82f6; font-weight:500;">Scraping sedang berjalan — data akan otomatis muncul di tabel</span>
+</div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}</style>
+{% endif %}
+
+<style>
+    .biz-rating { display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; }
+    .biz-rating .star { color:#f59e0b; }
+    .action-btn { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; font-size:14px; text-decoration:none; transition:all .2s; }
+    .action-wa { background:rgba(37,211,102,0.1); color:#25d366; }
+    .action-wa:hover { background:rgba(37,211,102,0.2); }
+    .action-maps { background:rgba(59,130,246,0.1); color:#3b82f6; }
+    .action-maps:hover { background:rgba(59,130,246,0.2); }
+    .action-web { background:rgba(139,92,246,0.1); color:#8b5cf6; }
+    .action-web:hover { background:rgba(139,92,246,0.2); }
+    .action-disabled { opacity:.3; pointer-events:none; }
+    .row-check { accent-color:#10b981; width:15px; height:15px; cursor:pointer; }
+    tr.row-selected { background:rgba(16,185,129,0.06) !important; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const TASK_ID = {{ task.id }};
+const TASK_STATUS = '{{ task.status }}';
+let currentPage = 1;
+let currentSearch = '';
+let selectedIds = new Set();
+let allLoadedIds = [];
+let waTemplates = [];
+let waClicks = {};
+
+function loadWaData() {
+    fetch('/api/task/' + TASK_ID + '/wa-data').then(r => r.json()).then(data => {
+        waTemplates = data.templates || [];
+        waClicks = {};
+        (data.clicks || []).forEach(function(c) {
+            if (!waClicks[c.business_id]) waClicks[c.business_id] = [];
+            waClicks[c.business_id].push(c);
+        });
+    }).catch(function() {});
+}
+
+function fetchBusinesses(page, search) {
+    let url = '/api/task/' + TASK_ID + '/businesses?page=' + page;
+    if (search) url += '&q=' + encodeURIComponent(search);
+
+    fetch(url).then(r => r.json()).then(data => {
+        renderTable(data.businesses, data.total, page, data.pages);
+        document.getElementById('search-count').textContent = data.total + ' data';
+        document.getElementById('total-count').textContent = data.total + ' data';
+    }).catch(() => {
+        document.getElementById('results-body').innerHTML = '<tr><td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">Gagal memuat data</td></tr>';
+    });
+}
+
+function normalizePhone(phone) {
+    var digits = (phone || '').replace(/[^0-9]/g, '');
+    if (digits.startsWith('62')) return digits;
+    if (digits.startsWith('0')) return '62' + digits.substring(1);
+    if (digits.length >= 10) return '62' + digits;
+    return '';
+}
+
+function processTemplate(template, business, linkUrl) {
+    var msg = template.message;
+    msg = msg.replace(/\{name\}/g, business.name || '');
+    msg = msg.replace(/\{phone\}/g, business.phone || '');
+    msg = msg.replace(/\{address\}/g, business.address || '');
+    msg = msg.replace(/\{category\}/g, business.category || '');
+    msg = msg.replace(/\{link\}/g, linkUrl || '');
+    return msg;
+}
+
+function renderTable(biz, total, page, pages) {
+    const tbody = document.getElementById('results-body');
+    if (!biz || biz.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">Tidak ada data</td></tr>';
+        document.getElementById('pagination-bar').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('pagination-bar').style.display = 'flex';
+    document.getElementById('page-info').textContent = 'Hal ' + page + ' dari ' + pages + ' (' + total + ' data)';
+    document.getElementById('btn-prev').disabled = (page <= 1);
+    document.getElementById('btn-next').disabled = (page >= pages);
+
+    allLoadedIds = biz.map(function(b) { return b.id; });
+
+    let html = '';
+    biz.forEach(function(b) {
+        var waNum = normalizePhone(b.phone);
+        var clicks = waClicks[b.id] || [];
+        var hasClicked = clicks.length > 0;
+        var mapsLink = b.google_maps_url || '';
+        var webLink = b.website || '';
+        var rating = b.rating ? '<span class="biz-rating"><span class="star">★</span>' + b.rating + '</span>' : '<span style="color:var(--text-muted);">-</span>';
+        var checked = selectedIds.has(b.id) ? 'checked' : '';
+        var rowClass = selectedIds.has(b.id) ? 'row-selected' : '';
+
+        var waBtn = '';
+        if (!waNum || waTemplates.length === 0) {
+            waBtn = '<span class="action-btn action-wa action-disabled" title="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>';
+        } else if (waTemplates.length === 1) {
+            var t = waTemplates[0];
+            var links = t.links || [];
+            var msg = processTemplate(t, b, links.length > 0 ? links[0].url : '');
+            var waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
+            var title = hasClicked ? 'WhatsApp (sudah dikirim)' : 'WhatsApp';
+            var style = hasClicked ? 'background:rgba(16,185,129,0.15); color:#10b981;' : '';
+            waBtn = '<a href="' + waLink + '" target="_blank" class="action-btn action-wa" title="' + title + '" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + (links.length > 0 ? links[0].id : 'null') + ',\'' + escHtml(b.phone || '') + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>';
+        } else {
+            var dropdownId = 'wa-drop-' + b.id;
+            var clickDetail = '';
+            if (hasClicked) {
+                var last = clicks[clicks.length - 1];
+                clickDetail = ' via ' + (last.template_name || '') + ' - ' + (last.clicked_at ? new Date(last.clicked_at).toLocaleDateString('id-ID') : '');
+            }
+            var badge = hasClicked ? '<span style="position:absolute; top:-4px; right:-4px; width:10px; height:10px; border-radius:50%; background:#10b981; border:2px solid var(--card-bg);"></span>' : '';
+            var titleAttr = hasClicked ? ' title="Sudah dikirim' + escHtml(clickDetail) + '"' : ' title="Pilih template"';
+            waBtn = '<div style="position:relative; display:inline-block;">' + badge +
+                '<button' + titleAttr + ' class="action-btn action-wa" style="cursor:pointer; border:none; padding:0;" onclick="event.preventDefault(); toggleWaDropdown(\'' + dropdownId + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>' +
+                '<div id="' + dropdownId + '" style="display:none; position:absolute; right:0; top:100%; margin-top:4px; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:50; min-width:200px; padding:6px;">' +
+                waTemplates.map(function(t) {
+                    var links = t.links || [];
+                    if (links.length <= 1) {
+                        var linkUrl = links.length > 0 ? links[0].url : '';
+                        var msg = processTemplate(t, b, linkUrl);
+                        var waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
+                        var linkId = links.length > 0 ? links[0].id : 'null';
+                        return '<a href="' + waLink + '" target="_blank" style="display:block; padding:8px 12px; font-size:12px; color:var(--text); border-radius:6px; text-decoration:none; transition:background .15s;" onmouseover="this.style.background=\'var(--accent-light)\'" onmouseout="this.style.background=\'transparent\'" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + linkId + ',\'' + escHtml(b.phone || '') + '\')">' + escHtml(t.name) + '</a>';
+                    } else {
+                        return '<button onclick="showLinkPicker(' + b.id + ',' + t.id + ',' + waNum + ',\'' + escHtml(b.phone || '') + '\')" style="display:block; width:100%; text-align:left; padding:8px 12px; font-size:12px; color:var(--text); border:none; background:none; border-radius:6px; cursor:pointer; transition:background .15s;" onmouseover="this.style.background=\'var(--accent-light)\'" onmouseout="this.style.background=\'transparent\'">' + escHtml(t.name) + ' <span style="color:var(--text-muted);">(' + links.length + ' link)</span></button>';
+                    }
+                }).join('') +
+                '</div></div>';
+        }
+
+        var checkmark = '';
+        if (hasClicked) {
+            var lastClick = clicks[clicks.length - 1];
+            var tip = 'Terkirim via ' + (lastClick.template_name || '-') + (lastClick.link_name ? ' - ' + lastClick.link_name : '') + (lastClick.clicked_at ? ' (' + new Date(lastClick.clicked_at).toLocaleDateString('id-ID') + ')' : '');
+            checkmark = '<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(16,185,129,0.15); color:#10b981; font-size:11px; margin-left:4px; cursor:help;" title="' + escHtml(tip) + '">✓</span>';
+        }
+
+        html += '<tr class="' + rowClass + '" style="border-bottom:1px solid var(--border-light); transition:background .2s;" onmouseover="if(!this.classList.contains(\'row-selected\'))this.style.background=\'var(--accent-light)\'" onmouseout="if(!this.classList.contains(\'row-selected\'))this.style.background=\'transparent\'">';
+        html += '<td style="padding:10px 12px 10px 16px;"><input type="checkbox" class="row-check" data-id="' + b.id + '" ' + checked + ' onchange="toggleSelect(' + b.id + ', this)"></td>';
+        html += '<td style="padding:10px 16px; font-size:13px; font-weight:600; color:var(--text); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.name) + '">' + escHtml(b.name) + '</td>';
+        html += '<td style="padding:10px 16px; font-size:13px; color:var(--text-sec); white-space:nowrap;">' + (b.phone ? escHtml(b.phone) : '<span style="color:var(--text-muted);">-</span>') + checkmark + '</td>';
+        html += '<td style="padding:10px 16px;">' + rating + '</td>';
+        html += '<td style="padding:10px 16px; font-size:12px; color:var(--text-sec); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.address || '') + '">' + escHtml(b.address || '-') + '</td>';
+        html += '<td style="padding:10px 16px; font-size:12px; color:var(--text-sec); white-space:nowrap;">' + escHtml(b.category || '-') + '</td>';
+        html += '<td style="padding:10px 16px; text-align:center;">';
+        html += '<div style="display:flex; gap:4px; justify-content:center;">';
+        html += waBtn;
+        html += '<a href="' + (mapsLink || '#') + '" target="_blank" class="action-btn action-maps ' + (!mapsLink ? 'action-disabled' : '') + '" title="Google Maps"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></a>';
+        html += '<a href="' + (webLink || '#') + '" target="_blank" class="action-btn action-web ' + (!webLink ? 'action-disabled' : '') + '" title="Website"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>';
+        html += '</div></td>';
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    updateToolbar();
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function toggleWaDropdown(id) {
+    document.querySelectorAll('[id^="wa-drop-"]').forEach(function(el) {
+        if (el.id !== id) el.style.display = 'none';
+    });
+    var el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function showLinkPicker(businessId, templateId, waNum, phone) {
+    var t = waTemplates.find(function(t) { return t.id === templateId; });
+    if (!t) return;
+    var links = t.links || [];
+    var b = { name: '[Nama Bisnis]', phone: phone, address: '[Alamat]', category: '[Kategori]' };
+
+    var html = '<div style="position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:100; display:flex; align-items:center; justify-content:center;" onclick="this.remove()">';
+    html += '<div style="background:var(--card-bg); border-radius:16px; padding:24px; max-width:400px; width:90%; box-shadow:0 16px 48px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">';
+    html += '<h3 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:12px;">Pilih Link untuk ' + escHtml(t.name) + '</h3>';
+    links.forEach(function(link) {
+        var msg = processTemplate(t, b, link.url);
+        var waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
+        html += '<a href="' + waLink + '" target="_blank" style="display:block; padding:12px; margin-bottom:8px; border-radius:10px; border:1px solid var(--border); text-decoration:none; transition:all .15s;" onmouseover="this.style.borderColor=\'#25d366\';this.style.background=\'rgba(37,211,102,0.05)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'transparent\'" onclick="recordWaClick(' + businessId + ',' + templateId + ',' + link.id + ',\'' + escHtml(phone) + '\')">';
+        html += '<div style="font-size:13px; font-weight:600; color:var(--text);">' + escHtml(link.name) + '</div>';
+        html += '<div style="font-size:11px; color:var(--text-muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + escHtml(link.url) + '</div>';
+        html += '</a>';
+    });
+    html += '<button onclick="this.closest(\'div[style=fixed]\').remove()" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--text-sec); font-size:13px; cursor:pointer; margin-top:4px;">Batal</button>';
+    html += '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function recordWaClick(businessId, templateId, linkId, phone) {
+    fetch('/api/wa-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_id: businessId, template_id: templateId, link_id: linkId, phone: phone, task_id: TASK_ID })
+    }).then(function() { loadWaData(); }).catch(function() {});
+}
+
+function toggleSelect(id, cb) {
+    if (cb.checked) {
+        selectedIds.add(id);
+        cb.closest('tr').classList.add('row-selected');
+    } else {
+        selectedIds.delete(id);
+        cb.closest('tr').classList.remove('row-selected');
+    }
+    updateToolbar();
+    updateSelectAll();
+}
+
+function toggleSelectAll(cb) {
+    const checkboxes = document.querySelectorAll('.row-check');
+    checkboxes.forEach(function(c) {
+        const id = parseInt(c.dataset.id);
+        c.checked = cb.checked;
+        if (cb.checked) {
+            selectedIds.add(id);
+            c.closest('tr').classList.add('row-selected');
+        } else {
+            selectedIds.delete(id);
+            c.closest('tr').classList.remove('row-selected');
+        }
+    });
+    updateToolbar();
+}
+
+function updateSelectAll() {
+    const all = document.querySelectorAll('.row-check');
+    const sel = document.querySelectorAll('.row-check:checked');
+    const selectAll = document.getElementById('select-all');
+    selectAll.checked = all.length > 0 && all.length === sel.length;
+    selectAll.indeterminate = sel.length > 0 && sel.length < all.length;
+}
+
+function updateToolbar() {
+    const toolbar = document.getElementById('bulk-toolbar');
+    const count = selectedIds.size;
+    document.getElementById('selected-count').textContent = count;
+    toolbar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+function bulkDelete() {
+    const count = selectedIds.size;
+    if (!count) return;
+    if (!confirm('Hapus ' + count + ' data yang dipilih?')) return;
+
+    const ids = Array.from(selectedIds);
+    fetch('/api/businesses/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: ids })
+    }).then(r => r.json()).then(data => {
+        selectedIds.clear();
+        updateToolbar();
+        fetchBusinesses(currentPage, currentSearch);
+    });
+}
+
+function changePage(delta) {
+    currentPage = currentPage + delta;
+    if (currentPage < 1) currentPage = 1;
+    fetchBusinesses(currentPage, currentSearch);
+}
+
+let searchTimeout;
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function() {
+        currentSearch = document.getElementById('search-box').value.trim();
+        currentPage = 1;
+        selectedIds.clear();
+        updateToolbar();
+        fetchBusinesses(currentPage, currentSearch);
+    }, 300);
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('[id^="wa-drop-"]') && !e.target.closest('.action-btn.action-wa')) {
+        document.querySelectorAll('[id^="wa-drop-"]').forEach(function(el) { el.style.display = 'none'; });
+    }
+});
+
+loadWaData();
+fetchBusinesses(1, '');
+
+let eventSource = null;
+let tableRefreshTimeout = null;
+let sseRetryCount = 0;
+const SSE_MAX_RETRIES = 10;
+
+function startSSE() {
+    if (TASK_STATUS === 'completed' || TASK_STATUS === 'failed' || TASK_STATUS === 'cancelled') return;
+
+    eventSource = new EventSource('/api/task/' + TASK_ID + '/progress');
+
+    eventSource.onopen = function() {
+        sseRetryCount = 0;
+        hideSSEError();
+    };
+
+    eventSource.onmessage = function(event) {
+        try {
+            var data = JSON.parse(event.data);
+
+            if (data.status) updateStatusBadge(data.status);
+
+            if (data.scraped_results !== undefined) {
+                document.getElementById('total-count').textContent = data.scraped_results + ' data';
+            }
+
+            clearTimeout(tableRefreshTimeout);
+            tableRefreshTimeout = setTimeout(function() {
+                fetchBusinesses(currentPage, currentSearch);
+            }, 3000);
+
+            if (data.status === 'completed' || data.status === 'failed' || data.status === 'cancelled') {
+                fetchBusinesses(currentPage, currentSearch);
+                eventSource.close();
+                eventSource = null;
+                hideProgressBanner();
+            }
+        } catch(e) {
+            console.error('SSE parse error:', e);
+        }
+    };
+
+    eventSource.onerror = function() {
+        console.warn('SSE connection error, retry ' + (sseRetryCount + 1) + '/' + SSE_MAX_RETRIES);
+        if (eventSource) { eventSource.close(); eventSource = null; }
+        sseRetryCount++;
+        if (sseRetryCount >= SSE_MAX_RETRIES) {
+            showSSEError();
+            return;
+        }
+        setTimeout(startSSE, 3000);
+    };
+}
+
+function showSSEError() {
+    var existing = document.getElementById('sse-error');
+    if (existing) return;
+    var div = document.createElement('div');
+    div.id = 'sse-error';
+    div.style.cssText = 'margin-top:16px; padding:12px 16px; border-radius:10px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.15); display:flex; align-items:center; gap:8px;';
+    div.innerHTML = '<div style="width:8px; height:8px; border-radius:50%; background:#ef4444;"></div><span style="font-size:13px; color:#ef4444; font-weight:500;">Koneksi real-time terputus. <a href="javascript:location.reload()" style="color:#ef4444; text-decoration:underline;">Muat ulang</a> untuk melihat data terbaru.</span>';
+    document.querySelector('.card').parentNode.insertBefore(div, document.querySelector('.card').nextSibling);
+}
+
+function hideSSEError() {
+    var el = document.getElementById('sse-error');
+    if (el) el.remove();
+}
+
+function updateStatusBadge(status) {
+    var badge = document.querySelector('.status-badge');
+    if (!badge) return;
+    var map = {
+        completed:  { bg: 'rgba(16,185,129,0.1)', color: '#10b981', text: 'Selesai' },
+        running:    { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', text: 'Berjalan' },
+        pending:    { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', text: 'Menunggu' },
+        failed:     { bg: 'var(--border)', color: 'var(--text-sec)', text: 'Gagal' },
+        cancelled:  { bg: 'var(--border)', color: 'var(--text-sec)', text: 'Dibatalkan' },
+    };
+    var s = map[status] || map.failed;
+    badge.style.background = s.bg;
+    badge.style.color = s.color;
+    badge.textContent = s.text;
+}
+
+function hideProgressBanner() {
+    var banners = document.querySelectorAll('div[style]');
+    banners.forEach(function(el) {
+        if (el.textContent.indexOf('Scraping sedang berjalan') !== -1) {
+            el.style.display = 'none';
+        }
+    });
+}
+
+startSSE();
+
+function deleteTask() {
+    if (!confirm('Hapus data scraping "{{ task.keyword }}" di "{{ task.location }}"? Semua data hasil scraping akan dihapus.')) return;
+    fetch('/scrape/' + TASK_ID + '/delete', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'deleted') {
+                localStorage.removeItem('activeTaskId');
+                window.location.href = '/history';
+            }
+        });
+}
+</script>
+{% endblock %}

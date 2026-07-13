@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Scraping - RoroJonggrang{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
 <div style="margin-bottom:32px;">
     <h1 style="font-size:24px; font-weight:800; color:var(--text);">Scraping Baru</h1>
     <p style="color:var(--text-sec); margin-top:4px;">Masukkan keyword dan lokasi untuk mulai scraping data dari Google Maps</p>
 </div>
 
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-    <!-- Left: Form + Terminal -->
     <div style="display:flex; flex-direction:column; gap:24px;">
-        <!-- Form Card -->
         <div class="card" style="padding:28px;">
             <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
                 <span style="width:28px; height:28px; border-radius:8px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">🔍</span>
@@ -20,15 +20,38 @@
                     <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Keyword Pencarian</label>
                     <input type="text" name="keyword" id="keyword" required class="input" placeholder="Contoh: toko besi, sekolah, PT manufacturing">
                 </div>
+
                 <div>
-                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Lokasi Target</label>
-                    <select name="location" id="location" required class="input">
-                        <option value="">Pilih lokasi...</option>
-                        {% for loc in locations %}
-                        <option value="{{ loc }}">{{ loc }}</option>
-                        {% endfor %}
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Negara</label>
+                    <select name="country" id="country" class="input">
+                        <option value="Indonesia" selected>Indonesia</option>
                     </select>
                 </div>
+
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Provinsi</label>
+                    <select name="province" id="province" class="input" disabled>
+                        <option value="">Pilih provinsi...</option>
+                    </select>
+                    <div id="province-loading" style="display:none; font-size:11px; color:var(--text-sec); margin-top:4px;">Memuat provinsi...</div>
+                </div>
+
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Kabupaten / Kota</label>
+                    <select name="regency" id="regency" class="input" disabled>
+                        <option value="">Pilih kabupaten/kota...</option>
+                    </select>
+                    <div id="regency-loading" style="display:none; font-size:11px; color:var(--text-sec); margin-top:4px;">Memuat kabupaten/kota...</div>
+                </div>
+
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Kecamatan</label>
+                    <select name="district" id="district" class="input" disabled>
+                        <option value="">Pilih kecamatan...</option>
+                    </select>
+                    <div id="district-loading" style="display:none; font-size:11px; color:var(--text-sec); margin-top:4px;">Memuat kecamatan...</div>
+                </div>
+
                 <div>
                     <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Kategori (Opsional)</label>
                     <select name="category" id="category" class="input">
@@ -38,35 +61,21 @@
                         {% endfor %}
                     </select>
                 </div>
+
                 <div>
-                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:8px;">Radius Pencarian</label>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;" id="radius-group">
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="1" style="display:none;">
-                            <span class="radius-btn" data-v="1">1 km</span>
-                        </label>
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="2" style="display:none;">
-                            <span class="radius-btn" data-v="2">2 km</span>
-                        </label>
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="5" checked style="display:none;">
-                            <span class="radius-btn active" data-v="5">5 km</span>
-                        </label>
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="10" style="display:none;">
-                            <span class="radius-btn" data-v="10">10 km</span>
-                        </label>
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="20" style="display:none;">
-                            <span class="radius-btn" data-v="20">20 km</span>
-                        </label>
-                        <label style="cursor:pointer;">
-                            <input type="radio" name="radius" value="0" style="display:none;">
-                            <span class="radius-btn" data-v="0">Semua</span>
-                        </label>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Radius Pencarian</label>
+                    <div style="border-radius:12px; overflow:hidden; border:1.5px solid var(--border);" id="map-container">
+                        <div id="radius-map" style="height:300px; width:100%; background:#1a1f2e;"></div>
                     </div>
+                    <div style="display:flex; align-items:center; gap:12px; margin-top:10px;">
+                        <input type="range" id="radius-slider" min="1" max="20" value="5" step="1" style="flex:1; accent-color:var(--accent);">
+                        <span id="radius-label" style="font-size:14px; font-weight:700; color:var(--text); min-width:55px; text-align:right;">5 km</span>
+                    </div>
+                    <input type="hidden" name="radius" id="radius-input" value="5">
+                    <input type="hidden" name="center_lat" id="center_lat" value="">
+                    <input type="hidden" name="center_lng" id="center_lng" value="">
                 </div>
+
                 <button type="submit" id="btn-scrape" class="btn-primary" style="width:100%; justify-content:center; padding:12px;">
                     <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     Mulai Scraping
@@ -74,7 +83,6 @@
             </form>
         </div>
 
-        <!-- Terminal Card -->
         <div id="progress-section" class="card" style="display:none; overflow:hidden;">
             <div style="background:#161b22; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #30363d;">
                 <div style="display:flex; align-items:center; gap:8px;">
@@ -89,7 +97,6 @@
                 <div style="color:#8b949e;">$ rorojonggrang scrape <span id="term-cmd"></span></div>
                 <div id="term-output" style="margin-top:8px;"></div>
             </div>
-            <!-- Progress bar inside terminal -->
             <div style="background:#161b22; padding:16px 20px; border-top:1px solid #30363d;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                     <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;" id="term-status">Memulai...</span>
@@ -107,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Right: Stats + Tips -->
     <div style="display:flex; flex-direction:column; gap:24px;">
         <div class="card" style="padding:28px;">
             <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
@@ -150,11 +156,11 @@
                 </li>
                 <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
                     <span style="color:var(--accent); font-weight:700;">→</span>
-                    Scraping membutuhkan waktu 3-10 menit per task
+                    Klik pada peta untuk menentukan pusat pencarian
                 </li>
                 <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
                     <span style="color:var(--accent); font-weight:700;">→</span>
-                    Data akan otomatis tersimpan ke database
+                    Scraping membutuhkan waktu 3-10 menit per task
                 </li>
             </ul>
         </div>
@@ -162,157 +168,301 @@
 </div>
 
 <style>
-    .radius-btn {
-        display:inline-block; padding:8px 18px; border-radius:10px;
-        border:1.5px solid var(--border); background:var(--bg-card); color:var(--text-sec);
-        font-size:13px; font-weight:600; cursor:pointer; transition:all .2s;
-    }
-    .radius-btn:hover { border-color:var(--accent); color:var(--accent); }
-    .radius-btn.active {
-        background:linear-gradient(135deg,var(--grad-start),var(--grad-end));
-        color:#fff; border-color:transparent;
-    }
     #terminal::-webkit-scrollbar { width:6px; }
     #terminal::-webkit-scrollbar-track { background:transparent; }
     #terminal::-webkit-scrollbar-thumb { background:#30363d; border-radius:3px; }
     #terminal::-webkit-scrollbar-thumb:hover { background:#484f58; }
+    .leaflet-control-attribution { font-size:9px !important; }
+    .leaflet-control-attribution a { color:var(--text-sec) !important; }
+    @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let currentTaskId = null;
-let eventSource = null;
-let startTime = null;
+(function() {
+    let currentTaskId = null;
+    let eventSource = null;
+    let startTime = null;
 
-document.querySelectorAll('.radius-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-    });
-});
-
-function termPrint(text, color) {
-    const el = document.getElementById('term-output');
-    const line = document.createElement('div');
-    if (color) line.style.color = color;
-    line.textContent = text;
-    el.appendChild(line);
-    const terminal = document.getElementById('terminal');
-    terminal.scrollTop = terminal.scrollHeight;
-}
-
-document.getElementById('scrape-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('btn-scrape');
-    btn.disabled = true;
-    btn.innerHTML = '<svg style="width:18px;height:18px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memulai...';
-
-    const formData = new FormData(this);
-    const radius = formData.get('radius');
-    const keyword = formData.get('keyword');
-    const location = formData.get('location');
-
-    document.getElementById('progress-section').style.display = 'block';
-    document.getElementById('term-cmd').textContent = '--keyword "' + keyword + '" --location "' + location + '"' + (radius != '0' ? ' --radius ' + radius + 'km' : '');
-    document.getElementById('term-output').innerHTML = '';
-    termPrint('[Connecting to Google Maps...]', '#8b949e');
-
+    // ===== MAP =====
+    let map, centerMarker, radiusCircle;
     try {
-        const resp = await fetch('/scrape', { method: 'POST', body: formData });
-        const data = await resp.json();
-        if (resp.ok) {
-            currentTaskId = data.task_id;
-            startTime = Date.now();
-            termPrint('[✓] Task #' + data.task_id + ' created', '#3fb950');
-            startSSE(currentTaskId);
-        } else {
-            termPrint('[✗] Error: ' + (data.error || 'Gagal memulai'), '#f85149');
-            btn.disabled = false;
-            btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-        }
-    } catch(err) {
-        termPrint('[✗] Network error: ' + err.message, '#f85149');
-        btn.disabled = false;
-        btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-    }
-});
+        map = L.map('radius-map', { center: [-2.5, 118.0], zoom: 5 });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap', maxZoom: 18
+        }).addTo(map);
 
-function startSSE(taskId) {
-    eventSource = new EventSource('/api/task/' + taskId + '/progress');
-    const barEl = document.getElementById('term-bar');
-    const statusEl = document.getElementById('term-status');
-    const countEl = document.getElementById('term-count');
-    const speedEl = document.getElementById('term-speed');
-    const btnScrape = document.getElementById('btn-scrape');
+        centerMarker = L.marker([-2.5, 118.0], { draggable: true }).addTo(map);
+        radiusCircle = L.circle([-2.5, 118.0], {
+            radius: 5000, color: '#3b82f6', fillColor: '#3b82f6',
+            fillOpacity: 0.12, weight: 2, dashArray: '6, 4'
+        }).addTo(map);
 
-    eventSource.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        const pct = Math.round(data.progress_percent || 0);
-        barEl.style.width = pct + '%';
-        countEl.textContent = data.scraped_results + '/' + data.total_results;
-
-        if (startTime) {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const min = Math.floor(elapsed / 60);
-            const sec = elapsed % 60;
-            speedEl.textContent = min + 'm ' + sec + 's elapsed';
-        }
-
-        if (data.status === 'completed') {
-            statusEl.textContent = '✓ Selesai — ' + data.scraped_results + ' data';
-            statusEl.style.color = '#3fb950';
-            barEl.style.background = '#3fb950';
-            eventSource.close();
-            btnScrape.disabled = false;
-            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-            termPrint('', '');
-            termPrint('[✓] Scraping selesai! ' + data.scraped_results + ' data tersimpan.', '#3fb950');
-            termPrint('', '');
-            const dlCsv = document.createElement('div');
-            dlCsv.innerHTML = '<span style="color:#58a6ff; cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/csv\')">[↓ Download CSV]</span>  <span style="color:#d2a8ff; cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/json\')">[↓ Download JSON]</span>';
-            document.getElementById('term-output').appendChild(dlCsv);
-        } else if (data.status === 'failed') {
-            statusEl.textContent = '✗ Gagal';
-            statusEl.style.color = '#f85149';
-            barEl.style.background = '#f85149';
-            eventSource.close();
-            btnScrape.disabled = false;
-            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-            termPrint('[✗] Error: ' + (data.error_message || 'Unknown error'), '#f85149');
-        } else if (data.status === 'cancelled') {
-            statusEl.textContent = '⊘ Dibatalkan';
-            statusEl.style.color = '#8b949e';
-            eventSource.close();
-            btnScrape.disabled = false;
-            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-            termPrint('[⊘] Task dibatalkan', '#8b949e');
-        } else {
-            statusEl.textContent = 'Berjalan... ' + pct + '%';
-            if (data.current_log) {
-                const log = data.current_log;
-                const parts = log.split('] ');
-                if (parts.length > 1) {
-                    termPrint(log, '#c9d1d9');
-                }
-            }
-        }
-    };
-
-    eventSource.onerror = function() {};
-}
-
-function cancelTask() {
-    if (!currentTaskId) return;
-    fetch('/scrape/' + currentTaskId + '/cancel', { method: 'POST' })
-        .then(r => r.json())
-        .then(data => {
-            if (data.status === 'cancelled') {
-                document.getElementById('term-status').textContent = '⊘ Dibatalkan';
-                document.getElementById('term-status').style.color = '#8b949e';
-            }
+        centerMarker.on('drag', function(e) {
+            var ll = e.target.getLatLng();
+            document.getElementById('center_lat').value = ll.lat.toFixed(6);
+            document.getElementById('center_lng').value = ll.lng.toFixed(6);
+            radiusCircle.setLatLng(ll);
         });
-}
+
+        centerMarker.on('dragend', function(e) {
+            var ll = e.target.getLatLng();
+            document.getElementById('center_lat').value = ll.lat.toFixed(6);
+            document.getElementById('center_lng').value = ll.lng.toFixed(6);
+        });
+
+        map.on('click', function(e) {
+            centerMarker.setLatLng(e.latlng);
+            radiusCircle.setLatLng(e.latlng);
+            document.getElementById('center_lat').value = e.latlng.lat.toFixed(6);
+            document.getElementById('center_lng').value = e.latlng.lng.toFixed(6);
+        });
+
+        document.getElementById('radius-slider').addEventListener('input', function() {
+            var km = parseInt(this.value);
+            radiusCircle.setRadius(km * 1000);
+            document.getElementById('radius-input').value = km;
+            document.getElementById('radius-label').textContent = km + ' km';
+        });
+
+        setTimeout(function() { map.invalidateSize(); }, 300);
+    } catch(e) {
+        console.error('Map init error:', e);
+    }
+
+    function setMapCenter(lat, lng) {
+        if (!map) return;
+        map.setView([lat, lng], 12);
+        centerMarker.setLatLng([lat, lng]);
+        radiusCircle.setLatLng([lat, lng]);
+        document.getElementById('center_lat').value = lat.toFixed(6);
+        document.getElementById('center_lng').value = lng.toFixed(6);
+    }
+
+    // ===== CASCADING DROPDOWNS =====
+    var provinceSelect = document.getElementById('province');
+    var regencySelect = document.getElementById('regency');
+    var districtSelect = document.getElementById('district');
+
+    function showLoading(id, show) {
+        document.getElementById(id).style.display = show ? 'block' : 'none';
+    }
+
+    function resetSelect(el, placeholder) {
+        el.innerHTML = '<option value="">' + placeholder + '</option>';
+        el.disabled = true;
+    }
+
+    function populateSelect(el, items) {
+        el.innerHTML = '<option value="">Pilih...</option>';
+        items.forEach(function(item) {
+            var opt = document.createElement('option');
+            opt.value = item.name;
+            opt.textContent = item.name;
+            opt.dataset.code = item.code;
+            el.appendChild(opt);
+        });
+        el.disabled = false;
+    }
+
+    function loadProvinces() {
+        showLoading('province-loading', true);
+        resetSelect(provinceSelect, 'Pilih provinsi...');
+        fetch('/api/wilayah/provinces')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.data && data.data.length > 0) {
+                    populateSelect(provinceSelect, data.data);
+                } else {
+                    console.error('No provinces data:', data);
+                }
+            })
+            .catch(function(e) { console.error('Gagal memuat provinsi:', e); })
+            .finally(function() { showLoading('province-loading', false); });
+    }
+
+    function loadRegencies(code) {
+        showLoading('regency-loading', true);
+        resetSelect(regencySelect, 'Pilih kabupaten/kota...');
+        resetSelect(districtSelect, 'Pilih kecamatan...');
+        fetch('/api/wilayah/regencies/' + code)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.data && data.data.length > 0) {
+                    populateSelect(regencySelect, data.data);
+                }
+            })
+            .catch(function(e) { console.error('Gagal memuat kabupaten:', e); })
+            .finally(function() { showLoading('regency-loading', false); });
+    }
+
+    function loadDistricts(code) {
+        showLoading('district-loading', true);
+        resetSelect(districtSelect, 'Pilih kecamatan...');
+        fetch('/api/wilayah/districts/' + code)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.data && data.data.length > 0) {
+                    populateSelect(districtSelect, data.data);
+                }
+            })
+            .catch(function(e) { console.error('Gagal memuat kecamatan:', e); })
+            .finally(function() { showLoading('district-loading', false); });
+    }
+
+    function geocodeAndCenter(query) {
+        fetch('/api/wilayah/geocode?q=' + encodeURIComponent(query))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.lat && data.lng) setMapCenter(data.lat, data.lng);
+            })
+            .catch(function(e) { console.error('Geocode gagal:', e); });
+    }
+
+    provinceSelect.addEventListener('change', function() {
+        var code = this.options[this.selectedIndex].dataset.code;
+        if (code) {
+            loadRegencies(code);
+            if (this.value) geocodeAndCenter(this.value);
+        } else {
+            resetSelect(regencySelect, 'Pilih kabupaten/kota...');
+            resetSelect(districtSelect, 'Pilih kecamatan...');
+        }
+    });
+
+    regencySelect.addEventListener('change', function() {
+        var code = this.options[this.selectedIndex].dataset.code;
+        if (code) {
+            loadDistricts(code);
+            if (this.value && provinceSelect.value) geocodeAndCenter(this.value + ', ' + provinceSelect.value);
+        } else {
+            resetSelect(districtSelect, 'Pilih kecamatan...');
+        }
+    });
+
+    districtSelect.addEventListener('change', function() {
+        if (this.value && regencySelect.value && provinceSelect.value) {
+            geocodeAndCenter(this.value + ', ' + regencySelect.value + ', ' + provinceSelect.value);
+        }
+    });
+
+    loadProvinces();
+
+    // ===== TERMINAL =====
+    function termPrint(text, color) {
+        var el = document.getElementById('term-output');
+        var line = document.createElement('div');
+        if (color) line.style.color = color;
+        line.textContent = text;
+        el.appendChild(line);
+        document.getElementById('terminal').scrollTop = document.getElementById('terminal').scrollHeight;
+    }
+
+    document.getElementById('scrape-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!provinceSelect.value) { alert('Provinsi harus dipilih!'); return; }
+        if (!regencySelect.value) { alert('Kabupaten/Kota harus dipilih!'); return; }
+
+        var btn = document.getElementById('btn-scrape');
+        btn.disabled = true;
+        btn.innerHTML = '<svg style="width:18px;height:18px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memulai...';
+
+        var formData = new FormData(this);
+        var radius = formData.get('radius');
+        var keyword = formData.get('keyword');
+        var locationLabel = [districtSelect.value, regencySelect.value, provinceSelect.value].filter(Boolean).join(', ');
+
+        document.getElementById('progress-section').style.display = 'block';
+        document.getElementById('term-cmd').textContent = '--keyword "' + keyword + '" --location "' + locationLabel + '"' + (radius != '0' ? ' --radius ' + radius + 'km' : '');
+        document.getElementById('term-output').innerHTML = '';
+        termPrint('[Connecting to Google Maps...]', '#8b949e');
+
+        fetch('/scrape', { method: 'POST', body: formData })
+            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(result) {
+                if (result.ok) {
+                    currentTaskId = result.data.task_id;
+                    startTime = Date.now();
+                    termPrint('[✓] Task #' + result.data.task_id + ' created', '#3fb950');
+                    startSSE(currentTaskId);
+                    if (typeof openPersistentTerminal === 'function') openPersistentTerminal(result.data.task_id);
+                } else {
+                    termPrint('[✗] Error: ' + (result.data.error || 'Gagal memulai'), '#f85149');
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                }
+            })
+            .catch(function(err) {
+                termPrint('[✗] Network error: ' + err.message, '#f85149');
+                btn.disabled = false;
+                btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+            });
+    });
+
+    function startSSE(taskId) {
+        eventSource = new EventSource('/api/task/' + taskId + '/progress');
+        var barEl = document.getElementById('term-bar');
+        var statusEl = document.getElementById('term-status');
+        var countEl = document.getElementById('term-count');
+        var speedEl = document.getElementById('term-speed');
+        var btnScrape = document.getElementById('btn-scrape');
+
+        eventSource.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            var pct = Math.round(data.progress_percent || 0);
+            barEl.style.width = pct + '%';
+            countEl.textContent = data.scraped_results + '/' + data.total_results;
+            if (startTime) {
+                var elapsed = Math.floor((Date.now() - startTime) / 1000);
+                speedEl.textContent = Math.floor(elapsed / 60) + 'm ' + (elapsed % 60) + 's elapsed';
+            }
+            if (data.status === 'completed') {
+                statusEl.textContent = '✓ Selesai — ' + data.scraped_results + ' data';
+                statusEl.style.color = '#3fb950';
+                barEl.style.background = '#3fb950';
+                eventSource.close();
+                btnScrape.disabled = false;
+                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                termPrint('[✓] Scraping selesai! ' + data.scraped_results + ' data tersimpan.', '#3fb950');
+                var dl = document.createElement('div');
+                dl.innerHTML = '<span style="color:#58a6ff;cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/csv\')">[↓ CSV]</span> <span style="color:#d2a8ff;cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/json\')">[↓ JSON]</span>';
+                document.getElementById('term-output').appendChild(dl);
+            } else if (data.status === 'failed') {
+                statusEl.textContent = '✗ Gagal';
+                statusEl.style.color = '#f85149';
+                barEl.style.background = '#f85149';
+                eventSource.close();
+                btnScrape.disabled = false;
+                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                termPrint('[✗] Error: ' + (data.error_message || 'Unknown'), '#f85149');
+            } else if (data.status === 'cancelled') {
+                statusEl.textContent = '⊘ Dibatalkan';
+                statusEl.style.color = '#8b949e';
+                eventSource.close();
+                btnScrape.disabled = false;
+                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                termPrint('[⊘] Task dibatalkan', '#8b949e');
+            } else {
+                statusEl.textContent = 'Berjalan... ' + pct + '%';
+                if (data.current_log && data.current_log.indexOf(']') > -1) termPrint(data.current_log, '#c9d1d9');
+            }
+        };
+        eventSource.onerror = function() {};
+    }
+
+    window.cancelTask = function() {
+        if (!currentTaskId) return;
+        fetch('/scrape/' + currentTaskId + '/cancel', { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.status === 'cancelled') {
+                    document.getElementById('term-status').textContent = '⊘ Dibatalkan';
+                    document.getElementById('term-status').style.color = '#8b949e';
+                }
+            });
+    };
+})();
 </script>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 {% endblock %}

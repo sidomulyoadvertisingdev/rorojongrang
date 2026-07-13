@@ -19,6 +19,19 @@ def extract_phone(text: str) -> str:
     return match.group(0) if match else ""
 
 
+def normalize_phone_for_wa(phone: str) -> str:
+    if not phone:
+        return ""
+    digits = re.sub(r"[^0-9]", "", phone)
+    if digits.startswith("62"):
+        return digits
+    if digits.startswith("0"):
+        return "62" + digits[1:]
+    if digits.startswith("+62"):
+        return digits[1:]
+    return digits
+
+
 def extract_rating(text: str) -> float:
     if not text:
         return 0.0
@@ -41,9 +54,11 @@ RADIUS_ZOOM = {
 }
 
 
-def build_search_url(keyword: str, location: str, radius_km: int = 0) -> str:
+def build_search_url(keyword: str, location: str, radius_km: int = 0, lat: float = 0, lng: float = 0) -> str:
     from config.settings import GOOGLE_MAPS_BASE_URL
     query = f"{keyword} {location}"
     encoded = query.replace(" ", "+")
     zoom = RADIUS_ZOOM.get(radius_km, 14)
+    if lat and lng:
+        return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@{lat},{lng},{zoom}z"
     return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@0,0,{zoom}z"

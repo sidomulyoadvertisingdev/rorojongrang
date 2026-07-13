@@ -23,7 +23,7 @@ class Business(db.Model):
     rating = db.Column(db.Float)
     review_count = db.Column(db.Integer, default=0)
     google_maps_url = db.Column(db.Text)
-    place_id = db.Column(db.String(255), unique=True)
+    place_id = db.Column(db.String(255))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     operating_hours = db.Column(db.Text)
@@ -35,16 +35,21 @@ class Business(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "task_id": self.task_id,
             "name": self.name,
             "category": self.category,
             "address": self.address,
             "phone": self.phone,
             "website": self.website,
+            "email": self.email,
             "rating": self.rating,
             "review_count": self.review_count,
             "google_maps_url": self.google_maps_url,
+            "place_id": self.place_id,
             "latitude": self.latitude,
             "longitude": self.longitude,
             "operating_hours": self.operating_hours,
+            "source_keyword": self.source_keyword,
+            "source_location": self.source_location,
             "scraped_at": self.scraped_at.isoformat() if self.scraped_at else None,
         }

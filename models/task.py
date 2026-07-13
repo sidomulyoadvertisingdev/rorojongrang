@@ -21,6 +21,12 @@ class ScrapingTask(db.Model):
     error_message = db.Column(db.Text)
     celery_task_id = db.Column(db.String(255))
     search_radius = db.Column(db.Integer, default=5)
+    country = db.Column(db.String(100), default="Indonesia")
+    province = db.Column(db.String(100))
+    regency = db.Column(db.String(100))
+    district = db.Column(db.String(100))
+    center_lat = db.Column(db.Float)
+    center_lng = db.Column(db.Float)
     started_at = db.Column(db.DateTime)
     completed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -43,6 +49,12 @@ class ScrapingTask(db.Model):
             "location": self.location,
             "category": self.category,
             "search_radius": self.search_radius,
+            "country": self.country,
+            "province": self.province,
+            "regency": self.regency,
+            "district": self.district,
+            "center_lat": self.center_lat,
+            "center_lng": self.center_lng,
             "status": self.status,
             "total_results": self.total_results,
             "scraped_results": self.scraped_results,

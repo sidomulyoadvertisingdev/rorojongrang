@@ -1,3 +1,4 @@
+import os
 import time
 import random
 from selenium.webdriver.common.by import By
@@ -5,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 
-from config.settings import SCRAPE_CONFIG
+from config.settings import SCRAPE_CONFIG, LOG_DIR
 from utils.rate_limiter import RateLimiter
 from utils.logger import get_logger
 
@@ -17,10 +18,21 @@ class MapNavigator:
         self.driver = driver
         self.rate_limiter = rate_limiter
 
+    def _screenshot(self, name="debug"):
+        try:
+            path = LOG_DIR / f"{name}_{int(time.time())}.png"
+            self.driver.save_screenshot(str(path))
+            logger.info(f"Screenshot saved: {path}")
+        except Exception as e:
+            logger.warning(f"Screenshot failed: {e}")
+
     def open_search(self, url: str) -> bool:
         try:
             logger.info(f"Opening: {url}")
             self.driver.get(url)
+            time.sleep(5)
+            self.handle_consent_dialog()
+            self._screenshot("after_load")
             self.rate_limiter.wait()
             return True
         except Exception as e:
@@ -33,46 +45,77 @@ class MapNavigator:
                 EC.presence_of_element_located((By.CSS_SELECTOR, 'div.Nv2PK, a.hfpxzc, div[role="feed"], div.m6QErb'))
             )
             time.sleep(5)
+            self.handle_consent_dialog()
+            time.sleep(2)
             logger.info("Results loaded")
+            self._screenshot("results_loaded")
             return True
         except TimeoutException:
             logger.warning("Timeout waiting for results")
+            self._screenshot("timeout")
             return False
 
     def get_result_links(self) -> list:
         links = []
-        selectors = [
-            'a.hfpxzc',
-            'a[data-value]',
-            'div.Nv2PK a',
-        ]
-        for selector in selectors:
-            try:
-                elements = self.driver.find_elements(By.CSS_SELECTOR, selector)
-                for el in elements:
-                    href = el.get_attribute("href")
-                    if href and "/maps/place/" in href:
-                        links.append(href)
-                if links:
-                    logger.info(f"Found {len(links)} result links")
-                    return list(set(links))
-            except Exception:
-                continue
 
+        # Retry loop: Google Maps renders <a> tags inside Nv2PK asynchronously
+        for attempt in range(4):
+            links = []
+            try:
+                nv2pk_elements = self.driver.find_elements(By.CSS_SELECTOR, 'div.Nv2PK')
+                logger.info(f"Nv2PK elements: {len(nv2pk_elements)}")
+                for el in nv2pk_elements:
+                    try:
+                        a_tags = el.find_elements(By.TAG_NAME, 'a')
+                        for a in a_tags:
+                            href = a.get_attribute('href')
+                            if href and '/maps/place/' in href:
+                                links.append(href)
+                    except Exception:
+                        continue
+                if links:
+                    links = list(set(links))
+                    logger.info(f"Found {len(links)} result links (Nv2PK, attempt {attempt + 1})")
+                    return links
+            except Exception:
+                pass
+
+            # Fallback: querySelectorAll across whole page
+            try:
+                js_links = self.driver.execute_script("""
+                    var results = [];
+                    var anchors = document.querySelectorAll('a[href*="/maps/place/"]');
+                    anchors.forEach(function(a) { results.push(a.href); });
+                    return results;
+                """)
+                if js_links:
+                    links = list(set(js_links))
+                    logger.info(f"Found {len(links)} result links (JS, attempt {attempt + 1})")
+                    return links
+            except Exception as e:
+                logger.warning(f"JS link extraction failed: {e}")
+
+            if attempt < 3:
+                wait = 2.0 * (attempt + 1)
+                logger.info(f"No links on attempt {attempt + 1}, waiting {wait}s...")
+                time.sleep(wait)
+
+        # Final fallback: all <a> tags
         try:
             all_links = self.driver.find_elements(By.TAG_NAME, "a")
+            logger.info(f"Total <a> tags on page: {len(all_links)}")
             for link in all_links:
                 href = link.get_attribute("href")
                 if href and "/maps/place/" in href:
                     links.append(href)
             if links:
                 links = list(set(links))
-                logger.info(f"Found {len(links)} result links (fallback)")
+                logger.info(f"Found {len(links)} result links (final fallback)")
                 return links
         except Exception:
             pass
 
-        logger.warning("No result links found")
+        logger.warning("No result links found after retries")
         return []
 
     def scroll_results_panel(self) -> int:
@@ -171,24 +214,55 @@ class MapNavigator:
 
     def handle_consent_dialog(self):
         try:
-            consent_selectors = [
-                'button[aria-label*="Accept"]',
-                'button[aria-label*="Setuju"]',
-                'button[aria-label*="Agree"]',
-                'button:has-text("Accept")',
-                'form button',
-            ]
-            for sel in consent_selectors:
+            all_buttons = self.driver.find_elements(By.TAG_NAME, "button")
+            visible_texts = []
+            for btn in all_buttons:
                 try:
-                    btns = self.driver.find_elements(By.CSS_SELECTOR, sel)
-                    for btn in btns:
-                        text = btn.text.lower()
-                        if any(w in text for w in ["accept", "setuju", "agree", "ok"]):
-                            btn.click()
-                            logger.info("Consent dialog dismissed")
-                            time.sleep(1)
-                            return
+                    text = (btn.text or "").strip()
+                    if text and btn.is_displayed():
+                        visible_texts.append(text)
                 except Exception:
-                    continue
-        except Exception:
-            pass
+                    pass
+            logger.info(f"Visible buttons: {visible_texts}")
+
+            has_consent = any("tetap gunakan web" in t.lower() for t in visible_texts)
+            if not has_consent:
+                return
+
+            # Try Escape key first (does not change page state)
+            from selenium.webdriver.common.keys import Keys
+            self.driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+            time.sleep(1)
+            logger.info("Pressed Escape to dismiss consent")
+
+            # Check if consent is gone
+            still_visible = False
+            for btn in self.driver.find_elements(By.TAG_NAME, "button"):
+                try:
+                    text = (btn.text or "").strip().lower()
+                    if btn.is_displayed() and "tetap gunakan web" in text:
+                        still_visible = True
+                        break
+                except Exception:
+                    pass
+
+            if still_visible:
+                # Escape didn't work — click it then reload the page
+                for btn in self.driver.find_elements(By.TAG_NAME, "button"):
+                    try:
+                        text = (btn.text or "").strip().lower()
+                        if btn.is_displayed() and "tetap gunakan web" in text:
+                            current_url = self.driver.current_url
+                            btn.click()
+                            logger.info("Clicked 'Tetap gunakan web'")
+                            time.sleep(2)
+                            self.driver.get(current_url)
+                            time.sleep(5)
+                            logger.info("Reloaded page to restore results")
+                            return
+                    except Exception:
+                        continue
+            else:
+                logger.info("Consent dismissed via Escape")
+        except Exception as e:
+            logger.debug(f"Consent dialog handling error: {e}")

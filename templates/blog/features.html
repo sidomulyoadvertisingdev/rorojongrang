@@ -163,34 +163,137 @@
                 </h2>
                 <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
                     {% if lang == 'id' %}
-                    Tersedia 10 lokasi di Jawa Barat dan 6 kategori bisnis yang berbeda. Dari toko material bangunan hingga sekolah, semuanya bisa di-scrape secara otomatis.
-                    {% else %}Available 10 locations in West Java and 6 different business categories. From building material stores to schools, everything can be scraped automatically.{% endif %}
+                    Tersedia seluruh provinsi, kabupaten, dan kecamatan di Indonesia melalui API Wilayah. Pilih lokasi secara cascading dari Provinsi → Kabupaten → Kecamatan. Dilengkapi lebih dari 20 kategori bisnis yang berbeda.
+                    {% else %}Available all provinces, regencies, and districts in Indonesia via Wilayah API. Select locations cascading from Province → Regency → District. Equipped with more than 20 different business categories.{% endif %}
                 </p>
                 <div style="margin-top: 20px;">
                     <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">{% if lang == 'id' %}LOKASI{% else %}LOCATIONS{% endif %}</div>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Bandung</span>
-                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Bandung Barat</span>
-                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Cimahi</span>
-                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Sumedang</span>
-                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">+ 6 lainnya</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">38 Provinsi</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">500+ Kabupaten</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">7.000+ Kecamatan</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--accent-light); font-size: 12px; color: var(--accent); font-weight: 600;">Seluruh Indonesia ✓</span>
                     </div>
                 </div>
             </div>
             <div class="feature-visual">
-                <div style="color: #8b949e; margin-bottom: 8px;">// Available categories</div>
+                <div style="color: #8b949e; margin-bottom: 8px;">// Available categories (20+)</div>
                 <div class="line-success">🏗  Toko Material Bangunan</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">toko besi, toko cat, toko plumbing...</div>
-                <div class="line-info">🏫  Sekolah</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">SD, SMP, SMA, pesantren...</div>
-                <div class="line-accent">🏢  Perusahaan</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">PT, CV, pabrik, warehouse...</div>
+                <div class="line-info">🏫  Sekolah & Pendidikan</div>
+                <div class="line-accent">🏢  Perusahaan & Kantor</div>
                 <div style="color: #f0883e;">📺  Toko Elektronik</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">handphone, laptop, komputer...</div>
                 <div style="color: #3fb950;">🛋  Toko Furniture</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">mebel, sofa, kitchen set...</div>
                 <div style="color: #d2a8ff;">🏪  Toko Bangunan</div>
-                <div style="padding-left: 24px; color: #c9d1d9;">hardware store, building supply...</div>
+                <div style="color: #f778ba;">🏥  Klinik & Kesehatan</div>
+                <div style="color: #79c0ff;">🍽  Restoran & Cafe</div>
+                <div style="color: #ffa657;">🚗  Otomotif & Bengkel</div>
+                <div style="color: #7ee787;">✂  Salon & Kecantikan</div>
+                <div style="color: #d2a8ff;">+ 10 kategori lainnya...</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cascading Dropdowns -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">📋</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Dropdown Cascading{% else %}Cascading Dropdowns{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Pilih lokasi secara berurutan dari Provinsi → Kabupaten → Kecamatan. Setiap dropdown akan memuat opsi berdasarkan pilihan sebelumnya, memastikan Anda selalu mendapatkan data lokasi yang valid dan akurat dari seluruh Indonesia.
+                    {% else %}Select locations sequentially from Province → Regency → District. Each dropdown loads options based on the previous selection, ensuring you always get valid and accurate location data from across Indonesia.{% endif %}
+                </p>
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">Provinsi ▼</span>
+                    <span style="color: var(--text-muted); font-size: 18px;">→</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">Kabupaten ▼</span>
+                    <span style="color: var(--text-muted); font-size: 18px;">→</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; font-size: 13px; font-weight: 600;">Kecamatan ✓</span>
+                </div>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Cascading location selection</div>
+                <div class="line-info">Provinsi:  [Jawa Barat          ▼]</div>
+                <div style="color: #8b949e;">  ↓ loaded 17 kabupaten</div>
+                <div class="line-accent">Kabupaten: [Kab. Bandung        ▼]</div>
+                <div style="color: #8b949e;">  ↓ loaded 31 kecamatan</div>
+                <div class="line-success">Kecamatan: [Cimahi Utara        ✓]</div>
+                <div style="margin-top: 16px; color: #8b949e;">// API: wilayah-id-restapi.vercel.app</div>
+                <div style="color: #3fb950;">38 Provinsi • 500+ Kabupaten</div>
+                <div style="color: #58a6ff;">7.000+ Kecamatan se-Indonesia</div>
+            </div>
+        </div>
+
+        <!-- Interactive Map -->
+        <div class="feature-row reverse fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">🗺</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Peta Interaktif Leaflet.js{% else %}Leaflet.js Interactive Map{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Gunakan peta interaktif berbasis Leaflet.js dan OpenStreetMap untuk menentukan lokasi pencarian. Geser marker ke lokasi yang diinginkan dan atur radius pencarian secara visual. Koordinat pusat otomatis terisi berdasarkan kecamatan yang dipilih.
+                    {% else %}Use an interactive map powered by Leaflet.js and OpenStreetMap to determine your search location. Drag the marker to your desired location and set the search radius visually. Center coordinates are auto-filled based on the selected district.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Marker draggable (geser ke lokasi target){% else %}Draggable marker (drag to target location){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Lingkaran radius visual (1-20km){% else %}Visual radius circle (1-20km){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Koordinat pusat otomatis dari kecamatan{% else %}Auto center coordinates from district{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Peta OpenStreetMap gratis tanpa API key{% else %}Free OpenStreetMap without API key{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Interactive map preview</div>
+                <div style="width: 100%; height: 200px; border-radius: 8px; background: #e8f4e8; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #d4e8d0 0%, #b8d4b0 50%, #a0c8a0 100%);"></div>
+                    <div style="position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 2px dashed #3b82f6; background: rgba(59,130,246,0.1);"></div>
+                    <div style="position: relative; z-index: 1; background: #ef4444; color: #fff; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;">📍 -6.9175, 107.6191</div>
+                </div>
+                <div style="margin-top: 12px; color: #58a6ff;">Center: -6.9175, 107.6191</div>
+                <div style="color: #f0883e;">Radius: 5 km (14z)</div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Templates -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">💬</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Template WhatsApp{% else %}WhatsApp Templates{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Buat pesan WhatsApp personal secara otomatis untuk setiap bisnis. Gunakan placeholder seperti {name}, {phone}, {address}, dan {category} untuk pesan yang relevan. Kelola beberapa template dan lacak status pengiriman langsung dari tabel hasil scraping.
+                    {% else %}Automatically create personalized WhatsApp messages for each business. Use placeholders like {name}, {phone}, {address}, and {category} for relevant messages. Manage multiple templates and track send status directly from the results table.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Placeholder: {name}, {phone}, {address}, {category}, {link}{% else %}Placeholders: {name}, {phone}, {address}, {category}, {link}{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Beberapa link per template (pilih saat kirim){% else %}Multiple links per template (choose when sending){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Centang hijau ✓ untuk bisnis yang sudah dikirimi{% else %}Green checkmark ✓ for businesses already sent{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Riwayat klik dengan nama template dan tanggal{% else %}Click history with template name and date{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// WhatsApp template example</div>
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #d2a8ff; font-weight: 600;">Template: "Promosi Toko"</div>
+                    <div style="color: #c9d1d9; margin-top: 4px;">Halo {name}! 👋</div>
+                    <div style="color: #c9d1d9;">Kami dari RoroJonggrang ingin menawarkan...</div>
+                    <div style="color: #c9d1d9;">Lokasi: {address}</div>
+                    <div style="color: #c9d1d9;">Kategori: {category}</div>
+                </div>
+                <div style="border-top: 1px solid #30363d; padding-top: 12px;">
+                    <div style="color: #8b949e;">Link 1: <span style="color: #58a6ff;">Landing Page</span></div>
+                    <div style="color: #8b949e;">Link 2: <span style="color: #58a6ff;">WhatsApp Business</span></div>
+                </div>
+                <div style="margin-top: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(16,185,129,0.15); color: #3fb950; font-size: 12px;">✓ Toko Besi Mulya — terkirim via Promosi Toko</div>
+                <div style="margin-top: 4px; padding: 8px 12px; border-radius: 8px; background: rgba(16,185,129,0.15); color: #3fb950; font-size: 12px;">✓ Gudang Besi — terkirim via Promosi Toko</div>
             </div>
         </div>
     </div>
