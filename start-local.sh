@@ -2,12 +2,22 @@
 
 set -e
 
-echo "Starting RoroJonggrang Data Scrape..."
+echo "Starting RoroJonggrang locally..."
 
 if [ -f ".env" ]; then
   set -a
   . ./.env
   set +a
+fi
+
+if [ ! -f ".env" ]; then
+  if [ -f ".env.example" ]; then
+    cp .env.example .env
+    echo "Created .env from .env.example. Please review the values first."
+  else
+    echo "Missing .env and .env.example"
+    exit 1
+  fi
 fi
 
 REDIS_HOST=${REDIS_HOST:-127.0.0.1}
@@ -19,28 +29,25 @@ if command -v nc >/dev/null 2>&1; then
   fi
 fi
 
-echo "[1/3] Redis: $REDIS_HOST:$REDIS_PORT"
-if [ "$REDIS_READY" = true ]; then
-  echo "Redis is reachable"
-else
-  echo "Redis is NOT reachable. Celery/SSE will not work until Redis is started."
-fi
-
-# Start Flask
-echo "[2/3] Starting Flask server on port 5001..."
+echo "[1/2] Starting Flask server on port 5001..."
 PYTHONPATH=$(pwd) python app.py &
 FLASK_PID=$!
 
-# Wait for Flask
 sleep 3
 
-CELERY_PID=""
+if ! kill -0 "$FLASK_PID" >/dev/null 2>&1; then
+  echo "Flask failed to start. Check the traceback above."
+  exit 1
+fi
+
 if [ "$REDIS_READY" = true ]; then
-  echo "[3/3] Starting Celery worker..."
+  echo "[2/2] Starting Celery worker..."
   PYTHONPATH=$(pwd) celery -A celery_worker.celery worker --loglevel=info &
   CELERY_PID=$!
 else
-  echo "[3/3] Skipping Celery worker because Redis is offline"
+  echo "[2/2] Redis is not reachable on $REDIS_HOST:$REDIS_PORT"
+  echo "Celery will be skipped for now. Start Redis first, then rerun this script."
+  CELERY_PID=""
 fi
 
 echo ""
@@ -49,7 +56,6 @@ echo "  RoroJonggrang Data Scrape is running!    "
 echo "============================================"
 echo ""
 echo "  Web App:  http://localhost:5001"
-echo "  Redis:    $REDIS_HOST:$REDIS_PORT"
 if [ -n "$CELERY_PID" ]; then
   echo "  Celery:   Worker running"
 else

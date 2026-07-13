@@ -118,6 +118,16 @@ class MapNavigator:
         logger.warning("No result links found after retries")
         return []
 
+    def get_result_cards_count(self) -> int:
+        try:
+            cards = self.driver.find_elements(By.CSS_SELECTOR, "div.Nv2PK")
+            count = len([card for card in cards if card.is_displayed()])
+            logger.info(f"Visible result cards: {count}")
+            return count
+        except Exception as e:
+            logger.warning(f"Could not count result cards: {e}")
+            return 0
+
     def scroll_results_panel(self) -> int:
         max_scrolls = SCRAPE_CONFIG["max_scroll_attempts"]
         scroll_count = 0
@@ -145,7 +155,7 @@ class MapNavigator:
                 time.sleep(2)
 
                 current_links = self.get_result_links()
-                current_count = len(current_links)
+                current_count = len(current_links) or self.get_result_cards_count()
 
                 if current_count == last_count and scroll_count > 3:
                     logger.info(f"No new results after scroll {scroll_count}")
@@ -167,7 +177,7 @@ class MapNavigator:
                 logger.error(f"Scroll error: {e}")
                 break
 
-        logger.info(f"Scrolling complete: {scroll_count} scrolls, {last_count} links")
+        logger.info(f"Scrolling complete: {scroll_count} scrolls, {last_count} results")
         return last_count
 
     def _scroll_window(self) -> int:
@@ -182,7 +192,7 @@ class MapNavigator:
                 time.sleep(2)
 
                 current_links = self.get_result_links()
-                current_count = len(current_links)
+                current_count = len(current_links) or self.get_result_cards_count()
 
                 if current_count == last_count and scroll_count > 3:
                     break
@@ -203,10 +213,49 @@ class MapNavigator:
             logger.error(f"Failed to open place: {e}")
             return False
 
+    def open_result_card(self, index: int, timeout: int = 12) -> bool:
+        try:
+            cards = self.driver.find_elements(By.CSS_SELECTOR, "div.Nv2PK")
+            visible_cards = [card for card in cards if card.is_displayed()]
+            if index >= len(visible_cards):
+                logger.warning(f"Result card index out of range: {index}/{len(visible_cards)}")
+                return False
+
+            card = visible_cards[index]
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", card)
+            time.sleep(0.6)
+
+            clicked = False
+            for selector in ["a.hfpxzc", "[role='button']", "[jsaction]", "div[role='article']"]:
+                try:
+                    target = card.find_element(By.CSS_SELECTOR, selector)
+                    self.driver.execute_script("arguments[0].click();", target)
+                    clicked = True
+                    break
+                except Exception:
+                    continue
+
+            if not clicked:
+                self.driver.execute_script("arguments[0].click();", card)
+
+            WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "h1.DUwDvf, h1, button[data-item-id='address'], div[role='main']"))
+            )
+            time.sleep(2)
+            logger.info(f"Opened result card #{index + 1}")
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to open result card #{index + 1}: {e}")
+            self._screenshot("open_card_failed")
+            return False
+
     def go_back_to_results(self) -> bool:
         try:
             self.driver.back()
-            time.sleep(2)
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div.Nv2PK, div[role='feed']"))
+            )
+            time.sleep(1.5)
             return True
         except Exception as e:
             logger.error(f"Failed to go back: {e}")

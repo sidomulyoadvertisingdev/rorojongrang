@@ -8,8 +8,8 @@
     <p style="color:var(--text-sec); margin-top:4px;">Masukkan keyword dan lokasi untuk mulai scraping data dari Google Maps</p>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-    <div style="display:flex; flex-direction:column; gap:24px;">
+<div class="scrape-layout">
+    <div class="scrape-left">
         <div class="card" style="padding:28px;">
             <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
                 <span style="width:28px; height:28px; border-radius:8px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">🔍</span>
@@ -80,41 +80,12 @@
                     <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     Mulai Scraping
                 </button>
+                <div id="scrape-feedback" style="display:none; font-size:13px; color:var(--text-sec); line-height:1.5;"></div>
             </form>
-        </div>
-
-        <div id="progress-section" class="card" style="display:none; overflow:hidden;">
-            <div style="background:#161b22; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #30363d;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="width:12px; height:12px; border-radius:50%; background:#f85149;"></span>
-                    <span style="width:12px; height:12px; border-radius:50%; background:#f0883e;"></span>
-                    <span style="width:12px; height:12px; border-radius:50%; background:#3fb950;"></span>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;">rorojonggrang — scrape</span>
-                <div></div>
-            </div>
-            <div style="background:#0d1117; padding:20px; min-height:350px; max-height:500px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8;" id="terminal">
-                <div style="color:#8b949e;">$ rorojonggrang scrape <span id="term-cmd"></span></div>
-                <div id="term-output" style="margin-top:8px;"></div>
-            </div>
-            <div style="background:#161b22; padding:16px 20px; border-top:1px solid #30363d;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;" id="term-status">Memulai...</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;" id="term-count">0/0</span>
-                </div>
-                <div style="height:6px; background:#21262d; border-radius:100px; overflow:hidden;">
-                    <div id="term-bar" style="height:100%; width:0%; background:linear-gradient(90deg,#3fb950,#58a6ff); border-radius:100px; transition:width .5s ease;"></div>
-                </div>
-                <div style="display:flex; gap:8px; margin-top:12px;">
-                    <button id="btn-cancel" class="btn-danger" onclick="cancelTask()" style="font-size:12px; padding:6px 14px;">Batal</button>
-                    <div style="flex:1;"></div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8b949e;" id="term-speed"></span>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:24px;">
+    <div class="scrape-right">
         <div class="card" style="padding:28px;">
             <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
                 <span style="width:28px; height:28px; border-radius:8px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">📊</span>
@@ -168,13 +139,34 @@
 </div>
 
 <style>
-    #terminal::-webkit-scrollbar { width:6px; }
-    #terminal::-webkit-scrollbar-track { background:transparent; }
-    #terminal::-webkit-scrollbar-thumb { background:#30363d; border-radius:3px; }
-    #terminal::-webkit-scrollbar-thumb:hover { background:#484f58; }
+    .scrape-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+        gap: 24px;
+        align-items: start;
+    }
+    .scrape-left,
+    .scrape-right {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        min-width: 0;
+    }
+    .scrape-right {
+        position: sticky;
+        top: 28px;
+    }
     .leaflet-control-attribution { font-size:9px !important; }
     .leaflet-control-attribution a { color:var(--text-sec) !important; }
     @keyframes spin{to{transform:rotate(360deg)}}
+    @media (max-width: 1100px) {
+        .scrape-layout {
+            grid-template-columns: 1fr;
+        }
+        .scrape-right {
+            position: static;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -182,10 +174,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function() {
-    let currentTaskId = null;
-    let eventSource = null;
-    let startTime = null;
-
     // ===== MAP =====
     let map, centerMarker, radiusCircle;
     try {
@@ -350,14 +338,17 @@
 
     loadProvinces();
 
-    // ===== TERMINAL =====
-    function termPrint(text, color) {
-        var el = document.getElementById('term-output');
-        var line = document.createElement('div');
-        if (color) line.style.color = color;
-        line.textContent = text;
-        el.appendChild(line);
-        document.getElementById('terminal').scrollTop = document.getElementById('terminal').scrollHeight;
+    function setFeedback(message, color) {
+        var feedback = document.getElementById('scrape-feedback');
+        feedback.textContent = message;
+        feedback.style.color = color || 'var(--text-sec)';
+        feedback.style.display = message ? 'block' : 'none';
+    }
+
+    function resetButton() {
+        var btn = document.getElementById('btn-scrape');
+        btn.disabled = false;
+        btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
     }
 
     document.getElementById('scrape-form').addEventListener('submit', function(e) {
@@ -374,95 +365,36 @@
         var keyword = formData.get('keyword');
         var locationLabel = [districtSelect.value, regencySelect.value, provinceSelect.value].filter(Boolean).join(', ');
 
-        document.getElementById('progress-section').style.display = 'block';
-        document.getElementById('term-cmd').textContent = '--keyword "' + keyword + '" --location "' + locationLabel + '"' + (radius != '0' ? ' --radius ' + radius + 'km' : '');
-        document.getElementById('term-output').innerHTML = '';
-        termPrint('[Connecting to Google Maps...]', '#8b949e');
+        setFeedback('Membuat task scraping untuk ' + locationLabel + '...', 'var(--text-sec)');
 
         fetch('/scrape', { method: 'POST', body: formData })
-            .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+            .then(function(r) {
+                return r.text().then(function(text) {
+                    var data;
+                    try {
+                        data = text ? JSON.parse(text) : {};
+                    } catch (err) {
+                        data = { error: text || 'Response tidak valid JSON' };
+                    }
+                    return { ok: r.ok, data: data };
+                });
+            })
             .then(function(result) {
                 if (result.ok) {
-                    currentTaskId = result.data.task_id;
-                    startTime = Date.now();
-                    termPrint('[✓] Task #' + result.data.task_id + ' created', '#3fb950');
-                    startSSE(currentTaskId);
+                    setFeedback('Task #' + result.data.task_id + ' dibuat. Terminal detail dibuka di kanan bawah.', '#10b981');
                     if (typeof openPersistentTerminal === 'function') openPersistentTerminal(result.data.task_id);
+                    resetButton();
                 } else {
-                    termPrint('[✗] Error: ' + (result.data.error || 'Gagal memulai'), '#f85149');
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                    setFeedback(result.data.error || 'Gagal memulai scraping', '#ef4444');
+                    resetButton();
                 }
             })
             .catch(function(err) {
-                termPrint('[✗] Network error: ' + err.message, '#f85149');
-                btn.disabled = false;
-                btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+                setFeedback('Network error: ' + err.message, '#ef4444');
+                resetButton();
             });
     });
 
-    function startSSE(taskId) {
-        eventSource = new EventSource('/api/task/' + taskId + '/progress');
-        var barEl = document.getElementById('term-bar');
-        var statusEl = document.getElementById('term-status');
-        var countEl = document.getElementById('term-count');
-        var speedEl = document.getElementById('term-speed');
-        var btnScrape = document.getElementById('btn-scrape');
-
-        eventSource.onmessage = function(event) {
-            var data = JSON.parse(event.data);
-            var pct = Math.round(data.progress_percent || 0);
-            barEl.style.width = pct + '%';
-            countEl.textContent = data.scraped_results + '/' + data.total_results;
-            if (startTime) {
-                var elapsed = Math.floor((Date.now() - startTime) / 1000);
-                speedEl.textContent = Math.floor(elapsed / 60) + 'm ' + (elapsed % 60) + 's elapsed';
-            }
-            if (data.status === 'completed') {
-                statusEl.textContent = '✓ Selesai — ' + data.scraped_results + ' data';
-                statusEl.style.color = '#3fb950';
-                barEl.style.background = '#3fb950';
-                eventSource.close();
-                btnScrape.disabled = false;
-                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-                termPrint('[✓] Scraping selesai! ' + data.scraped_results + ' data tersimpan.', '#3fb950');
-                var dl = document.createElement('div');
-                dl.innerHTML = '<span style="color:#58a6ff;cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/csv\')">[↓ CSV]</span> <span style="color:#d2a8ff;cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/json\')">[↓ JSON]</span>';
-                document.getElementById('term-output').appendChild(dl);
-            } else if (data.status === 'failed') {
-                statusEl.textContent = '✗ Gagal';
-                statusEl.style.color = '#f85149';
-                barEl.style.background = '#f85149';
-                eventSource.close();
-                btnScrape.disabled = false;
-                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-                termPrint('[✗] Error: ' + (data.error_message || 'Unknown'), '#f85149');
-            } else if (data.status === 'cancelled') {
-                statusEl.textContent = '⊘ Dibatalkan';
-                statusEl.style.color = '#8b949e';
-                eventSource.close();
-                btnScrape.disabled = false;
-                btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
-                termPrint('[⊘] Task dibatalkan', '#8b949e');
-            } else {
-                statusEl.textContent = 'Berjalan... ' + pct + '%';
-                if (data.current_log && data.current_log.indexOf(']') > -1) termPrint(data.current_log, '#c9d1d9');
-            }
-        };
-        eventSource.onerror = function() {};
-    }
-
-    window.cancelTask = function() {
-        if (!currentTaskId) return;
-        fetch('/scrape/' + currentTaskId + '/cancel', { method: 'POST' })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.status === 'cancelled') {
-                    document.getElementById('term-status').textContent = '⊘ Dibatalkan';
-                    document.getElementById('term-status').style.color = '#8b949e';
-                }
-            });
-    };
 })();
 </script>
 {% endblock %}

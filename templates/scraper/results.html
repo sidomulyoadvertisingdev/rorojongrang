@@ -40,6 +40,30 @@
     <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;" id="search-count"></span>
 </div>
 
+<div class="lead-console">
+    <div>
+        <div style="font-size:13px; font-weight:800; color:var(--text); margin-bottom:4px;">Lead Console</div>
+        <div style="font-size:12px; color:var(--text-sec);">Prioritaskan prospek paling panas, kontak via WA, lalu pindahkan statusnya.</div>
+    </div>
+    <div class="filter-group">
+        <button class="filter-chip active" data-quality="all" onclick="setQualityFilter('all')">Semua</button>
+        <button class="filter-chip" data-quality="hot" onclick="setQualityFilter('hot')">Hot</button>
+        <button class="filter-chip" data-quality="warm" onclick="setQualityFilter('warm')">Warm</button>
+        <button class="filter-chip" data-quality="with_phone" onclick="setQualityFilter('with_phone')">Ada WA</button>
+        <button class="filter-chip" data-quality="contacted" onclick="setQualityFilter('contacted')">Terkontak</button>
+    </div>
+    <select id="lead-status-filter" class="input" style="width:auto; min-width:150px; padding:8px 12px; font-size:12px;" onchange="setLeadFilter(this.value)">
+        <option value="all">Semua status</option>
+        <option value="new">Baru</option>
+        <option value="sent">Terkirim</option>
+        <option value="replied">Dibalas</option>
+        <option value="interested">Tertarik</option>
+        <option value="followup">Follow-up</option>
+        <option value="not_interested">Tidak tertarik</option>
+        <option value="closed">Closing</option>
+    </select>
+</div>
+
 <div class="card" style="overflow:hidden;">
     <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
@@ -49,16 +73,18 @@
                         <input type="checkbox" id="select-all" style="accent-color:#10b981; width:15px; height:15px; cursor:pointer;" onchange="toggleSelectAll(this)">
                     </th>
                     <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Nama</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Skor</th>
                     <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Telepon</th>
                     <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Rating</th>
                     <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Alamat</th>
                     <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Kategori</th>
-                    <th style="padding:12px 16px; text-align:center; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; width:120px;">Aksi</th>
+                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Status Lead</th>
+                    <th style="padding:12px 16px; text-align:center; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; width:210px;">Aksi</th>
                 </tr>
             </thead>
             <tbody id="results-body">
                 <tr>
-                    <td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">
+                    <td colspan="9" style="padding:40px; text-align:center; color:var(--text-muted);">
                         <div id="loading-indicator">Memuat data...</div>
                     </td>
                 </tr>
@@ -70,6 +96,59 @@
         <div style="display:flex; gap:6px;">
             <button class="btn-secondary" style="font-size:12px; padding:5px 12px;" id="btn-prev" onclick="changePage(-1)" disabled>Sebelumnya</button>
             <button class="btn-secondary" style="font-size:12px; padding:5px 12px;" id="btn-next" onclick="changePage(1)" disabled>Selanjutnya</button>
+        </div>
+    </div>
+</div>
+
+<div id="lead-playbook-modal" class="lead-modal" style="display:none;" onclick="closeLeadPlaybook(event)">
+    <div class="lead-modal-card" onclick="event.stopPropagation()">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px;">
+            <div>
+                <div id="playbook-kicker" style="font-size:11px; color:#10b981; font-weight:800; text-transform:uppercase; letter-spacing:.5px;">Lead Playbook</div>
+                <h3 id="playbook-title" style="font-size:20px; font-weight:900; color:var(--text); margin-top:4px;">Lead</h3>
+                <p id="playbook-subtitle" style="font-size:13px; color:var(--text-sec); margin-top:4px;"></p>
+            </div>
+            <button type="button" class="modal-close" onclick="closeLeadPlaybook()">×</button>
+        </div>
+
+        <div class="playbook-grid">
+            <div class="playbook-panel">
+                <div class="playbook-label">Kenapa prospek ini menarik</div>
+                <div id="playbook-reasons" class="reason-list"></div>
+            </div>
+            <div class="playbook-panel">
+                <div class="playbook-label">Next best action</div>
+                <div id="playbook-next" style="font-size:13px; color:var(--text); line-height:1.6;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <div class="playbook-label">Copy pesan sesuai tahap</div>
+            <div class="message-actions">
+                <button type="button" onclick="copyStageMessage('first')">Pesan Awal</button>
+                <button type="button" onclick="copyStageMessage('followup')">Follow-up</button>
+                <button type="button" onclick="copyStageMessage('demo')">Ajak Demo</button>
+                <button type="button" onclick="copyStageMessage('closing')">Closing Soft</button>
+            </div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <div class="playbook-label">Balasan objection cepat</div>
+            <div class="message-actions objection-actions">
+                <button type="button" onclick="copyStageMessage('price')">Mahal</button>
+                <button type="button" onclick="copyStageMessage('has_pos')">Sudah punya kasir</button>
+                <button type="button" onclick="copyStageMessage('later')">Nanti dulu</button>
+                <button type="button" onclick="copyStageMessage('not_owner')">Bukan owner</button>
+            </div>
+        </div>
+
+        <div style="margin-top:16px;">
+            <div class="playbook-label">Catatan sales</div>
+            <textarea id="playbook-note" class="input" rows="4" placeholder="Contoh: Owner minta dihubungi Jumat sore, tertarik fitur stok..." style="resize:vertical;"></textarea>
+            <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+                <button type="button" class="btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="closeLeadPlaybook()">Tutup</button>
+                <button type="button" class="btn-primary" style="font-size:12px; padding:8px 12px;" onclick="saveLeadNote()">Simpan Catatan</button>
+            </div>
         </div>
     </div>
 </div>
@@ -92,9 +171,184 @@
     .action-maps:hover { background:rgba(59,130,246,0.2); }
     .action-web { background:rgba(139,92,246,0.1); color:#8b5cf6; }
     .action-web:hover { background:rgba(139,92,246,0.2); }
+    .action-copy { background:rgba(245,158,11,0.1); color:#f59e0b; border:none; cursor:pointer; }
+    .action-copy:hover { background:rgba(245,158,11,0.2); }
+    .action-play { background:rgba(16,185,129,0.1); color:#10b981; border:none; cursor:pointer; font-size:11px; font-weight:900; }
+    .action-play:hover { background:rgba(16,185,129,0.2); }
     .action-disabled { opacity:.3; pointer-events:none; }
     .row-check { accent-color:#10b981; width:15px; height:15px; cursor:pointer; }
     tr.row-selected { background:rgba(16,185,129,0.06) !important; }
+    .lead-console {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+        flex-wrap:wrap;
+        padding:14px 18px;
+        margin-bottom:16px;
+        border:1px solid rgba(16,185,129,0.16);
+        border-radius:16px;
+        background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.06));
+    }
+    .filter-group { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .filter-chip {
+        border:1px solid var(--border);
+        background:var(--card-bg);
+        color:var(--text-sec);
+        border-radius:999px;
+        padding:7px 12px;
+        font-size:12px;
+        font-weight:700;
+        cursor:pointer;
+        transition:all .18s ease;
+    }
+    .filter-chip:hover,
+    .filter-chip.active {
+        border-color:rgba(16,185,129,0.35);
+        background:rgba(16,185,129,0.12);
+        color:#10b981;
+    }
+    .score-badge {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:54px;
+        border-radius:999px;
+        padding:5px 9px;
+        font-size:11px;
+        font-weight:800;
+    }
+    .score-hot { background:rgba(239,68,68,0.1); color:#ef4444; }
+    .score-warm { background:rgba(245,158,11,0.12); color:#d97706; }
+    .score-cold { background:rgba(100,116,139,0.12); color:#64748b; }
+    .lead-select {
+        width:118px;
+        border:1px solid var(--border);
+        border-radius:8px;
+        background:var(--card-bg);
+        color:var(--text);
+        padding:6px 8px;
+        font-size:12px;
+        font-weight:700;
+    }
+    .lead-modal {
+        position:fixed;
+        inset:0;
+        z-index:120;
+        background:rgba(15,23,42,0.72);
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    }
+    .lead-modal-card {
+        width:min(760px, 96vw);
+        max-height:90vh;
+        overflow:auto;
+        background:#ffffff;
+        color:#111827;
+        border:1px solid rgba(148,163,184,0.55);
+        border-radius:22px;
+        box-shadow:0 32px 90px rgba(15,23,42,0.46);
+        padding:24px;
+    }
+    .lead-modal-card h3,
+    .lead-modal-card p,
+    .lead-modal-card span,
+    .lead-modal-card div {
+        text-shadow:none;
+    }
+    .modal-close {
+        width:34px;
+        height:34px;
+        border-radius:10px;
+        border:1px solid #cbd5e1;
+        background:#f8fafc;
+        color:#64748b;
+        cursor:pointer;
+        font-size:22px;
+        line-height:1;
+    }
+    .playbook-grid {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+    .playbook-panel {
+        border:1px solid #dbe4ef;
+        border-radius:16px;
+        background:#f8fafc;
+        padding:14px;
+    }
+    .playbook-label {
+        font-size:11px;
+        font-weight:900;
+        color:#64748b;
+        text-transform:uppercase;
+        letter-spacing:.5px;
+        margin-bottom:8px;
+    }
+    .reason-list {
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+        font-size:13px;
+        color:#172033;
+        line-height:1.5;
+    }
+    .reason-item {
+        display:flex;
+        gap:8px;
+        align-items:flex-start;
+    }
+    .reason-dot {
+        width:7px;
+        height:7px;
+        border-radius:50%;
+        background:#10b981;
+        margin-top:6px;
+        flex-shrink:0;
+    }
+    .message-actions {
+        display:grid;
+        grid-template-columns:repeat(4, minmax(0, 1fr));
+        gap:8px;
+    }
+    .message-actions button {
+        border:1px solid rgba(16,185,129,0.22);
+        background:#ecfdf5;
+        color:#059669;
+        border-radius:12px;
+        padding:10px 12px;
+        cursor:pointer;
+        font-size:12px;
+        font-weight:800;
+        transition:all .16s ease;
+    }
+    .message-actions button:hover {
+        transform:translateY(-1px);
+        background:#d1fae5;
+    }
+    .objection-actions button {
+        border-color:rgba(245,158,11,0.24);
+        background:#fffbeb;
+        color:#d97706;
+    }
+    #playbook-title { color:#111827 !important; }
+    #playbook-subtitle,
+    #playbook-next { color:#334155 !important; }
+    #playbook-note {
+        background:#ffffff !important;
+        color:#111827 !important;
+        border:1px solid #cbd5e1 !important;
+    }
+    @media (max-width: 760px) {
+        .playbook-grid,
+        .message-actions {
+            grid-template-columns:1fr;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -102,12 +356,17 @@
 <script>
 const TASK_ID = {{ task.id }};
 const TASK_STATUS = '{{ task.status }}';
+const TOPOS_LINK = 'https://toposdigital.com';
 let currentPage = 1;
 let currentSearch = '';
 let selectedIds = new Set();
 let allLoadedIds = [];
 let waTemplates = [];
 let waClicks = {};
+let currentQualityFilter = 'all';
+let currentLeadFilter = 'all';
+let loadedBusinesses = {};
+let activePlaybookBusinessId = null;
 
 function loadWaData() {
     fetch('/api/task/' + TASK_ID + '/wa-data').then(r => r.json()).then(data => {
@@ -123,13 +382,15 @@ function loadWaData() {
 function fetchBusinesses(page, search) {
     let url = '/api/task/' + TASK_ID + '/businesses?page=' + page;
     if (search) url += '&q=' + encodeURIComponent(search);
+    if (currentQualityFilter !== 'all') url += '&quality=' + encodeURIComponent(currentQualityFilter);
+    if (currentLeadFilter !== 'all') url += '&lead_status=' + encodeURIComponent(currentLeadFilter);
 
     fetch(url).then(r => r.json()).then(data => {
         renderTable(data.businesses, data.total, page, data.pages);
         document.getElementById('search-count').textContent = data.total + ' data';
         document.getElementById('total-count').textContent = data.total + ' data';
     }).catch(() => {
-        document.getElementById('results-body').innerHTML = '<tr><td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">Gagal memuat data</td></tr>';
+        document.getElementById('results-body').innerHTML = '<tr><td colspan="9" style="padding:40px; text-align:center; color:var(--text-muted);">Gagal memuat data</td></tr>';
     });
 }
 
@@ -142,19 +403,293 @@ function normalizePhone(phone) {
 }
 
 function processTemplate(template, business, linkUrl) {
+    var profile = buildToposProfile(business);
+    var smartMessage = buildToposMessage(business, linkUrl);
     var msg = template.message;
+    msg = msg.replace(/\{smart_message\}/g, smartMessage);
     msg = msg.replace(/\{name\}/g, business.name || '');
     msg = msg.replace(/\{phone\}/g, business.phone || '');
     msg = msg.replace(/\{address\}/g, business.address || '');
     msg = msg.replace(/\{category\}/g, business.category || '');
     msg = msg.replace(/\{link\}/g, linkUrl || '');
+    msg = msg.replace(/\{area\}/g, profile.area);
+    msg = msg.replace(/\{business_type\}/g, profile.businessType);
+    msg = msg.replace(/\{pain_point\}/g, profile.painPoint);
+    msg = msg.replace(/\{topos_benefit\}/g, profile.benefit);
+    msg = msg.replace(/\{topos_pitch\}/g, profile.pitch);
+    msg = msg.replace(/\{topos_hook\}/g, profile.hook);
+    msg = msg.replace(/\{topos_question\}/g, profile.question);
+    msg = msg.replace(/\{topos_cta\}/g, profile.cta);
+    msg = msg.replace(/\{rating_context\}/g, profile.ratingContext);
     return msg;
+}
+
+function whatsappIcon() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+}
+
+function firstMatch(text, words) {
+    return words.some(function(word) { return text.indexOf(word) !== -1; });
+}
+
+function extractArea(address) {
+    var clean = (address || '').replace(/^Alamat:\s*/i, '').trim();
+    if (!clean) return 'area sekitar';
+    var parts = clean.split(',').map(function(part) { return part.trim(); }).filter(Boolean);
+    return parts.length > 1 ? parts.slice(-2).join(', ') : parts[0];
+}
+
+function buildToposProfile(business) {
+    var text = ((business.name || '') + ' ' + (business.category || '') + ' ' + (business.address || '')).toLowerCase();
+    var profile = {
+        businessType: 'bisnis UMKM',
+        hook: 'operasional harian biasanya makin terasa kalau transaksi mulai ramai',
+        painPoint: 'transaksi harian, stok, dan laporan penjualan perlu dicatat rapi',
+        benefit: 'transaksi kasir, data produk, dan laporan penjualan bisa dipantau lebih cepat tanpa rekap manual',
+        pitch: 'ToposDigital adalah kasir digital/POS untuk UMKM agar operasional bisnis lebih rapi dan mudah dikontrol',
+        question: 'Selama ini pencatatan transaksi dan laporan penjualannya masih manual atau sudah pakai sistem?',
+        cta: 'Kalau berkenan, saya kirim demo singkat 1 menit yang relevan untuk bisnis kakak?'
+    };
+
+    if (firstMatch(text, ['restoran', 'restaurant', 'cafe', 'caffe', 'coffee', 'kopi', 'warung makan', 'kedai', 'bakso', 'mie', 'ayam', 'bebek', 'seafood'])) {
+        profile = {
+            businessType: 'kuliner',
+            hook: 'bisnis kuliner kalau mulai ramai biasanya paling kerasa di order, stok bahan, dan laporan harian',
+            painPoint: 'catat order, varian menu, stok bahan, menu terlaris, dan laporan shift sering makan waktu',
+            benefit: 'order kasir, menu, stok bahan, dan laporan penjualan harian bisa lebih rapi dalam satu sistem',
+            pitch: 'ToposDigital membantu cafe, restoran, dan kedai punya kasir digital yang cepat, rapi, dan mudah dipakai tim',
+            question: 'Di tempat kakak, order dan laporan harian masih dicatat manual atau sudah pakai sistem kasir?',
+            cta: 'Kalau boleh, saya kirim contoh demo 1 menit untuk alur cafe/restoran?'
+        };
+    } else if (firstMatch(text, ['bangunan', 'bahan bangunan', 'toko bangunan', 'material', 'matrial', 'besi', 'hardware', 'listrik', 'cat', 'keramik', 'plumbing'])) {
+        profile = {
+            businessType: 'toko bahan bangunan',
+            hook: 'toko material biasanya SKU-nya banyak dan stoknya harus akurat supaya tidak salah jual',
+            painPoint: 'produk banyak, stok gudang perlu akurat, transaksi satuan/grosir harus jelas, dan laporan penjualan perlu cepat dicek',
+            benefit: 'produk, stok, transaksi kasir, dan laporan penjualan toko bisa lebih mudah dikontrol',
+            pitch: 'ToposDigital membantu toko bahan bangunan punya sistem kasir dan stok yang lebih rapi',
+            question: 'Untuk stok dan transaksi toko, kakak masih pakai catatan manual atau sudah pakai POS?',
+            cta: 'Kalau boleh, saya kirim demo singkat untuk alur toko material?'
+        };
+    } else if (firstMatch(text, ['sembako', 'kelontong', 'grosir', 'minimarket', 'supermarket', 'mart', 'retail', 'atk', 'kosmetik', 'fashion', 'baju', 'butik', 'sepatu', 'tas'])) {
+        profile = {
+            businessType: 'retail atau toko sembako',
+            hook: 'toko retail biasanya paling repot di stok barang, harga modal, dan barang yang cepat habis',
+            painPoint: 'barang masuk-keluar banyak, harga modal dan harga jual berubah, stok menipis perlu cepat ketahuan, dan laporan harian harus akurat',
+            benefit: 'stok, harga produk, transaksi kasir, barang terlaris, dan laporan penjualan bisa lebih tertata',
+            pitch: 'ToposDigital membantu toko retail dan sembako naik kelas dengan kasir digital modern untuk UMKM',
+            question: 'Kalau di toko kakak, stok dan laporan penjualan harian masih dicek manual?',
+            cta: 'Kalau berkenan, saya kirim contoh demo 1 menit untuk toko retail/sembako?'
+        };
+    } else if (firstMatch(text, ['salon', 'barber', 'barbershop', 'spa', 'beauty', 'nail', 'klinik', 'laundry'])) {
+        profile = {
+            businessType: 'jasa lokal',
+            hook: 'bisnis jasa biasanya butuh catatan transaksi dan pelanggan yang rapi supaya repeat order lebih mudah',
+            painPoint: 'layanan, paket harga, data pelanggan, dan pemasukan harian perlu dicatat konsisten',
+            benefit: 'transaksi layanan, paket harga, data pelanggan, dan laporan pemasukan bisa lebih rapi',
+            pitch: 'ToposDigital membantu bisnis jasa lokal punya pencatatan transaksi yang praktis dan profesional',
+            question: 'Di tempat kakak, transaksi layanan dan data pelanggan sudah tercatat di sistem?',
+            cta: 'Kalau berkenan, saya kirim demo singkat untuk bisnis jasa?'
+        };
+    }
+
+    profile.area = extractArea(business.address || '');
+    var rating = parseFloat(business.rating || 0);
+    var reviews = parseInt(business.review_count || 0, 10);
+    if (rating >= 4.5) {
+        profile.ratingContext = 'Ratingnya juga bagus, kelihatan sudah dipercaya pelanggan.';
+    } else if (reviews >= 20) {
+        profile.ratingContext = 'Dari review-nya terlihat bisnis kakak sudah cukup dikenal pelanggan.';
+    } else {
+        profile.ratingContext = 'Saya lihat bisnis kakak sudah muncul di Google Maps, jadi sayang kalau operasionalnya masih banyak yang manual.';
+    }
+    return profile;
+}
+
+function buildToposMessage(business, linkUrl) {
+    var profile = buildToposProfile(business);
+    var lines = [
+        'Halo kak, saya lihat ' + (business.name || 'bisnis kakak') + ' di ' + profile.area + '. ' + profile.ratingContext,
+        '',
+        'Biasanya untuk ' + profile.businessType + ', yang sering bikin repot itu ' + profile.painPoint + '.',
+        '',
+        'Saya dari ToposDigital. Kami bantu UMKM pakai kasir digital/POS supaya ' + profile.benefit + '.',
+        '',
+        profile.question,
+        '',
+        profile.cta
+    ];
+    if (linkUrl) {
+        lines.push('', 'Info lengkap: ' + linkUrl);
+    }
+    return lines.join('\n');
+}
+
+function calculateLeadScore(business) {
+    var score = 0;
+    var text = ((business.name || '') + ' ' + (business.category || '') + ' ' + (business.address || '')).toLowerCase();
+    var rating = parseFloat(business.rating || 0);
+    var reviews = parseInt(business.review_count || 0, 10);
+
+    if (normalizePhone(business.phone)) score += 30;
+    if (rating >= 4.5) score += 20;
+    else if (rating >= 4.0) score += 12;
+    if (reviews >= 50) score += 20;
+    else if (reviews >= 20) score += 14;
+    else if (reviews >= 5) score += 8;
+    if (firstMatch(text, ['restoran', 'cafe', 'coffee', 'kopi', 'sembako', 'kelontong', 'grosir', 'minimarket', 'toko', 'retail', 'bangunan', 'bahan bangunan', 'toko bangunan', 'material', 'matrial', 'salon', 'barber', 'laundry'])) score += 20;
+    if (business.website) score += 5;
+    if (business.last_contacted_at) score += 5;
+    return Math.min(score, 100);
+}
+
+function scoreBadge(score) {
+    var cls = score >= 75 ? 'score-hot' : (score >= 50 ? 'score-warm' : 'score-cold');
+    var label = score >= 75 ? 'Hot' : (score >= 50 ? 'Warm' : 'Cold');
+    return '<span class="score-badge ' + cls + '">' + label + ' ' + score + '</span>';
+}
+
+function leadStatusOptions(current) {
+    var statuses = [
+        ['new', 'Baru'],
+        ['sent', 'Terkirim'],
+        ['replied', 'Dibalas'],
+        ['interested', 'Tertarik'],
+        ['followup', 'Follow-up'],
+        ['not_interested', 'Tidak tertarik'],
+        ['closed', 'Closing']
+    ];
+    current = current || 'new';
+    return statuses.map(function(item) {
+        return '<option value="' + item[0] + '"' + (item[0] === current ? ' selected' : '') + '>' + item[1] + '</option>';
+    }).join('');
+}
+
+function buildFollowUpMessage(business) {
+    var profile = buildToposProfile(business);
+    return [
+        'Halo kak, izin follow up sebentar.',
+        '',
+        'Kemarin saya sempat kirim soal ToposDigital untuk bantu ' + profile.businessType + ' merapikan transaksi, stok, dan laporan penjualan.',
+        '',
+        'Kalau belum butuh sekarang tidak apa-apa. Tapi kalau kakak mau lihat contoh demo 1 menit yang sesuai alur bisnis kakak, saya bisa kirimkan.',
+        '',
+        'Mau saya kirim demo singkatnya?'
+    ].join('\n');
+}
+
+function buildDemoMessage(business) {
+    var profile = buildToposProfile(business);
+    return [
+        'Siap kak, saya kirim gambaran singkat ya.',
+        '',
+        'Untuk ' + profile.businessType + ', demo ToposDigital biasanya saya tunjukkan alur:',
+        '1. input transaksi di kasir',
+        '2. pantau stok/produk',
+        '3. lihat laporan penjualan harian',
+        '',
+        'Tujuannya supaya ' + profile.benefit + '.',
+        '',
+        'Link demo/info: ' + TOPOS_LINK,
+        '',
+        'Kakak lebih enak lihat demo via video singkat atau saya jelaskan poin-poin fiturnya dulu?'
+    ].join('\n');
+}
+
+function buildClosingMessage(business) {
+    var profile = buildToposProfile(business);
+    return [
+        'Kalau dari kebutuhan ' + (business.name || 'bisnis kakak') + ', ToposDigital paling cocok dipakai untuk merapikan ' + profile.painPoint + '.',
+        '',
+        'Saran saya, kakak bisa mulai dari alur kasir + stok + laporan harian dulu. Nanti kalau sudah jalan, baru rapikan data produk dan laporan yang lebih detail.',
+        '',
+        'Kalau kakak setuju, saya bantu arahkan langkah awalnya: setup data produk, contoh alur transaksi, lalu cek laporan penjualan. Mau saya bantu mulai dari mana dulu?'
+    ].join('\n');
+}
+
+function buildObjectionMessage(type, business) {
+    var profile = buildToposProfile(business);
+    var messages = {
+        price: [
+            'Betul kak, biaya memang perlu dipertimbangkan.',
+            '',
+            'Biasanya yang kami bantu bukan cuma “punya aplikasi kasir”, tapi mengurangi waktu rekap, salah catat stok, dan laporan harian yang tercecer.',
+            '',
+            'Kalau boleh tahu, di ' + (business.name || 'tempat kakak') + ' yang paling sering makan waktu sekarang bagian transaksi, stok, atau laporan?'
+        ],
+        has_pos: [
+            'Bagus kak kalau sudah pakai sistem kasir.',
+            '',
+            'Biasanya saya cek bukan cuma kasirnya, tapi apakah stok, produk terlaris, laporan harian, dan kontrol operasionalnya sudah nyaman dipakai.',
+            '',
+            'Kalau sistem yang sekarang sudah oke, aman. Tapi kalau masih ada bagian yang ribet, saya bisa bantu bandingkan apakah Topos lebih pas.'
+        ],
+        later: [
+            'Siap kak, tidak apa-apa.',
+            '',
+            'Biar tidak mengganggu, saya follow up lain waktu saja. Biasanya untuk ' + profile.businessType + ', Topos paling terasa manfaatnya saat transaksi mulai ramai dan laporan harian perlu lebih rapi.',
+            '',
+            'Kakak lebih enak saya follow up minggu depan atau bulan depan?'
+        ],
+        not_owner: [
+            'Siap kak, terima kasih infonya.',
+            '',
+            'Kalau boleh, saya minta diarahkan ke owner atau bagian yang biasa mengurus kasir/stok/laporan penjualan?',
+            '',
+            'Saya hanya ingin kirim demo singkat 1 menit supaya bisa dicek dulu apakah relevan untuk bisnisnya.'
+        ]
+    };
+    return (messages[type] || messages.later).join('\n');
+}
+
+function buildLeadReasons(business) {
+    var reasons = [];
+    var score = calculateLeadScore(business);
+    var rating = parseFloat(business.rating || 0);
+    var reviews = parseInt(business.review_count || 0, 10);
+    var profile = buildToposProfile(business);
+
+    reasons.push('Skor prospek ' + score + '/100: ' + (score >= 75 ? 'prioritas tinggi' : score >= 50 ? 'layak diprospek' : 'perlu pendekatan lebih pelan') + '.');
+    if (normalizePhone(business.phone)) reasons.push('Punya nomor WA, bisa dikontak langsung secara personal.');
+    if (rating >= 4.5) reasons.push('Rating tinggi, sinyal bisnis aktif dan dipercaya pelanggan.');
+    if (reviews >= 20) reasons.push('Review cukup banyak, peluang operasionalnya sudah ramai.');
+    if (business.website) reasons.push('Punya website, sinyal bisnis lebih serius secara digital.');
+    reasons.push('Angle utama: ' + profile.painPoint + '.');
+    return reasons;
+}
+
+function getNextAction(business) {
+    var status = business.lead_status || 'new';
+    var score = calculateLeadScore(business);
+    var actions = {
+        new: score >= 75 ? 'Kontak hari ini. Pakai pesan awal, lalu tanyakan apakah pencatatan transaksi/stok masih manual.' : 'Kontak dengan pendekatan soft. Fokus validasi masalah, jangan langsung hard selling.',
+        sent: 'Tunggu 1 hari kerja. Kalau belum dibalas, gunakan follow-up halus via tombol Follow-up.',
+        replied: 'Balas cepat. Arahkan ke pertanyaan kebutuhan: transaksi, stok, atau laporan yang paling merepotkan.',
+        interested: 'Dorong ke demo singkat. Pakai pesan Ajak Demo, lalu tawarkan format video singkat atau penjelasan fitur.',
+        followup: 'Jika belum balas setelah follow-up, jangan spam. Tunggu 3-5 hari atau pindahkan ke nurturing.',
+        not_interested: 'Stop kontak dulu. Jangan follow-up kecuali mereka minta dihubungi lagi.',
+        closed: 'Catat hasil closing dan lanjutkan onboarding/setup.'
+    };
+    return actions[status] || actions.new;
+}
+
+function leadStatusLabel(status) {
+    var labels = {
+        new: 'Baru',
+        sent: 'Terkirim',
+        replied: 'Dibalas',
+        interested: 'Tertarik',
+        followup: 'Follow-up',
+        not_interested: 'Tidak tertarik',
+        closed: 'Closing'
+    };
+    return labels[status || 'new'] || 'Baru';
 }
 
 function renderTable(biz, total, page, pages) {
     const tbody = document.getElementById('results-body');
     if (!biz || biz.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="padding:40px; text-align:center; color:var(--text-muted);">Tidak ada data</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="padding:40px; text-align:center; color:var(--text-muted);">Tidak ada data</td></tr>';
         document.getElementById('pagination-bar').style.display = 'none';
         return;
     }
@@ -165,6 +700,8 @@ function renderTable(biz, total, page, pages) {
     document.getElementById('btn-next').disabled = (page >= pages);
 
     allLoadedIds = biz.map(function(b) { return b.id; });
+    loadedBusinesses = {};
+    biz.forEach(function(b) { loadedBusinesses[b.id] = b; });
 
     let html = '';
     biz.forEach(function(b) {
@@ -176,10 +713,14 @@ function renderTable(biz, total, page, pages) {
         var rating = b.rating ? '<span class="biz-rating"><span class="star">★</span>' + b.rating + '</span>' : '<span style="color:var(--text-muted);">-</span>';
         var checked = selectedIds.has(b.id) ? 'checked' : '';
         var rowClass = selectedIds.has(b.id) ? 'row-selected' : '';
+        var score = calculateLeadScore(b);
 
         var waBtn = '';
-        if (!waNum || waTemplates.length === 0) {
-            waBtn = '<span class="action-btn action-wa action-disabled" title="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>';
+        if (!waNum) {
+            waBtn = '<span class="action-btn action-wa action-disabled" title="Nomor WhatsApp tidak tersedia">' + whatsappIcon() + '</span>';
+        } else if (waTemplates.length === 0) {
+            var defaultMsg = buildToposMessage(b, '');
+            waBtn = '<a href="https://wa.me/' + waNum + '?text=' + encodeURIComponent(defaultMsg) + '" target="_blank" class="action-btn action-wa" title="WhatsApp ToposDigital" onclick="markLeadContacted(' + b.id + ',' + score + ')">' + whatsappIcon() + '</a>';
         } else if (waTemplates.length === 1) {
             var t = waTemplates[0];
             var links = t.links || [];
@@ -225,15 +766,19 @@ function renderTable(biz, total, page, pages) {
         html += '<tr class="' + rowClass + '" style="border-bottom:1px solid var(--border-light); transition:background .2s;" onmouseover="if(!this.classList.contains(\'row-selected\'))this.style.background=\'var(--accent-light)\'" onmouseout="if(!this.classList.contains(\'row-selected\'))this.style.background=\'transparent\'">';
         html += '<td style="padding:10px 12px 10px 16px;"><input type="checkbox" class="row-check" data-id="' + b.id + '" ' + checked + ' onchange="toggleSelect(' + b.id + ', this)"></td>';
         html += '<td style="padding:10px 16px; font-size:13px; font-weight:600; color:var(--text); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.name) + '">' + escHtml(b.name) + '</td>';
+        html += '<td style="padding:10px 16px;">' + scoreBadge(score) + '</td>';
         html += '<td style="padding:10px 16px; font-size:13px; color:var(--text-sec); white-space:nowrap;">' + (b.phone ? escHtml(b.phone) : '<span style="color:var(--text-muted);">-</span>') + checkmark + '</td>';
         html += '<td style="padding:10px 16px;">' + rating + '</td>';
         html += '<td style="padding:10px 16px; font-size:12px; color:var(--text-sec); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.address || '') + '">' + escHtml(b.address || '-') + '</td>';
         html += '<td style="padding:10px 16px; font-size:12px; color:var(--text-sec); white-space:nowrap;">' + escHtml(b.category || '-') + '</td>';
+        html += '<td style="padding:10px 16px;"><select class="lead-select" onchange="updateLeadStatus(' + b.id + ', this.value, ' + score + ')">' + leadStatusOptions(b.lead_status) + '</select></td>';
         html += '<td style="padding:10px 16px; text-align:center;">';
         html += '<div style="display:flex; gap:4px; justify-content:center;">';
         html += waBtn;
         html += '<a href="' + (mapsLink || '#') + '" target="_blank" class="action-btn action-maps ' + (!mapsLink ? 'action-disabled' : '') + '" title="Google Maps"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></a>';
         html += '<a href="' + (webLink || '#') + '" target="_blank" class="action-btn action-web ' + (!webLink ? 'action-disabled' : '') + '" title="Website"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>';
+        html += '<button class="action-btn action-play" title="Lead playbook" onclick="openLeadPlaybook(' + b.id + ')">Play</button>';
+        html += '<button class="action-btn action-copy" title="Copy follow-up" onclick="copyFollowUp(' + b.id + ')">FU</button>';
         html += '</div></td>';
         html += '</tr>';
     });
@@ -281,7 +826,134 @@ function recordWaClick(businessId, templateId, linkId, phone) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ business_id: businessId, template_id: templateId, link_id: linkId, phone: phone, task_id: TASK_ID })
-    }).then(function() { loadWaData(); }).catch(function() {});
+    }).then(function() {
+        loadWaData();
+        fetchBusinesses(currentPage, currentSearch);
+    }).catch(function() {});
+}
+
+function markLeadContacted(businessId, score) {
+    fetch('/api/businesses/' + businessId + '/lead', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({ mark_contacted: true, lead_score: score || 0 })
+    }).then(function() {
+        fetchBusinesses(currentPage, currentSearch);
+    }).catch(function() {});
+}
+
+function updateLeadStatus(businessId, status, score) {
+    fetch('/api/businesses/' + businessId + '/lead', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lead_status: status, lead_score: score || 0 })
+    }).then(function() {
+        fetchBusinesses(currentPage, currentSearch);
+    }).catch(function() {});
+}
+
+function copyFollowUp(businessId) {
+    var business = loadedBusinesses[businessId];
+    if (!business) return;
+    var message = buildFollowUpMessage(business);
+    navigator.clipboard.writeText(message).then(function() {
+        updateLeadStatus(businessId, 'followup', calculateLeadScore(business));
+    }).catch(function() {
+        window.prompt('Copy pesan follow-up:', message);
+    });
+}
+
+function openLeadPlaybook(businessId) {
+    var business = loadedBusinesses[businessId];
+    if (!business) return;
+    activePlaybookBusinessId = businessId;
+
+    var score = calculateLeadScore(business);
+    var profile = buildToposProfile(business);
+    var reasons = buildLeadReasons(business);
+
+    document.getElementById('playbook-title').textContent = business.name || 'Lead';
+    document.getElementById('playbook-subtitle').textContent = leadStatusLabel(business.lead_status) + ' · ' + profile.businessType + ' · skor ' + score + '/100';
+    document.getElementById('playbook-next').textContent = getNextAction(business);
+    document.getElementById('playbook-note').value = business.lead_note || '';
+    document.getElementById('playbook-reasons').innerHTML = reasons.map(function(reason) {
+        return '<div class="reason-item"><span class="reason-dot"></span><span>' + escHtml(reason) + '</span></div>';
+    }).join('');
+
+    var modal = document.getElementById('lead-playbook-modal');
+    modal.style.display = 'flex';
+}
+
+function closeLeadPlaybook(event) {
+    if (event && event.target && event.target.id !== 'lead-playbook-modal') return;
+    document.getElementById('lead-playbook-modal').style.display = 'none';
+    activePlaybookBusinessId = null;
+}
+
+function copyTextToClipboard(message) {
+    return navigator.clipboard.writeText(message).catch(function() {
+        window.prompt('Copy pesan:', message);
+    });
+}
+
+function copyStageMessage(type) {
+    if (!activePlaybookBusinessId) return;
+    var business = loadedBusinesses[activePlaybookBusinessId];
+    if (!business) return;
+
+    var message = '';
+    var nextStatus = null;
+    if (type === 'first') {
+        message = buildToposMessage(business, '');
+        nextStatus = 'sent';
+    } else if (type === 'followup') {
+        message = buildFollowUpMessage(business);
+        nextStatus = 'followup';
+    } else if (type === 'demo') {
+        message = buildDemoMessage(business);
+        nextStatus = 'interested';
+    } else if (type === 'closing') {
+        message = buildClosingMessage(business);
+        nextStatus = 'interested';
+    } else {
+        message = buildObjectionMessage(type, business);
+    }
+
+    copyTextToClipboard(message).then(function() {
+        if (nextStatus) {
+            updateLeadStatus(activePlaybookBusinessId, nextStatus, calculateLeadScore(business));
+        }
+    });
+}
+
+function saveLeadNote() {
+    if (!activePlaybookBusinessId) return;
+    var note = document.getElementById('playbook-note').value;
+    fetch('/api/businesses/' + activePlaybookBusinessId + '/lead', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lead_note: note, lead_score: calculateLeadScore(loadedBusinesses[activePlaybookBusinessId] || {}) })
+    }).then(function(r) { return r.json(); }).then(function(updated) {
+        loadedBusinesses[activePlaybookBusinessId] = updated;
+        fetchBusinesses(currentPage, currentSearch);
+        closeLeadPlaybook();
+    }).catch(function() {});
+}
+
+function setQualityFilter(value) {
+    currentQualityFilter = value;
+    currentPage = 1;
+    document.querySelectorAll('[data-quality]').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.quality === value);
+    });
+    fetchBusinesses(currentPage, currentSearch);
+}
+
+function setLeadFilter(value) {
+    currentLeadFilter = value;
+    currentPage = 1;
+    fetchBusinesses(currentPage, currentSearch);
 }
 
 function toggleSelect(id, cb) {

@@ -1,5 +1,6 @@
 import json
 import threading
+from datetime import datetime
 from flask import Blueprint, Response, current_app, jsonify, request
 from flask_login import login_required, current_user
 from models import db
@@ -8,6 +9,7 @@ from models.business import Business
 from models.wa_template import WaTemplate
 from models.wa_link import WaLink
 from models.wa_click import WaClick
+from config.settings import REDIS_HOST, REDIS_PORT, REDIS_DB
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -25,6 +27,8 @@ def task_businesses(task_id):
     task = ScrapingTask.query.filter_by(id=task_id, user_id=current_user.id).first_or_404()
     page = request.args.get("page", 1, type=int)
     search = request.args.get("q", "").strip()
+    quality = request.args.get("quality", "all").strip()
+    lead_status = request.args.get("lead_status", "all").strip()
     query = Business.query.filter_by(task_id=task_id)
     if search:
         like = f"%{search}%"
@@ -35,6 +39,27 @@ def task_businesses(task_id):
                 Business.address.ilike(like),
                 Business.category.ilike(like),
             )
+        )
+    if lead_status and lead_status != "all":
+        if lead_status == "new":
+            query = query.filter(db.or_(Business.lead_status == "new", Business.lead_status.is_(None)))
+        else:
+            query = query.filter(Business.lead_status == lead_status)
+    if quality == "with_phone":
+        query = query.filter(Business.phone.isnot(None), Business.phone != "")
+    elif quality == "contacted":
+        query = query.filter(Business.last_contacted_at.isnot(None))
+    elif quality == "hot":
+        query = query.filter(
+            Business.phone.isnot(None),
+            Business.phone != "",
+            db.or_(Business.rating >= 4.5, Business.review_count >= 20),
+        )
+    elif quality == "warm":
+        query = query.filter(
+            Business.phone.isnot(None),
+            Business.phone != "",
+            db.or_(Business.rating >= 4.0, Business.review_count >= 5),
         )
     query = query.order_by(Business.id.asc())
     paginated = query.paginate(page=page, per_page=25, error_out=False)
@@ -76,11 +101,42 @@ def task_wa_data(task_id):
     return jsonify({"templates": template_list, "clicks": click_list})
 
 
+@api_bp.route("/businesses/<int:business_id>/lead", methods=["PATCH"])
+@login_required
+def update_business_lead(business_id):
+    business = Business.query.filter_by(id=business_id, user_id=current_user.id).first_or_404()
+    data = request.get_json() or {}
+    allowed_statuses = {"new", "sent", "replied", "interested", "followup", "not_interested", "closed"}
+
+    lead_status = data.get("lead_status")
+    if lead_status:
+        if lead_status not in allowed_statuses:
+            return jsonify({"error": "Invalid lead_status"}), 400
+        business.lead_status = lead_status
+
+    if "lead_note" in data:
+        business.lead_note = (data.get("lead_note") or "").strip()
+
+    if "lead_score" in data:
+        try:
+            business.lead_score = int(data.get("lead_score") or 0)
+        except (TypeError, ValueError):
+            return jsonify({"error": "Invalid lead_score"}), 400
+
+    if data.get("mark_contacted"):
+        business.last_contacted_at = datetime.utcnow()
+        if not business.lead_status or business.lead_status == "new":
+            business.lead_status = "sent"
+
+    db.session.commit()
+    return jsonify(business.to_dict())
+
+
 @api_bp.route("/task/<int:task_id>/stream")
 @login_required
 def task_stream(task_id):
     import redis as redis_lib
-    redis_client = redis_lib.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    redis_client = redis_lib.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
     app = current_app._get_current_object()
 
     def generate():
@@ -124,7 +180,7 @@ def task_stream(task_id):
 @login_required
 def task_progress(task_id):
     import redis as redis_lib
-    redis_client = redis_lib.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    redis_client = redis_lib.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
     app = current_app._get_current_object()
 
     def generate():

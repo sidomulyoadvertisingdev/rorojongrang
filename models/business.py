@@ -31,6 +31,10 @@ class Business(db.Model):
     source_keyword = db.Column(db.String(255))
     source_location = db.Column(db.String(255))
     is_verified = db.Column(db.Boolean, default=False)
+    lead_status = db.Column(db.String(30), default="new")
+    lead_note = db.Column(db.Text)
+    lead_score = db.Column(db.Integer, default=0)
+    last_contacted_at = db.Column(db.DateTime)
 
     def to_dict(self):
         return {
@@ -51,5 +55,9 @@ class Business(db.Model):
             "operating_hours": self.operating_hours,
             "source_keyword": self.source_keyword,
             "source_location": self.source_location,
+            "lead_status": self.lead_status or "new",
+            "lead_note": self.lead_note,
+            "lead_score": self.lead_score or 0,
+            "last_contacted_at": self.last_contacted_at.isoformat() if self.last_contacted_at else None,
             "scraped_at": self.scraped_at.isoformat() if self.scraped_at else None,
         }

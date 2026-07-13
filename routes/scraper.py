@@ -155,7 +155,21 @@ def start_scrape():
     db.session.commit()
 
     from services.scraping_service import run_scraping
-    celery_result = run_scraping.delay(task.id, radius=radius, center_lat=lat, center_lng=lng)
+    try:
+        celery_result = run_scraping.delay(
+            task.id,
+            radius=radius,
+            center_lat=lat,
+            center_lng=lng,
+        )
+    except Exception as exc:
+        task.status = "failed"
+        task.error_message = f"Gagal antre task ke Redis/Celery: {exc}"
+        db.session.commit()
+        return jsonify({
+            "error": "Gagal memulai scraping. Pastikan Redis dan Celery berjalan.",
+            "detail": str(exc),
+        }), 503
 
     task.celery_task_id = celery_result.id
     db.session.commit()

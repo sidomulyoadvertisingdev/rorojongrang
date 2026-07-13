@@ -1,13 +1,15 @@
 from celery import Celery
 
+from config.settings import REDIS_URL
+
 celery = Celery(
     "gmaps_scraper",
     include=["services.scraping_service"],
 )
 
 celery.conf.update(
-    broker_url="redis://localhost:6379/0",
-    result_backend="redis://localhost:6379/0",
+    broker_url=REDIS_URL,
+    result_backend=REDIS_URL,
     accept_content=["json"],
     task_serializer="json",
     result_serializer="json",

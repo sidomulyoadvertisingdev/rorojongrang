@@ -1,4 +1,4 @@
-"""Create admin user if not exists."""
+"""Create default admin user if not exists."""
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -7,39 +7,38 @@ from app import create_app
 from models import db
 from models.user import User
 
-ADMIN_EMAIL = "admin@admin.com"
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
-ADMIN_NAME = "Administrator"
-
-
 def seed():
+    admin_username = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
+    admin_email = os.getenv("DEFAULT_ADMIN_EMAIL", "admin@rorojonggrang.com")
+    admin_password = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
+    admin_name = os.getenv("DEFAULT_ADMIN_FULL_NAME", "Administrator")
+
     app = create_app()
     with app.app_context():
         existing = User.query.filter(
-            db.or_(User.email == ADMIN_EMAIL, User.username == ADMIN_USERNAME)
+            db.or_(User.email == admin_email, User.username == admin_username)
         ).first()
         if existing:
             print(f"  [=] Admin sudah ada: {existing.email} (username: {existing.username})")
-            if existing.email != ADMIN_EMAIL or not existing.is_admin:
-                existing.email = ADMIN_EMAIL
-                existing.full_name = ADMIN_NAME
+            if existing.email != admin_email or not existing.is_admin:
+                existing.email = admin_email
+                existing.full_name = admin_name
                 existing.is_admin = True
-                existing.set_password(ADMIN_PASSWORD)
+                existing.set_password(admin_password)
                 db.session.commit()
-                print(f"  [~] Admin diupdate: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
+                print(f"  [~] Admin diupdate: {admin_email} / {admin_password}")
             return
 
         user = User(
-            username=ADMIN_USERNAME,
-            email=ADMIN_EMAIL,
-            full_name=ADMIN_NAME,
+            username=admin_username,
+            email=admin_email,
+            full_name=admin_name,
             is_admin=True,
         )
-        user.set_password(ADMIN_PASSWORD)
+        user.set_password(admin_password)
         db.session.add(user)
         db.session.commit()
-        print(f"  [+] Admin dibuat: {ADMIN_EMAIL} / {ADMIN_PASSWORD}")
+        print(f"  [+] Admin dibuat: {admin_email} / {admin_password}")
 
 
 if __name__ == "__main__":

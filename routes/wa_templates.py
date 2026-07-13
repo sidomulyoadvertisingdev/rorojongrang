@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
+from datetime import datetime
 from models import db
 from models.wa_template import WaTemplate
 from models.wa_link import WaLink
@@ -105,5 +106,10 @@ def record_click():
         phone=phone,
     )
     db.session.add(click)
+    business = Business.query.filter_by(id=business_id, user_id=current_user.id).first()
+    if business:
+        business.last_contacted_at = datetime.utcnow()
+        if not business.lead_status or business.lead_status == "new":
+            business.lead_status = "sent"
     db.session.commit()
     return jsonify({"status": "recorded", "click_id": click.id})

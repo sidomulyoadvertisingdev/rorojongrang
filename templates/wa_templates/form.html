@@ -16,9 +16,12 @@
                     <input type="text" name="name" required class="input" placeholder="Contoh: Promo Produk" value="{{ template.name if template else '' }}">
                 </div>
                 <div>
-                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Pesan Template</label>
-                    <textarea name="message" required class="input" rows="6" placeholder="Halo {name}, saya tertarik dengan produk Anda. Kunjungi: {link}" id="messageInput" oninput="updatePreview()">{{ template.message if template else '' }}</textarea>
-                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Gunakan <code>{name}</code>, <code>{phone}</code>, <code>{address}</code>, <code>{link}</code>, atau placeholder custom lainnya</p>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px;">
+                        <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec);">Pesan Template</label>
+                        <button type="button" class="btn-secondary" style="font-size:11px; padding:5px 10px;" onclick="fillToposSmartTemplate()">Pakai Topos Smart</button>
+                    </div>
+                    <textarea name="message" required class="input" rows="8" placeholder="{smart_message}" id="messageInput" oninput="updatePreview()">{{ template.message if template else '' }}</textarea>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Gunakan <code>{smart_message}</code> untuk pesan ToposDigital otomatis, atau susun sendiri dengan placeholder dinamis.</p>
                 </div>
             </div>
 
@@ -65,6 +68,15 @@
                     <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{address}</code><span style="color:var(--text-muted);">Alamat</span></div>
                     <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{link}</code><span style="color:var(--text-muted);">Link yang dipilih</span></div>
                     <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{category}</code><span style="color:var(--text-muted);">Kategori bisnis</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{smart_message}</code><span style="color:var(--text-muted);">Pesan Topos otomatis</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{business_type}</code><span style="color:var(--text-muted);">Jenis toko</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{topos_hook}</code><span style="color:var(--text-muted);">Hook masalah</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{pain_point}</code><span style="color:var(--text-muted);">Masalah toko</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{topos_benefit}</code><span style="color:var(--text-muted);">Manfaat Topos</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{area}</code><span style="color:var(--text-muted);">Area bisnis</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{rating_context}</code><span style="color:var(--text-muted);">Konteks rating</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{topos_question}</code><span style="color:var(--text-muted);">Pertanyaan pembuka</span></div>
+                    <div style="display:flex; justify-content:space-between;"><code style="background:var(--border); padding:2px 6px; border-radius:4px;">{topos_cta}</code><span style="color:var(--text-muted);">Ajakan demo</span></div>
                 </div>
             </div>
         </div>
@@ -86,13 +98,32 @@ function addLink(name, url) {
 function updatePreview() {
     var msg = document.getElementById('messageInput').value;
     var preview = msg
+        .replace(/\{smart_message\}/g, '<strong style="color:#25d366;">Halo kak, saya lihat Nama Bisnis di Cileungsi. Ratingnya juga bagus, kelihatan sudah dipercaya pelanggan.<br><br>Biasanya untuk kuliner, yang sering bikin repot itu catat order, varian menu, stok bahan, menu terlaris, dan laporan shift sering makan waktu.<br><br>Saya dari ToposDigital. Kami bantu UMKM pakai kasir digital/POS supaya order kasir, menu, stok bahan, dan laporan penjualan harian bisa lebih rapi dalam satu sistem.<br><br>Di tempat kakak, order dan laporan harian masih dicatat manual atau sudah pakai sistem kasir?<br><br>Kalau boleh, saya kirim contoh demo 1 menit untuk alur cafe/restoran?</strong>')
         .replace(/\{name\}/g, '<strong style="color:#25d366;">Nama Bisnis</strong>')
         .replace(/\{phone\}/g, '<strong style="color:#25d366;">08xxx</strong>')
         .replace(/\{address\}/g, '<strong style="color:#25d366;">Alamat Bisnis</strong>')
         .replace(/\{link\}/g, '<strong style="color:#25d366;">https://link-anda.com</strong>')
         .replace(/\{category\}/g, '<strong style="color:#25d366;">Kategori</strong>')
+        .replace(/\{area\}/g, '<strong style="color:#25d366;">Cileungsi</strong>')
+        .replace(/\{business_type\}/g, '<strong style="color:#25d366;">kuliner</strong>')
+        .replace(/\{topos_hook\}/g, '<strong style="color:#25d366;">bisnis kuliner kalau mulai ramai biasanya paling kerasa di order, stok bahan, dan laporan harian</strong>')
+        .replace(/\{pain_point\}/g, '<strong style="color:#25d366;">catat order, varian menu, stok bahan, menu terlaris, dan laporan shift sering makan waktu</strong>')
+        .replace(/\{topos_benefit\}/g, '<strong style="color:#25d366;">order kasir, menu, stok bahan, dan laporan penjualan harian bisa lebih rapi dalam satu sistem</strong>')
+        .replace(/\{topos_pitch\}/g, '<strong style="color:#25d366;">ToposDigital adalah solusi kasir digital untuk UMKM</strong>')
+        .replace(/\{rating_context\}/g, '<strong style="color:#25d366;">Ratingnya juga bagus, kelihatan sudah dipercaya pelanggan.</strong>')
+        .replace(/\{topos_question\}/g, '<strong style="color:#25d366;">Di tempat kakak, order dan laporan harian masih dicatat manual atau sudah pakai sistem kasir?</strong>')
+        .replace(/\{topos_cta\}/g, '<strong style="color:#25d366;">Kalau boleh, saya kirim contoh demo 1 menit untuk alur cafe/restoran?</strong>')
         .replace(/\{(\w+)\}/g, '<strong style="color:#25d366;">[$1]</strong>');
     document.getElementById('preview-box').innerHTML = preview || '<span style="color:var(--text-muted);">Ketik pesan di sebelah kiri untuk melihat preview...</span>';
+}
+
+function fillToposSmartTemplate() {
+    document.querySelector('input[name="name"]').value = 'Topos Smart - UMKM';
+    document.getElementById('messageInput').value = '{smart_message}';
+    if (!document.querySelector('#links-container .link-row')) {
+        addLink('Website ToposDigital', 'https://toposdigital.com');
+    }
+    updatePreview();
 }
 </script>
 {% endblock %}

@@ -4,7 +4,9 @@ from datetime import datetime
 from celery import shared_task
 import redis
 
-redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+from config.settings import REDIS_HOST, REDIS_PORT, REDIS_DB
+
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
 
 
 @shared_task(bind=True, name="services.scraping_service.run_scraping")
@@ -60,30 +62,47 @@ def run_scraping(self, task_id, radius=5, center_lat=0, center_lng=0):
             _publish_log(task_id, "info", "Menggulir halaman hasil...")
             total = navigator.scroll_results_panel()
             links = navigator.get_result_links()
+            use_card_fallback = False
 
             if not links:
-                _publish_log(task_id, "error", "Tidak ada link ditemukan setelah scroll")
-                task.status = "failed"
-                task.error_message = "No links found"
-                db.session.commit()
-                _publish_progress(task_id, task)
-                return {"error": "No links found"}
+                card_count = navigator.get_result_cards_count()
+                if card_count:
+                    use_card_fallback = True
+                    total = card_count
+                    _publish_log(task_id, "warning", f"Link hasil tidak ditemukan, pakai fallback klik {card_count} kartu hasil")
+                else:
+                    _publish_log(task_id, "error", "Tidak ada link/kartu hasil ditemukan setelah scroll")
+                    task.status = "failed"
+                    task.error_message = "No result links or cards found"
+                    db.session.commit()
+                    _publish_progress(task_id, task)
+                    return {"error": "No result links or cards found"}
 
-            task.total_results = len(links)
+            total_results = total if use_card_fallback else len(links)
+            task.total_results = total_results
             db.session.commit()
-            _publish_log(task_id, "success", f"Ditemukan {len(links)} hasil")
+            _publish_log(task_id, "success", f"Ditemukan {total_results} hasil")
             _publish_progress(task_id, task)
 
             scraped_count = 0
             error_count = 0
-            for idx, link in enumerate(links):
+            result_items = range(total_results) if use_card_fallback else links
+            for idx, item in enumerate(result_items):
                 task = ScrapingTask.query.get(task_id)
                 if task.status == "cancelled":
                     _publish_log(task_id, "warning", "Task dibatalkan oleh user")
                     break
 
                 try:
-                    navigator.open_place(link)
+                    if use_card_fallback:
+                        opened = navigator.open_result_card(idx)
+                    else:
+                        opened = navigator.open_place(item)
+                    if not opened:
+                        error_count += 1
+                        _publish_log(task_id, "warning", f"[{idx+1}/{total_results}] Gagal membuka hasil")
+                        continue
+
                     detail = parser.parse_business_detail(browser.driver)
                     detail["source_keyword"] = task.keyword
                     detail["source_location"] = task.location
@@ -101,33 +120,41 @@ def run_scraping(self, task_id, radius=5, center_lat=0, center_lng=0):
                             for key in ["phone", "website", "rating", "review_count", "operating_hours", "address"]:
                                 if detail.get(key) and not getattr(existing, key, None):
                                     setattr(existing, key, detail[key])
-                            _publish_log(task_id, "info", f"[{idx+1}/{len(links)}] Update: {detail.get('name', '')}")
+                            _publish_log(task_id, "info", f"[{idx+1}/{total_results}] Update: {detail.get('name', '')}")
                         else:
                             filtered = {k: v for k, v in detail.items() if hasattr(Business, k) and v is not None and v != ""}
                             biz = Business(**filtered)
                             db.session.add(biz)
-                            _publish_log(task_id, "data", f"[{idx+1}/{len(links)}] {detail.get('name', '')} | ☎ {detail.get('phone', '-')} | ⭐ {detail.get('rating', '-')}")
+                            _publish_log(task_id, "data", f"[{idx+1}/{total_results}] {detail.get('name', '')} | ☎ {detail.get('phone', '-')} | ⭐ {detail.get('rating', '-')}")
 
                         db.session.commit()
                         scraped_count += 1
                     else:
-                        _publish_log(task_id, "warning", f"[{idx+1}/{len(links)}] Nama kosong, skip")
+                        _publish_log(task_id, "warning", f"[{idx+1}/{total_results}] Nama kosong, skip")
                         error_count += 1
 
                     task.scraped_results = scraped_count
-                    task.progress_percent = ((idx + 1) / len(links)) * 100
-                    task.current_log = f"[{idx+1}/{len(links)}] {detail.get('name', '')}"
+                    task.progress_percent = ((idx + 1) / total_results) * 100
+                    task.current_log = f"[{idx+1}/{total_results}] {detail.get('name', '')}"
                     db.session.commit()
                     _publish_progress(task_id, task)
+
+                    if use_card_fallback:
+                        navigator.go_back_to_results()
 
                     rate_limiter.wait()
                 except Exception as e:
                     error_count += 1
-                    _publish_log(task_id, "warning", f"[{idx+1}/{len(links)}] Error: {str(e)[:80]}")
+                    _publish_log(task_id, "warning", f"[{idx+1}/{total_results}] Error: {str(e)[:80]}")
                     try:
                         db.session.rollback()
                     except:
                         pass
+                    if use_card_fallback:
+                        try:
+                            navigator.go_back_to_results()
+                        except Exception:
+                            pass
                     continue
 
             task = ScrapingTask.query.get(task_id)

@@ -22,6 +22,11 @@ SCRAPE_CONFIG = {
     "browser_restart_every": int(os.getenv("BROWSER_RESTART_EVERY", 50)),
 }
 
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB = int(os.getenv("REDIS_DB", 0))
+REDIS_URL = os.getenv("REDIS_URL", f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}")
+
 CHROME_OPTIONS = [
     "--disable-blink-features=AutomationControlled",
     "--disable-infobars",
