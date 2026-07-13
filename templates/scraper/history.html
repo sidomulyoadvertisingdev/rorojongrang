@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}History - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:32px;">
+    <h1 style="font-size:24px; font-weight:800; color:var(--text);">Riwayat Scraping</h1>
+    <p style="color:var(--text-sec); margin-top:4px;">Semua task scraping yang pernah Anda jalankan</p>
+</div>
+
+<div class="card" style="overflow:hidden;">
+    <div style="overflow-x:auto;">
+        <table style="width:100%;">
+            <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Keyword</th>
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Lokasi</th>
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Kategori</th>
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Status</th>
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Hasil</th>
+                    <th style="padding:14px 24px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Tanggal</th>
+                    <th style="padding:14px 24px; text-align:right; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks.items %}
+                <tr style="border-bottom:1px solid var(--border-light); transition:background .2s;" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:14px 24px; font-size:14px; font-weight:600; color:var(--text);">{{ task.keyword }}</td>
+                    <td style="padding:14px 24px; font-size:13px; color:var(--text-sec);">{{ task.location }}</td>
+                    <td style="padding:14px 24px; font-size:13px; color:var(--text-sec);">{{ task.category or '-' }}</td>
+                    <td style="padding:14px 24px;">
+                        {% if task.status == 'completed' %}
+                        <span class="status-badge" style="background:rgba(16,185,129,0.1); color:#10b981;">Selesai</span>
+                        {% elif task.status == 'running' %}
+                        <span class="status-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">Berjalan</span>
+                        {% elif task.status == 'pending' %}
+                        <span class="status-badge" style="background:rgba(245,158,11,0.1); color:#f59e0b;">Menunggu</span>
+                        {% elif task.status == 'failed' %}
+                        <span class="status-badge" style="background:rgba(239,68,68,0.1); color:#ef4444;">Gagal</span>
+                        {% else %}
+                        <span class="status-badge" style="background:var(--border); color:var(--text-sec);">Dibatalkan</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:14px 24px; font-size:13px; color:var(--text);">{{ task.scraped_results }} / {{ task.total_results }}</td>
+                    <td style="padding:14px 24px; font-size:13px; color:var(--text-sec);">{{ task.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                    <td style="padding:14px 24px; text-align:right; display:flex; gap:6px; justify-content:flex-end;">
+                        {% if task.status == 'completed' %}
+                        <a href="{{ url_for('scraper.download', task_id=task.id, fmt='csv') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px;">CSV</a>
+                        <a href="{{ url_for('scraper.download', task_id=task.id, fmt='json') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px;">JSON</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="padding:48px 24px; text-align:center; color:var(--text-sec);">
+                        Belum ada riwayat scraping
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if tasks.pages > 1 %}
+    <div style="padding:16px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <p style="font-size:13px; color:var(--text-sec);">Halaman {{ tasks.page }} dari {{ tasks.pages }}</p>
+        <div style="display:flex; gap:8px;">
+            {% if tasks.has_prev %}
+            <a href="?page={{ tasks.prev_num }}" class="btn-secondary" style="font-size:13px;">Sebelumnya</a>
+            {% endif %}
+            {% if tasks.has_next %}
+            <a href="?page={{ tasks.next_num }}" class="btn-secondary" style="font-size:13px;">Selanjutnya</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "blog/base.html" %}
+{% block title %}RoroJonggrang - Scraping Data Google Maps untuk Digital Marketing{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge fade-in">
+            <span class="dot"></span>
+            {% if lang == 'id' %}Platform Scraping #1 untuk Digital Marketing{% else %}#1 Scraping Platform for Digital Marketing{% endif %}
+        </div>
+        <h1 class="fade-in fade-in-delay-1">
+            {% if lang == 'id' %}
+            Scraping Data Google Maps<br>untuk Bisnis Anda
+            {% else %}
+            Scrape Google Maps Data<br>for Your Business
+            {% endif %}
+        </h1>
+        <p class="fade-in fade-in-delay-2">
+            {% if lang == 'id' %}
+            Kumpulkan data ribuan bisnis lokal dari Google Maps secara otomatis. Nama, alamat, telepon, rating — semua dalam satu klik.
+            {% else %}
+            Automatically collect data from thousands of local businesses on Google Maps. Names, addresses, phones, ratings — all in one click.
+            {% endif %}
+        </p>
+        <div class="hero-buttons fade-in fade-in-delay-3">
+            <a href="{{ url_for('auth.register') }}" class="btn-primary">
+                {% if lang == 'id' %}Mulai Gratis →{% else %}Start Free →{% endif %}
+            </a>
+            <a href="{{ url_for('blog.features', lang=lang) }}" class="btn-outline">
+                {% if lang == 'id' %}Lihat Fitur{% else %}View Features{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<div class="container">
+    <div class="stats-bar fade-in">
+        <div class="stat-item">
+            <div class="stat-number">110+</div>
+            <div class="stat-label">{% if lang == 'id' %}Data Terscraping{% else %}Data Scraped{% endif %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">10</div>
+            <div class="stat-label">{% if lang == 'id' %}Lokasi Target{% else %}Target Locations{% endif %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">6</div>
+            <div class="stat-label">{% if lang == 'id' %}Kategori Bisnis{% else %}Business Categories{% endif %}</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">{% if lang == 'id' %}Real-time Monitoring{% else %}Real-time Monitoring{% endif %}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Why RoroJonggrang -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if lang == 'id' %}Kenapa RoroJonggrang?{% else %}Why RoroJonggrang?{% endif %}</h2>
+            <p>{% if lang == 'id' %}Dirancang khusus untuk kebutuhan digital marketing yang membutuhkan data akurat dan cepat.{% else %}Designed specifically for digital marketing needs that require accurate and fast data.{% endif %}</p>
+        </div>
+        <div class="card-grid">
+            <div class="card fade-in">
+                <div class="card-icon">⚡</div>
+                <h3>{% if lang == 'id' %}Otomatis & Cepat{% else %}Automatic & Fast{% endif %}</h3>
+                <p>{% if lang == 'id' %}Tanpa perlu buka Google Maps manual. Masukkan keyword, pilih lokasi, dan biarkan sistem bekerja untuk Anda.{% else %}No need to open Google Maps manually. Enter keyword, choose location, and let the system work for you.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-1">
+                <div class="card-icon">📡</div>
+                <h3>{% if lang == 'id' %}Real-time Monitoring{% else %}Real-time Monitoring{% endif %}</h3>
+                <p>{% if lang == 'id' %}Pantau proses scraping secara langsung melalui terminal real-time. Lihat setiap data yang masuk secara instan.{% else %}Monitor the scraping process directly through a real-time terminal. See each incoming data instantly.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-2">
+                <div class="card-icon">🎯</div>
+                <h3>{% if lang == 'id' %}Radius Pencarian{% else %}Search Radius{% endif %}</h3>
+                <p>{% if lang == 'id' %}Atur radius pencarian dari 1km hingga 20km untuk mendapatkan data yang lebih relevan dengan area target Anda.{% else %}Set search radius from 1km to 20km to get data more relevant to your target area.{% endif %}</p>
+            </div>
+            <div class="card fade-in">
+                <div class="card-icon">📊</div>
+                <h3>{% if lang == 'id' %}Export Mudah{% else %}Easy Export{% endif %}</h3>
+                <p>{% if lang == 'id' %}Download hasil scraping dalam format CSV atau JSON. Siap diimport ke tools marketing Anda.{% else %}Download scraping results in CSV or JSON format. Ready to import into your marketing tools.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-1">
+                <div class="card-icon">🌙</div>
+                <h3>{% if lang == 'id' %}Dark & Light Mode{% else %}Dark & Light Mode{% endif %}</h3>
+                <p>{% if lang == 'id' %}Tampilan premium dengan mode malam dan siang. Nyaman digunakan kapan saja, di mana saja.{% else %}Premium interface with night and day modes. Comfortable to use anytime, anywhere.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-2">
+                <div class="card-icon">🔒</div>
+                <h3>{% if lang == 'id' %}Aman & Privat{% else %}Safe & Private{% endif %}</h3>
+                <p>{% if lang == 'id' %}Data Anda tersimpan aman di server lokal. Tidak ada data yang dikirim ke pihak ketiga.{% else %}Your data is securely stored on a local server. No data is sent to third parties.{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if lang == 'id' %}Cara Kerja{% else %}How It Works{% endif %}</h2>
+            <p>{% if lang == 'id' %}Hanya 3 langkah sederhana untuk mendapatkan data bisnis yang Anda butuhkan.{% else %}Just 3 simple steps to get the business data you need.{% endif %}</p>
+        </div>
+        <div class="steps">
+            <div class="step fade-in">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>{% if lang == 'id' %}Pilih Keyword & Lokasi{% else %}Choose Keyword & Location{% endif %}</h3>
+                    <p>{% if lang == 'id' %}Masukkan keyword bisnis yang ingin dicari (contoh: "toko besi") dan pilih lokasi target (contoh: "Kabupaten Bandung"). Atur radius jika diperlukan.{% else %}Enter the business keyword you want to search (e.g., "toko besi") and choose a target location (e.g., "Kabupaten Bandung"). Set the radius if needed.{% endif %}</p>
+                </div>
+            </div>
+            <div class="step fade-in fade-in-delay-1">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>{% if lang == 'id' %}Jalankan Scraping{% else %}Run Scraping{% endif %}</h3>
+                    <p>{% if lang == 'id' %}Klik tombol "Mulai Scraping" dan pantau prosesnya secara real-time melalui terminal. Sistem akan mengumpulkan data secara otomatis.{% else %}Click the "Start Scraping" button and monitor the process in real-time through the terminal. The system will collect data automatically.{% endif %}</p>
+                </div>
+            </div>
+            <div class="step fade-in fade-in-delay-2">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>{% if lang == 'id' %}Download Hasil{% else %}Download Results{% endif %}</h3>
+                    <p>{% if lang == 'id' %}Setelah selesai, download data dalam format CSV atau JSON. Siap digunakan untuk kampanye marketing, cold calling, atau analisis pasar.{% else %}Once finished, download the data in CSV or JSON format. Ready to use for marketing campaigns, cold calling, or market analysis.{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Use Cases -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if lang == 'id' %}Untuk Siapa Ini?{% else %}Who Is This For?{% endif %}</h2>
+            <p>{% if lang == 'id' %}Cocok untuk berbagai kebutuhan digital marketing dan penjualan.{% else %}Suitable for various digital marketing and sales needs.{% endif %}</p>
+        </div>
+        <div class="card-grid">
+            <div class="card fade-in">
+                <div class="card-icon">📱</div>
+                <h3>{% if lang == 'id' %}Digital Marketing Agency{% else %}Digital Marketing Agency{% endif %}</h3>
+                <p>{% if lang == 'id' %}Kumpulkan data prospek untuk kampanye iklan, email marketing, dan outreach klien.{% else %}Collect prospect data for ad campaigns, email marketing, and client outreach.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-1">
+                <div class="card-icon">📞</div>
+                <h3>{% if lang == 'id' %}Sales & Telemarketing{% else %}Sales & Telemarketing{% endif %}</h3>
+                <p>{% if lang == 'id' %}Dapatkan daftar nomor telepon bisnis lokal untuk cold calling dan WhatsApp blast.{% else %}Get local business phone numbers for cold calling and WhatsApp blasts.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-2">
+                <div class="card-icon">📈</div>
+                <h3>{% if lang == 'id' %}Market Research{% else %}Market Research{% endif %}</h3>
+                <p>{% if lang == 'id' %}Analisis kompetitor, jumlah bisnis per area, dan distribusi rating di suatu lokasi.{% else %}Analyze competitors, number of businesses per area, and rating distribution in a location.{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2>{% if lang == 'id' %}Siap Memulai?{% else %}Ready to Start?{% endif %}</h2>
+            <p>{% if lang == 'id' %}Daftar sekarang dan mulai kumpulkan data Google Maps untuk bisnis Anda.{% else %}Sign up now and start collecting Google Maps data for your business.{% endif %}</p>
+            <a href="{{ url_for('auth.register') }}" class="btn-white">
+                {% if lang == 'id' %}Daftar Gratis Sekarang{% else %}Register Free Now{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

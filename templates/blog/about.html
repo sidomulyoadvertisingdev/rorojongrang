@@ -1,0 +1,148 @@
+{% extends "blog/base.html" %}
+{% block title %}Tentang - RoroJonggrang{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>{% if lang == 'id' %}Tentang RoroJonggrang{% else %}About RoroJonggrang{% endif %}</h1>
+        <p>{% if lang == 'id' %}Platform scraping data Google Maps yang dirancang untuk kebutuhan digital marketing Indonesia.{% else %}Google Maps data scraping platform designed for Indonesian digital marketing needs.{% endif %}</p>
+    </div>
+</section>
+
+<!-- Vision & Mission -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="about-grid fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">🎯</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Visi & Misi{% else %}Vision & Mission{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
+                    {% if lang == 'id' %}
+                    RoroJonggrang hadir sebagai solusi untuk para digital marketer Indonesia yang membutuhkan data bisnis lokal secara cepat dan akurat. Nama "Roro Jonggrang" terinspirasi dari legenda Jawa yang menggambarkan kekuatan dan ketekunan.
+                    {% else %}
+                    RoroJonggrang is a solution for Indonesian digital marketers who need local business data quickly and accurately. The name "Roro Jonggrang" is inspired by Javanese legend that depicts strength and perseverance.
+                    {% endif %}
+                </p>
+                <div style="padding: 20px 24px; border-radius: 12px; background: var(--accent-light); border-left: 4px solid var(--accent);">
+                    <p style="font-size: 15px; color: var(--text); font-style: italic; line-height: 1.8;">
+                        {% if lang == 'id' %}
+                        "Memberdayakan digital marketer Indonesia dengan data yang akurat, cepat, dan mudah diakses."
+                        {% else %}
+                        "Empowering Indonesian digital marketers with accurate, fast, and accessible data."
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom: 16px;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Visi{% else %}Vision{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8;">
+                        {% if lang == 'id' %}
+                        Menjadi platform scraping data terdepan yang membantu bisnis Indonesia tumbuh melalui data yang berharga.
+                        {% else %}
+                        To become the leading data scraping platform that helps Indonesian businesses grow through valuable data.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Misi{% else %}Mission{% endif %}
+                    </h3>
+                    <ul style="font-size: 15px; color: var(--text-secondary); line-height: 2;">
+                        <li>• {% if lang == 'id' %}Menyediakan tools scraping yang mudah digunakan{% else %}Provide easy-to-use scraping tools{% endif %}</li>
+                        <li>• {% if lang == 'id' %}Menjamin keamanan dan privasi data pengguna{% else %}Ensure user data security and privacy{% endif %}</li>
+                        <li>• {% if lang == 'id' %}Terus mengembangkan fitur sesuai kebutuhan pasar{% else %}Continuously develop features according to market needs{% endif %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if lang == 'id' %}Tech Stack{% else %}Tech Stack{% endif %}</h2>
+            <p>{% if lang == 'id' %}Dibangun dengan teknologi modern yang andal dan teruji.{% else %}Built with modern, reliable, and tested technologies.{% endif %}</p>
+        </div>
+        <div class="card-grid">
+            <div class="card fade-in" style="text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 12px;">🐍</div>
+                <h3 style="font-size: 18px; font-weight: 700;">Python 3.9</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Backend & Automation</p>
+                <div class="tech-stack" style="justify-content: center; margin-top: 16px;">
+                    <span class="tech-badge">Flask</span>
+                    <span class="tech-badge">Celery</span>
+                    <span class="tech-badge">SQLAlchemy</span>
+                </div>
+            </div>
+            <div class="card fade-in fade-in-delay-1" style="text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 12px;">🌐</div>
+                <h3 style="font-size: 18px; font-weight: 700;">Selenium</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Browser Automation</p>
+                <div class="tech-stack" style="justify-content: center; margin-top: 16px;">
+                    <span class="tech-badge">Chrome</span>
+                    <span class="tech-badge">Headless</span>
+                    <span class="tech-badge">Anti-detect</span>
+                </div>
+            </div>
+            <div class="card fade-in fade-in-delay-2" style="text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 12px;">🗄</div>
+                <h3 style="font-size: 18px; font-weight: 700;">MySQL & Redis</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 8px;">Database & Message Queue</p>
+                <div class="tech-stack" style="justify-content: center; margin-top: 16px;">
+                    <span class="tech-badge">MySQL 8</span>
+                    <span class="tech-badge">Redis</span>
+                    <span class="tech-badge">Docker</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>{% if lang == 'id' %}Nilai-Nilai Kami{% else %}Our Values{% endif %}</h2>
+        </div>
+        <div class="card-grid">
+            <div class="card fade-in">
+                <div class="card-icon">🚀</div>
+                <h3>{% if lang == 'id' %}Kecepatan{% else %}Speed{% endif %}</h3>
+                <p>{% if lang == 'id' %}Data adalah senjata utama digital marketer. Kami memastikan Anda mendapatkannya secepat mungkin.{% else %}Data is a digital marketer's main weapon. We ensure you get it as fast as possible.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-1">
+                <div class="card-icon">🔒</div>
+                <h3>{% if lang == 'id' %}Keamanan{% else %}Security{% endif %}</h3>
+                <p>{% if lang == 'id' %}Data Anda tidak pernah keluar dari server lokal. Privasi Anda adalah prioritas kami.{% else %}Your data never leaves the local server. Your privacy is our priority.{% endif %}</p>
+            </div>
+            <div class="card fade-in fade-in-delay-2">
+                <div class="card-icon">💡</div>
+                <h3>{% if lang == 'id' %}Inovasi{% else %}Innovation{% endif %}</h3>
+                <p>{% if lang == 'id' %}Kami terus mengembangkan fitur baru sesuai dengan kebutuhan pasar digital marketing yang terus berubah.{% else %}We continuously develop new features according to the ever-changing digital marketing market needs.{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2>{% if lang == 'id' %}Bergabung dengan Kami{% else %}Join Us{% endif %}</h2>
+            <p>{% if lang == 'id' %}Mulai gunakan RoroJonggrang dan rasakan kemudahan scraping data Google Maps.{% else %}Start using RoroJonggrang and experience the ease of scraping Google Maps data.{% endif %}</p>
+            <a href="{{ url_for('auth.register') }}" class="btn-white">
+                {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

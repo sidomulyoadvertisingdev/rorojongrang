@@ -1,0 +1,196 @@
+{% extends "blog/base.html" %}
+{% block title %}FAQ - RoroJonggrang{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>{% if lang == 'id' %}Pertanyaan Umum{% else %}Frequently Asked Questions{% endif %}</h1>
+        <p>{% if lang == 'id' %}Jawaban atas pertanyaan yang sering ditanyakan tentang RoroJonggrang.{% else %}Answers to frequently asked questions about RoroJonggrang.{% endif %}</p>
+    </div>
+</section>
+
+<!-- FAQ List -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="faq-list">
+
+            <!-- FAQ 1 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apakah RoroJonggrang aman digunakan?{% else %}Is RoroJonggrang safe to use?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Ya, RoroJonggrang dirancang dengan fitur anti-detection yang membuat aktivitas scraping tidak terdeteksi oleh Google Maps. Sistem menggunakan random delay, rotasi user-agent, dan teknik lainnya untuk menjaga keamanan. Selain itu, semua data tersimpan di server lokal Anda, bukan di cloud eksternal.
+                    {% else %}
+                    Yes, RoroJonggrang is designed with anti-detection features that make scraping activities undetected by Google Maps. The system uses random delays, user-agent rotation, and other techniques to maintain safety. Additionally, all data is stored on your local server, not external clouds.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Berapa banyak data yang bisa di-scrape?{% else %}How much data can be scraped?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Tidak ada batasan jumlah data. Anda bisa melakukan scraping sebanyak yang Anda butuhkan. Namun, kami menyarankan untuk melakukan scraping secara bertahap dan tidak terlalu agresif untuk menjaga kestabilan sistem.
+                    {% else %}
+                    There is no limit to the amount of data. You can scrape as much as you need. However, we recommend scraping gradually and not too aggressively to maintain system stability.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apa saja data yang diambil dari Google Maps?{% else %}What data is taken from Google Maps?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    RoroJonggrang mengambil data berikut: nama bisnis, alamat lengkap, nomor telepon, rating bintang, jumlah review, dan link Google Maps. Semua data disimpan dalam format yang rapi dan siap digunakan.
+                    {% else %}
+                    RoroJonggrang collects the following data: business name, full address, phone number, star rating, number of reviews, and Google Maps link. All data is stored in a neat format and ready to use.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apakah saya perlu install software tambahan?{% else %}Do I need to install additional software?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Tidak. RoroJonggrang berjalan sepenuhnya di browser Anda. Cukup login ke akun Anda dan mulai scraping. Sistem akan bekerja secara otomatis di server.
+                    {% else %}
+                    No. RoroJonggrang runs entirely in your browser. Just login to your account and start scraping. The system will work automatically on the server.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apakah data yang di-scrape bisa di-export ke Excel?{% else %}Can scraped data be exported to Excel?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Ya! Anda bisa mendownload hasil scraping dalam format CSV yang bisa langsung dibuka di Google Sheets atau Microsoft Excel. Selain itu, tersedia juga format JSON untuk kebutuhan integrasi aplikasi.
+                    {% else %}
+                    Yes! You can download scraping results in CSV format that can be directly opened in Google Sheets or Microsoft Excel. Additionally, JSON format is also available for application integration needs.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 6 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Lokasi mana saja yang didukung?{% else %}Which locations are supported?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Saat ini RoroJonggrang mendukung 10 lokasi di Jawa Barat: Kabupaten Bandung, Bandung Barat, Cimahi, Sumedang, Garut, Tasikmalaya, Ciamis, Kuningan, Majalengka, dan Indramayu. Kami akan terus menambah lokasi baru sesuai permintaan.
+                    {% else %}
+                    Currently RoroJonggrang supports 10 locations in West Java: Kabupaten Bandung, Bandung Barat, Cimahi, Sumedang, Garut, Tasikmalaya, Ciamis, Kuningan, Majalengka, and Indramayu. We will continue to add new locations as requested.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 7 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Berapa lama waktu yang dibutuhkan untuk scraping?{% else %}How long does scraping take?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Waktu scraping tergantung pada jumlah hasil dan radius pencarian. Rata-rata, sistem bisa mengumpulkan 10-15 data per menit. Untuk 100 data, biasanya dibutuhkan sekitar 7-10 menit.
+                    {% else %}
+                    Scraping time depends on the number of results and search radius. On average, the system can collect 10-15 data per minute. For 100 data, it usually takes about 7-10 minutes.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 8 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apakah ada batasan penggunaan?{% else %}Are there usage limits?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Saat ini tidak ada batasan penggunaan. Anda bisa melakukan scraping sebanyak yang Anda butuhkan. Namun, kami menyarankan untuk tidak menjalankan terlalu banyak task secara bersamaan untuk menjaga performa sistem.
+                    {% else %}
+                    Currently there are no usage limits. You can scrape as much as you need. However, we recommend not running too many tasks simultaneously to maintain system performance.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 9 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Bagaimana cara mengatasi error saat scraping?{% else %}How to troubleshoot scraping errors?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Jika terjadi error, coba: (1) Pastikan koneksi internet stabil, (2) Gunakan keyword yang lebih spesifik, (3) Kurangi radius pencarian, (4) Tunggu beberapa menit lalu coba lagi. Jika masalah berlanjut, hubungi tim support kami.
+                    {% else %}
+                    If an error occurs, try: (1) Ensure stable internet connection, (2) Use more specific keywords, (3) Reduce search radius, (4) Wait a few minutes then try again. If the problem persists, contact our support team.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+            <!-- FAQ 10 -->
+            <div class="faq-item fade-in">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span>{% if lang == 'id' %}Apakah RoroJonggrang tersedia dalam bahasa Inggris?{% else %}Is RoroJonggrang available in English?{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>{% if lang == 'id' %}
+                    Ya! RoroJonggrang mendukung dua bahasa: Indonesia dan Inggris. Anda bisa beralih bahasa dengan mengklik tombol "EN" atau "ID" di pojok kanan atas halaman.
+                    {% else %}
+                    Yes! RoroJonggrang supports two languages: Indonesian and English. You can switch languages by clicking the "EN" or "ID" button in the top right corner of the page.
+                    {% endif %}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2>{% if lang == 'id' %}Masih Ada Pertanyaan?{% else %}Still Have Questions?{% endif %}</h2>
+            <p>{% if lang == 'id' %}Daftar dan coba sendiri kemudahan RoroJonggrang.{% else %}Sign up and try the ease of RoroJonggrang yourself.{% endif %}</p>
+            <a href="{{ url_for('auth.register') }}" class="btn-white">
+                {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+}
+</script>
+{% endblock %}

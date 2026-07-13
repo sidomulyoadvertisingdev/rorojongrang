@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RoroJonggrang Data Scrape{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/sse.js"></script>
+    <style>
+        :root {
+            --bg: #f8fafc; --bg-card: #ffffff; --bg-sidebar: #ffffff;
+            --text: #0f172a; --text-sec: #64748b; --text-muted: #94a3b8;
+            --border: #e2e8f0; --border-light: #f1f5f9;
+            --accent: #10b981; --accent-dark: #059669; --accent-light: #d1fae5;
+            --grad-start: #10b981; --grad-mid: #06b6d4; --grad-end: #3b82f6;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05); --shadow-hover: 0 8px 25px rgba(0,0,0,0.08);
+            --terminal-bg: #0d1117; --terminal-text: #c9d1d9;
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a; --bg-card: #1e293b; --bg-sidebar: #1e293b;
+            --text: #f1f5f9; --text-sec: #94a3b8; --text-muted: #64748b;
+            --border: #334155; --border-light: #1e293b;
+            --accent: #34d399; --accent-dark: #10b981; --accent-light: rgba(16,185,129,0.15);
+            --grad-start: #34d399; --grad-mid: #22d3ee; --grad-end: #60a5fa;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-hover: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); transition:background .3s,color .3s; }
+        a { text-decoration:none; color:inherit; }
+
+        /* Sidebar */
+        .sidebar { width:260px; background:var(--bg-sidebar); border-right:1px solid var(--border); transition:width .3s ease; overflow:hidden; }
+        .sidebar.collapsed { width:72px; }
+        .sidebar.collapsed .menu-label, .sidebar.collapsed .brand-text, .sidebar.collapsed .user-info { opacity:0; width:0; overflow:hidden; }
+        .sidebar.collapsed .nav-item { justify-content:center; padding-left:0; padding-right:0; }
+        .sidebar.collapsed .nav-item svg { margin:0; }
+        .sidebar-logo { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+        .logo-icon { width:40px; height:40px; min-width:40px; border-radius:12px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:18px; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:10px; font-size:14px; font-weight:500; color:var(--text-sec); transition:all .2s; cursor:pointer; margin:2px 8px; }
+        .nav-item:hover { background:var(--accent-light); color:var(--accent); }
+        .nav-item.active { background:var(--accent-light); color:var(--accent); font-weight:600; }
+        .nav-item svg { width:20px; height:20px; min-width:20px; }
+        .nav-divider { height:1px; background:var(--border); margin:12px 16px; }
+
+        /* Main */
+        .main-content { margin-left:260px; padding:32px; transition:margin-left .3s ease; min-height:100vh; }
+        .sidebar.collapsed ~ .main-wrap .main-content { margin-left:72px; }
+
+        /* Cards */
+        .card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); transition:all .3s; }
+        .card:hover { box-shadow:var(--shadow-hover); }
+
+        /* Buttons */
+        .btn-primary { background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); color:#fff; font-weight:600; padding:10px 20px; border-radius:10px; border:none; cursor:pointer; transition:transform .2s,box-shadow .2s; display:inline-flex; align-items:center; gap:8px; font-size:14px; }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 15px rgba(16,185,129,0.35); }
+        .btn-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+        .btn-secondary { background:var(--bg-card); border:1px solid var(--border); color:var(--text); font-weight:500; padding:8px 16px; border-radius:10px; cursor:pointer; transition:all .2s; font-size:13px; }
+        .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+        .btn-danger { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#ef4444; font-weight:500; padding:8px 16px; border-radius:10px; cursor:pointer; transition:all .2s; font-size:13px; }
+        .btn-danger:hover { background:rgba(239,68,68,0.2); }
+
+        /* Inputs */
+        .input { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); color:var(--text); font-size:14px; outline:none; transition:all .2s; font-family:inherit; }
+        .input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-light); }
+        select.input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; }
+
+        /* Status badges */
+        .status-badge { display:inline-flex; align-items:center; padding:4px 12px; border-radius:100px; font-size:12px; font-weight:600; }
+
+        /* Progress */
+        .progress-bar { height:8px; background:var(--border); border-radius:100px; overflow:hidden; }
+        .progress-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--grad-start),var(--grad-end)); transition:width .5s ease; }
+
+        /* Animations */
+        .fade-in { animation:fadeIn .4s ease-out; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Theme toggle */
+        .theme-toggle { width:36px; height:36px; border-radius:10px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all .2s; }
+        .theme-toggle:hover { border-color:var(--accent); }
+
+        /* Collapse toggle */
+        .collapse-toggle { position:absolute; top:28px; right:-12px; width:24px; height:24px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border); color:var(--text-sec); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; z-index:10; transition:all .2s; }
+        .collapse-toggle:hover { border-color:var(--accent); color:var(--accent); }
+
+        /* User section */
+        .user-section { padding:16px; border-top:1px solid var(--border); }
+        .user-avatar { width:36px; height:36px; min-width:36px; border-radius:10px; background:linear-gradient(135deg,var(--grad-start),var(--grad-mid)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; }
+
+        /* Flash messages */
+        .flash-msg { padding:12px 16px; border-radius:10px; font-size:14px; font-weight:500; margin-bottom:16px; animation:fadeIn .3s ease; }
+        .flash-success { background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.2); }
+        .flash-danger { background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.2); }
+        .flash-info { background:rgba(59,130,246,0.1); color:#3b82f6; border:1px solid rgba(59,130,246,0.2); }
+
+        /* Mobile */
+        @media(max-width:768px) {
+            .sidebar { position:fixed; z-index:50; transform:translateX(-100%); }
+            .sidebar.mobile-open { transform:translateX(0); }
+            .main-content { margin-left:0 !important; }
+            .mobile-hamburger { display:flex !important; }
+        }
+        .mobile-hamburger { display:none; position:fixed; top:16px; left:16px; z-index:40; width:40px; height:40px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border); color:var(--text); align-items:center; justify-content:center; cursor:pointer; }
+    </style>
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <button class="mobile-hamburger" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')">☰</button>
+    <div style="display:flex; min-height:100vh;">
+        <aside class="sidebar" id="sidebar" style="position:fixed; height:100vh; display:flex; flex-direction:column;">
+            <button class="collapse-toggle" onclick="toggleSidebar()" id="collapseBtn">«</button>
+            <div class="sidebar-logo">
+                <div class="logo-icon">R</div>
+                <div class="brand-text">
+                    <h1 style="font-size:16px; font-weight:800; color:var(--text); line-height:1.2;">RoroJonggrang</h1>
+                    <p style="font-size:11px; color:var(--text-muted); font-weight:500;">Data Scrape Platform</p>
+                </div>
+            </div>
+            <nav style="flex:1; padding:12px 0;">
+                <a href="{{ url_for('dashboard.index') }}" class="nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <span class="menu-label">Dashboard</span>
+                </a>
+                <a href="{{ url_for('scraper.scrape_form') }}" class="nav-item {% if request.endpoint == 'scraper.scrape_form' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <span class="menu-label">Scraping</span>
+                </a>
+                <a href="{{ url_for('scraper.history') }}" class="nav-item {% if request.endpoint == 'scraper.history' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="menu-label">History</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="{{ url_for('blog.home') }}" class="nav-item" target="_blank">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    <span class="menu-label">Blog</span>
+                </a>
+            </nav>
+            <div style="padding:8px 16px; display:flex; gap:8px; border-top:1px solid var(--border);">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">☀</button>
+                <div style="flex:1;"></div>
+            </div>
+            <div class="user-section">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
+                    <div class="user-info" style="flex:1; min-width:0;">
+                        <p style="font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ current_user.full_name or current_user.username }}</p>
+                        <p style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ current_user.email }}</p>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted); transition:color .2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text-muted)'" title="Logout">
+                        <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <div class="main-wrap" style="flex:1; margin-left:260px; transition:margin-left .3s;" id="mainWrap">
+            <div class="main-content" style="margin-left:0; padding:32px;">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:24px;">
+                    {% for category, message in messages %}
+                    <div class="flash-msg {% if category == 'success' %}flash-success{% elif category == 'danger' %}flash-danger{% else %}flash-info{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="min-height:100vh;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="position:fixed; top:16px; right:16px; z-index:50;">
+            {% for category, message in messages %}
+            <div class="flash-msg {% if category == 'success' %}flash-success{% elif category == 'danger' %}flash-danger{% else %}flash-info{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% endif %}
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('themeBtn').textContent = next === 'dark' ? '☀' : '☾';
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const wrap = document.getElementById('mainWrap');
+            const btn = document.getElementById('collapseBtn');
+            sidebar.classList.toggle('collapsed');
+            if (sidebar.classList.contains('collapsed')) {
+                wrap.style.marginLeft = '72px';
+                btn.textContent = '»';
+            } else {
+                wrap.style.marginLeft = '260px';
+                btn.textContent = '«';
+            }
+        }
+        (function() {
+            const saved = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀' : '☾';
+        })();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

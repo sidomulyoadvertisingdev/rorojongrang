@@ -1,0 +1,212 @@
+{% extends "blog/base.html" %}
+{% block title %}Fitur - RoroJonggrang{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>{% if lang == 'id' %}Fitur Unggulan{% else %}Key Features{% endif %}</h1>
+        <p>{% if lang == 'id' %}Semua yang Anda butuhkan untuk scraping data Google Maps secara efisien.{% else %}Everything you need to scrape Google Maps data efficiently.{% endif %}</p>
+    </div>
+</section>
+
+<!-- Terminal Log -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">💻</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Terminal Real-time{% else %}Real-time Terminal{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Pantau proses scraping secara langsung dengan tampilan terminal yang premium. Setiap data yang masuk ditampilkan secara real-time — nama bisnis, alamat, nomor telepon, rating, dan statusnya.
+                    {% else %}
+                    Monitor the scraping process directly with a premium terminal interface. Each incoming data is displayed in real-time — business name, address, phone number, rating, and its status.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Log detail per data yang masuk{% else %}Detailed log for each incoming data{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Progress bar visual{% else %}Visual progress bar{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Estimasi waktu selesai (ETA){% else %}Estimated time of arrival (ETA){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Warna terminal premium (hijau, biru, kuning){% else %}Premium terminal colors (green, blue, yellow){% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">$ rorojonggrang scrape</div>
+                <div class="line-success">[06:30:15] ✓ Connected to Google Maps</div>
+                <div class="line-info">[06:30:18] Searching: toko besi</div>
+                <div class="line-accent">[06:30:22] Found 87 results</div>
+                <div style="color: #8b949e;">[06:30:25] Scrolling results panel...</div>
+                <div class="line-success">[06:30:30] [001/120] ✓ Toko Besi Mulya</div>
+                <div style="padding-left: 16px;">├─ Phone: 081321425735</div>
+                <div style="padding-left: 16px;">├─ Address: Jl. Raya Barat</div>
+                <div style="padding-left: 16px;">└─ Rating: 4.5 ⭐</div>
+                <div class="line-success">[06:30:38] [002/120] ✓ Gudang Besi</div>
+                <div style="padding-left: 16px;">├─ Phone: 081224608973</div>
+                <div style="padding-left: 16px;">└─ Rating: 4.8 ⭐</div>
+                <div style="margin-top: 12px; color: #f0883e;">Progress: ████████████░░░░ 60%</div>
+            </div>
+        </div>
+
+        <!-- Radius Search -->
+        <div class="feature-row reverse fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">🎯</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Radius Pencarian{% else %}Search Radius{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Atur seberapa jauh pencarian dilakukan dari lokasi pusat. Cocok untuk Anda yang ingin mendapatkan data spesifik di area tertentu tanpa terganggu data dari luar area.
+                    {% else %}
+                    Set how far the search is conducted from the central location. Perfect for getting specific data in a certain area without being disturbed by data from outside.
+                    {% endif %}
+                </p>
+                <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">1 km</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">2 km</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; font-size: 13px; font-weight: 600;">5 km ✓</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">10 km</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-size: 13px; font-weight: 600;">20 km</span>
+                    <span style="padding: 8px 18px; border-radius: 10px; background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; font-weight: 600;">Semua</span>
+                </div>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 12px;">// Google Maps URL with radius</div>
+                <div class="line-info">maps/search/toko+besi/</div>
+                <div style="color: #58a6ff;">@-6.9175,107.6191,</div>
+                <div style="color: #f0883e;">14z</div>
+                <div style="margin-top: 16px; color: #8b949e;">// Zoom levels:</div>
+                <div>14z = ~5km radius</div>
+                <div>15z = ~2.5km radius</div>
+                <div>13z = ~10km radius</div>
+                <div>12z = ~20km radius</div>
+            </div>
+        </div>
+
+        <!-- Dark/Light Mode -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">🌙</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Dark & Light Mode{% else %}Dark & Light Mode{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Tampilan premium yang nyaman digunakan kapan saja. Mode malam untuk bekerja di ruangan gelap, mode siang untuk produktivitas di bawah sinar matahari.
+                    {% else %}A premium interface comfortable to use anytime. Night mode for working in dark rooms, day mode for productivity under sunlight.{% endif %}
+                </p>
+                <p style="font-size: 15px; color: var(--text-secondary); margin-top: 12px; line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Preferensi Anda tersimpan otomatis di browser, sehingga setiap kali membuka aplikasi, mode yang terakhir digunakan akan aktif.
+                    {% else %}Your preference is automatically saved in the browser, so every time you open the app, the last used mode will be active.{% endif %}
+                </p>
+            </div>
+            <div class="feature-visual" style="padding: 0; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 300px;">
+                    <div style="background: #f8fafc; padding: 32px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #e2e8f0;">
+                        <div style="font-size: 13px; color: #64748b; margin-bottom: 4px;">☀ Light Mode</div>
+                        <div style="font-family: 'Inter'; font-size: 18px; font-weight: 700; color: #0f172a;">Dashboard</div>
+                        <div style="font-family: 'Inter'; font-size: 13px; color: #64748b; margin-top: 8px;">Total: 110 data</div>
+                        <div style="width: 60px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #10b981, #3b82f6); margin-top: 12px;"></div>
+                    </div>
+                    <div style="background: #0f172a; padding: 32px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;">☾ Dark Mode</div>
+                        <div style="font-family: 'Inter'; font-size: 18px; font-weight: 700; color: #f1f5f9;">Dashboard</div>
+                        <div style="font-family: 'Inter'; font-size: 13px; color: #94a3b8; margin-top: 8px;">Total: 110 data</div>
+                        <div style="width: 60px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #34d399, #60a5fa); margin-top: 12px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export -->
+        <div class="feature-row reverse fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">📊</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Export CSV & JSON{% else %}CSV & JSON Export{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Download hasil scraping dalam format yang Anda butuhkan. CSV untuk import ke Google Sheets atau Excel. JSON untuk integrasi dengan aplikasi dan tools marketing.
+                    {% else %}Download scraping results in the format you need. CSV for importing to Google Sheets or Excel. JSON for integration with apps and marketing tools.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Format CSV (Google Sheets, Excel){% else %}CSV Format (Google Sheets, Excel){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Format JSON (API, aplikasi){% else %}JSON Format (API, applications){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Download langsung dari browser{% else %}Download directly from browser{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Export data format</div>
+                <div style="color: #3fb950;">[CSV] tokobesi_kabbandung.csv</div>
+                <div style="padding-left: 16px; color: #c9d1d9;">name,phone,address,rating</div>
+                <div style="padding-left: 16px; color: #8b949e;">"Toko Besi Mulya","081321425735"...</div>
+                <div style="margin-top: 12px; color: #58a6ff;">[JSON] tokobesi_kabbandung.json</div>
+                <div style="padding-left: 16px; color: #c9d1d9;">{</div>
+                <div style="padding-left: 32px; color: #d2a8ff;">"name": "Toko Besi Mulya",</div>
+                <div style="padding-left: 32px; color: #d2a8ff;">"phone": "081321425735",</div>
+                <div style="padding-left: 32px; color: #d2a8ff;">"address": "Jl. Raya..."</div>
+                <div style="padding-left: 16px; color: #c9d1d9;">}</div>
+            </div>
+        </div>
+
+        <!-- Multi-location -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;">📍</div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Multi Lokasi & Kategori{% else %}Multi Location & Categories{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Tersedia 10 lokasi di Jawa Barat dan 6 kategori bisnis yang berbeda. Dari toko material bangunan hingga sekolah, semuanya bisa di-scrape secara otomatis.
+                    {% else %}Available 10 locations in West Java and 6 different business categories. From building material stores to schools, everything can be scraped automatically.{% endif %}
+                </p>
+                <div style="margin-top: 20px;">
+                    <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">{% if lang == 'id' %}LOKASI{% else %}LOCATIONS{% endif %}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Bandung</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Bandung Barat</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Cimahi</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">Kab. Sumedang</span>
+                        <span style="padding: 4px 12px; border-radius: 6px; background: var(--bg-secondary); font-size: 12px; color: var(--text-secondary);">+ 6 lainnya</span>
+                    </div>
+                </div>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Available categories</div>
+                <div class="line-success">🏗  Toko Material Bangunan</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">toko besi, toko cat, toko plumbing...</div>
+                <div class="line-info">🏫  Sekolah</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">SD, SMP, SMA, pesantren...</div>
+                <div class="line-accent">🏢  Perusahaan</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">PT, CV, pabrik, warehouse...</div>
+                <div style="color: #f0883e;">📺  Toko Elektronik</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">handphone, laptop, komputer...</div>
+                <div style="color: #3fb950;">🛋  Toko Furniture</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">mebel, sofa, kitchen set...</div>
+                <div style="color: #d2a8ff;">🏪  Toko Bangunan</div>
+                <div style="padding-left: 24px; color: #c9d1d9;">hardware store, building supply...</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2>{% if lang == 'id' %}Coba Semua Fitur Sekarang{% else %}Try All Features Now{% endif %}</h2>
+            <p>{% if lang == 'id' %}Daftar gratis dan mulai scraping data Google Maps.{% else %}Register free and start scraping Google Maps data.{% endif %}</p>
+            <a href="{{ url_for('auth.register') }}" class="btn-white">
+                {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

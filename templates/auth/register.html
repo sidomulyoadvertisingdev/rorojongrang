@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Register - RoroJonggrang{% endblock %}
+{% block auth_content %}
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--bg); position:relative; overflow:hidden;">
+    <div style="position:absolute; top:-50%; left:-50%; right:-50%; bottom:-50%; background:radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(59,130,246,0.04) 0%, transparent 50%); pointer-events:none;"></div>
+    <div style="width:100%; max-width:420px; position:relative;">
+        <div style="text-align:center; margin-bottom:32px;">
+            <div style="width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#fff; font-size:28px; font-weight:800;">R</div>
+            <h1 style="font-size:28px; font-weight:800; color:var(--text);">RoroJonggrang</h1>
+            <p style="color:var(--text-sec); margin-top:4px;">Data Scrape Platform</p>
+        </div>
+        <div class="card" style="padding:32px;">
+            <h2 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:24px;">Buat akun baru</h2>
+            <form method="POST" style="display:flex; flex-direction:column; gap:14px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Username</label>
+                    <input type="text" name="username" required class="input" placeholder="Minimal 3 karakter" minlength="3">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nama Lengkap</label>
+                    <input type="text" name="full_name" class="input" placeholder="Nama lengkap Anda">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Email</label>
+                    <input type="email" name="email" required class="input" placeholder="anda@email.com">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Password</label>
+                    <input type="password" name="password" required class="input" placeholder="Minimal 6 karakter" minlength="6">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Konfirmasi Password</label>
+                    <input type="password" name="confirm_password" required class="input" placeholder="Ulangi password">
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px; margin-top:4px;">
+                    Daftar Sekarang
+                </button>
+            </form>
+            <p style="text-align:center; font-size:13px; color:var(--text-sec); margin-top:20px;">
+                Sudah punya akun?
+                <a href="{{ url_for('auth.login') }}" style="color:var(--accent); font-weight:600;">Masuk</a>
+            </p>
+        </div>
+        <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:24px;">
+            <a href="{{ url_for('blog.home') }}" style="color:var(--text-sec);">← Kembali ke beranda</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,253 @@
+{% extends "blog/base.html" %}
+{% block title %}Panduan - RoroJonggrang{% endblock %}
+{% block content %}
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>{% if lang == 'id' %}Panduan Penggunaan{% else %}User Guide{% endif %}</h1>
+        <p>{% if lang == 'id' %}Langkah demi langkah cara menggunakan RoroJonggrang untuk scraping data Google Maps.{% else %}Step-by-step how to use RoroJonggrang for scraping Google Maps data.{% endif %}</p>
+    </div>
+</section>
+
+<!-- Steps -->
+<section class="section" style="padding-top: 0;">
+    <div class="container" style="max-width: 800px;">
+
+        <!-- Step 1 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">1</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Daftar Akun Baru{% else %}Register New Account{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Buka halaman registrasi dan isi form dengan data Anda. Gunakan email aktif untuk verifikasi.
+                        {% else %}
+                        Open the registration page and fill in the form with your data. Use an active email for verification.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre>{% if lang == 'id' %}1. Klik "Daftar Sekarang" di halaman login
+2. Isi Username (minimal 3 karakter)
+3. Isi Nama Lengkap
+4. Isi Email yang valid
+5. Buat Password (minimal 6 karakter)
+6. Konfirmasi Password
+7. Klik "Daftar Sekarang"{% else %}1. Click "Register Now" on the login page
+2. Fill in Username (minimum 3 characters)
+3. Fill in Full Name
+4. Fill in valid Email
+5. Create Password (minimum 6 characters)
+6. Confirm Password
+7. Click "Register Now"{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">2</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Login ke Dashboard{% else %}Login to Dashboard{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Masuk dengan email dan password yang sudah didaftarkan. Anda akan diarahkan ke dashboard utama.
+                        {% else %}
+                        Login with your registered email and password. You will be redirected to the main dashboard.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre>{% if lang == 'id' %}Email:    anda@email.com
+Password: ********
+
+→ Dashboard menampilkan:
+  • Total task scraping
+  • Total data terscraping
+  • Task yang sedang berjalan
+  • Riwayat task terbaru{% else %}Email:    you@email.com
+Password: ********
+
+→ Dashboard shows:
+  • Total scraping tasks
+  • Total scraped data
+  • Currently running tasks
+  • Recent task history{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">3</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Pilih Keyword & Lokasi{% else %}Choose Keyword & Location{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Buka menu "Scrape Data" dan isi parameter pencarian sesuai kebutuhan Anda.
+                        {% else %}
+                        Open the "Scrape Data" menu and fill in search parameters according to your needs.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre>{% if lang == 'id' %}Keyword:    [toko besi                    ]
+Lokasi:     [Kabupaten Bandung         ▼  ]
+Radius:     [1km] [2km] [5km] [10km] [Semua]
+Kategori:   [Toko Material Bangunan    ▼  ]
+
+Contoh kombinasi:
+• "toko besi" di "Kab. Bandung" radius 5km
+• "sekolah" di "Kab. Sumedang" semua area
+• "toko elektronik" di "Kab. Cimahi" radius 2km{% else %}Keyword:    [toko besi                    ]
+Location:   [Kabupaten Bandung         ▼  ]
+Radius:     [1km] [2km] [5km] [10km] [All]
+Category:   [Building Material Store    ▼  ]
+
+Example combinations:
+• "toko besi" in "Kab. Bandung" radius 5km
+• "sekolah" in "Kab. Sumedang" all areas
+• "toko elektronik" in "Kab. Cimahi" radius 2km{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">4</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Jalankan Scraping{% else %}Run Scraping{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Klik tombol "Mulai Scraping" dan pantau prosesnya melalui terminal real-time. Setiap data yang masuk akan ditampilkan langsung.
+                        {% else %}
+                        Click the "Start Scraping" button and monitor the process through the real-time terminal. Each incoming data will be displayed directly.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre style="background: #0d1117; color: #c9d1d9; padding: 20px; border-radius: 12px;">{% if lang == 'id' %}$ rorojonggrang scrape --keyword "toko besi" \
+                        --location "Kab. Bandung" \
+                        --radius 5km
+
+[06:30:15] ✓ Connected to Google Maps
+[06:30:18] Searching: toko besi Kab. Bandung
+[06:30:22] Found 87 results in 5km radius
+[06:30:25] Scrolling results panel...
+
+[06:30:30] [001/120] ✓ Toko Besi Mulya
+            ├─ Phone: 081321425735
+            └─ Address: Jl. Raya Barat
+
+[06:30:38] [002/120] ✓ Gudang Besi Istana
+            ├─ Phone: 081224608973
+            └─ Address: Jl. Bojong Koneng
+
+Progress: ████████████░░░░ 60%
+Speed: ~12 data/menit | ETA: 4 menit{% else %}$ rorojonggrang scrape --keyword "toko besi" \
+                        --location "Kab. Bandung" \
+                        --radius 5km
+
+[06:30:15] ✓ Connected to Google Maps
+[06:30:18] Searching: toko besi Kab. Bandung
+[06:30:22] Found 87 results in 5km radius
+[06:30:25] Scrolling results panel...
+
+[06:30:30] [001/120] ✓ Toko Besi Mulya
+            ├─ Phone: 081321425735
+            └─ Address: Jl. Raya Barat
+
+[06:30:38] [002/120] ✓ Gudang Besi Istana
+            ├─ Phone: 081224608973
+            └─ Address: Jl. Bojong Koneng
+
+Progress: ████████████░░░░ 60%
+Speed: ~12 data/min | ETA: 4 min{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="card fade-in" style="margin-bottom: 24px;">
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div class="step-number">5</div>
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">
+                        {% if lang == 'id' %}Download Hasil{% else %}Download Results{% endif %}
+                    </h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
+                        {% if lang == 'id' %}
+                        Setelah scraping selesai, download data dalam format yang Anda butuhkan. CSV untuk spreadsheet, JSON untuk aplikasi.
+                        {% else %}
+                        After scraping is finished, download the data in the format you need. CSV for spreadsheets, JSON for applications.
+                        {% endif %}
+                    </p>
+                    <div class="guide-visual">
+                        <pre>{% if lang == 'id' %}Opsi Download:
+┌──────────────────────────────────────────┐
+│  [ 📄 Download CSV ]  [ 📋 Download JSON ] │
+└──────────────────────────────────────────┘
+
+CSV: cocok untuk Google Sheets, Excel
+JSON: cocok untuk integrasi API, aplikasi
+
+File tersimpan di folder Downloads Anda
+dengan nama: toko_besi_kab_bandung_[tanggal].csv{% else %}Download Options:
+┌──────────────────────────────────────────┐
+│  [ 📄 Download CSV ]  [ 📋 Download JSON ] │
+└──────────────────────────────────────────┘
+
+CSV: suitable for Google Sheets, Excel
+JSON: suitable for API integration, apps
+
+File is saved in your Downloads folder
+with name: toko_besi_kab_bandung_[date].csv{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card fade-in" style="background: var(--accent-light); border-color: var(--accent);">
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--accent);">
+                💡 {% if lang == 'id' %}Tips & Trik{% else %}Tips & Tricks{% endif %}
+            </h3>
+            <ul style="font-size: 15px; color: var(--text-secondary); line-height: 2.2;">
+                <li>✓ {% if lang == 'id' %}Gunakan keyword yang spesifik untuk hasil lebih akurat (contoh: "toko besi" bukan "toko"){% else %}Use specific keywords for more accurate results (e.g., "toko besi" not "toko"){% endif %}</li>
+                <li>✓ {% if lang == 'id' %}Atur radius kecil (1-2km) untuk area perkotaan yang padat{% else %}Set small radius (1-2km) for dense urban areas{% endif %}</li>
+                <li>✓ {% if lang == 'id' %}Gunakan radius besar (10-20km) untuk area pedesaan atau kabupaten{% else %}Use large radius (10-20km) for rural or regency areas{% endif %}</li>
+                <li>✓ {% if lang == 'id' %}Jangan tutup browser selama scraping berjalan{% else %}Don't close the browser while scraping is running{% endif %}</li>
+                <li>✓ {% if lang == 'id' %}Download data segera setelah selesai untuk menghemat storage{% else %}Download data immediately after finishing to save storage{% endif %}</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-box fade-in">
+            <h2>{% if lang == 'id' %}Siap Memulai?{% else %}Ready to Start?{% endif %}</h2>
+            <p>{% if lang == 'id' %}Daftar sekarang dan mulai kumpulkan data Google Maps.{% else %}Sign up now and start collecting Google Maps data.{% endif %}</p>
+            <a href="{{ url_for('auth.register') }}" class="btn-white">
+                {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

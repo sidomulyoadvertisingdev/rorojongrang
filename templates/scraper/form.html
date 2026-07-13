@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+{% block title %}Scraping - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:32px;">
+    <h1 style="font-size:24px; font-weight:800; color:var(--text);">Scraping Baru</h1>
+    <p style="color:var(--text-sec); margin-top:4px;">Masukkan keyword dan lokasi untuk mulai scraping data dari Google Maps</p>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <!-- Left: Form + Terminal -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+        <!-- Form Card -->
+        <div class="card" style="padding:28px;">
+            <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <span style="width:28px; height:28px; border-radius:8px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">🔍</span>
+                Form Scraping
+            </h2>
+            <form id="scrape-form" style="display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Keyword Pencarian</label>
+                    <input type="text" name="keyword" id="keyword" required class="input" placeholder="Contoh: toko besi, sekolah, PT manufacturing">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Lokasi Target</label>
+                    <select name="location" id="location" required class="input">
+                        <option value="">Pilih lokasi...</option>
+                        {% for loc in locations %}
+                        <option value="{{ loc }}">{{ loc }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Kategori (Opsional)</label>
+                    <select name="category" id="category" class="input">
+                        <option value="">Pilih kategori...</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.name }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:8px;">Radius Pencarian</label>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;" id="radius-group">
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="1" style="display:none;">
+                            <span class="radius-btn" data-v="1">1 km</span>
+                        </label>
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="2" style="display:none;">
+                            <span class="radius-btn" data-v="2">2 km</span>
+                        </label>
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="5" checked style="display:none;">
+                            <span class="radius-btn active" data-v="5">5 km</span>
+                        </label>
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="10" style="display:none;">
+                            <span class="radius-btn" data-v="10">10 km</span>
+                        </label>
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="20" style="display:none;">
+                            <span class="radius-btn" data-v="20">20 km</span>
+                        </label>
+                        <label style="cursor:pointer;">
+                            <input type="radio" name="radius" value="0" style="display:none;">
+                            <span class="radius-btn" data-v="0">Semua</span>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" id="btn-scrape" class="btn-primary" style="width:100%; justify-content:center; padding:12px;">
+                    <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Mulai Scraping
+                </button>
+            </form>
+        </div>
+
+        <!-- Terminal Card -->
+        <div id="progress-section" class="card" style="display:none; overflow:hidden;">
+            <div style="background:#161b22; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #30363d;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="width:12px; height:12px; border-radius:50%; background:#f85149;"></span>
+                    <span style="width:12px; height:12px; border-radius:50%; background:#f0883e;"></span>
+                    <span style="width:12px; height:12px; border-radius:50%; background:#3fb950;"></span>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;">rorojonggrang — scrape</span>
+                <div></div>
+            </div>
+            <div style="background:#0d1117; padding:20px; min-height:350px; max-height:500px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8;" id="terminal">
+                <div style="color:#8b949e;">$ rorojonggrang scrape <span id="term-cmd"></span></div>
+                <div id="term-output" style="margin-top:8px;"></div>
+            </div>
+            <!-- Progress bar inside terminal -->
+            <div style="background:#161b22; padding:16px 20px; border-top:1px solid #30363d;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;" id="term-status">Memulai...</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#8b949e;" id="term-count">0/0</span>
+                </div>
+                <div style="height:6px; background:#21262d; border-radius:100px; overflow:hidden;">
+                    <div id="term-bar" style="height:100%; width:0%; background:linear-gradient(90deg,#3fb950,#58a6ff); border-radius:100px; transition:width .5s ease;"></div>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <button id="btn-cancel" class="btn-danger" onclick="cancelTask()" style="font-size:12px; padding:6px 14px;">Batal</button>
+                    <div style="flex:1;"></div>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8b949e;" id="term-speed"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Stats + Tips -->
+    <div style="display:flex; flex-direction:column; gap:24px;">
+        <div class="card" style="padding:28px;">
+            <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <span style="width:28px; height:28px; border-radius:8px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">📊</span>
+                Quick Stats
+            </h2>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:var(--text-sec);">Total Tasks</span>
+                    <span style="font-size:15px; font-weight:700; color:var(--text);">{{ tasks|length }}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:var(--text-sec);">Selesai</span>
+                    <span style="font-size:15px; font-weight:700; color:#10b981;">{{ tasks|selectattr('status', 'equalto', 'completed')|list|length }}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:var(--text-sec);">Berjalan</span>
+                    <span style="font-size:15px; font-weight:700; color:#3b82f6;">{{ tasks|selectattr('status', 'equalto', 'running')|list|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="padding:28px;">
+            <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <span style="width:28px; height:28px; border-radius:8px; background:rgba(59,130,246,0.1); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">💡</span>
+                Tips
+            </h2>
+            <ul style="display:flex; flex-direction:column; gap:12px;">
+                <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
+                    <span style="color:var(--accent); font-weight:700;">→</span>
+                    Gunakan keyword spesifik untuk hasil lebih akurat
+                </li>
+                <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
+                    <span style="color:var(--accent); font-weight:700;">→</span>
+                    Atur radius kecil (1-2km) untuk area kota
+                </li>
+                <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
+                    <span style="color:var(--accent); font-weight:700;">→</span>
+                    Gunakan radius besar (10-20km) untuk kabupaten
+                </li>
+                <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
+                    <span style="color:var(--accent); font-weight:700;">→</span>
+                    Scraping membutuhkan waktu 3-10 menit per task
+                </li>
+                <li style="display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--text-sec); line-height:1.6;">
+                    <span style="color:var(--accent); font-weight:700;">→</span>
+                    Data akan otomatis tersimpan ke database
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .radius-btn {
+        display:inline-block; padding:8px 18px; border-radius:10px;
+        border:1.5px solid var(--border); background:var(--bg-card); color:var(--text-sec);
+        font-size:13px; font-weight:600; cursor:pointer; transition:all .2s;
+    }
+    .radius-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .radius-btn.active {
+        background:linear-gradient(135deg,var(--grad-start),var(--grad-end));
+        color:#fff; border-color:transparent;
+    }
+    #terminal::-webkit-scrollbar { width:6px; }
+    #terminal::-webkit-scrollbar-track { background:transparent; }
+    #terminal::-webkit-scrollbar-thumb { background:#30363d; border-radius:3px; }
+    #terminal::-webkit-scrollbar-thumb:hover { background:#484f58; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentTaskId = null;
+let eventSource = null;
+let startTime = null;
+
+document.querySelectorAll('.radius-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+function termPrint(text, color) {
+    const el = document.getElementById('term-output');
+    const line = document.createElement('div');
+    if (color) line.style.color = color;
+    line.textContent = text;
+    el.appendChild(line);
+    const terminal = document.getElementById('terminal');
+    terminal.scrollTop = terminal.scrollHeight;
+}
+
+document.getElementById('scrape-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-scrape');
+    btn.disabled = true;
+    btn.innerHTML = '<svg style="width:18px;height:18px;animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24"><circle style="opacity:.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path style="opacity:.75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Memulai...';
+
+    const formData = new FormData(this);
+    const radius = formData.get('radius');
+    const keyword = formData.get('keyword');
+    const location = formData.get('location');
+
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('term-cmd').textContent = '--keyword "' + keyword + '" --location "' + location + '"' + (radius != '0' ? ' --radius ' + radius + 'km' : '');
+    document.getElementById('term-output').innerHTML = '';
+    termPrint('[Connecting to Google Maps...]', '#8b949e');
+
+    try {
+        const resp = await fetch('/scrape', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (resp.ok) {
+            currentTaskId = data.task_id;
+            startTime = Date.now();
+            termPrint('[✓] Task #' + data.task_id + ' created', '#3fb950');
+            startSSE(currentTaskId);
+        } else {
+            termPrint('[✗] Error: ' + (data.error || 'Gagal memulai'), '#f85149');
+            btn.disabled = false;
+            btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+        }
+    } catch(err) {
+        termPrint('[✗] Network error: ' + err.message, '#f85149');
+        btn.disabled = false;
+        btn.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+    }
+});
+
+function startSSE(taskId) {
+    eventSource = new EventSource('/api/task/' + taskId + '/progress');
+    const barEl = document.getElementById('term-bar');
+    const statusEl = document.getElementById('term-status');
+    const countEl = document.getElementById('term-count');
+    const speedEl = document.getElementById('term-speed');
+    const btnScrape = document.getElementById('btn-scrape');
+
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const pct = Math.round(data.progress_percent || 0);
+        barEl.style.width = pct + '%';
+        countEl.textContent = data.scraped_results + '/' + data.total_results;
+
+        if (startTime) {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const min = Math.floor(elapsed / 60);
+            const sec = elapsed % 60;
+            speedEl.textContent = min + 'm ' + sec + 's elapsed';
+        }
+
+        if (data.status === 'completed') {
+            statusEl.textContent = '✓ Selesai — ' + data.scraped_results + ' data';
+            statusEl.style.color = '#3fb950';
+            barEl.style.background = '#3fb950';
+            eventSource.close();
+            btnScrape.disabled = false;
+            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+            termPrint('', '');
+            termPrint('[✓] Scraping selesai! ' + data.scraped_results + ' data tersimpan.', '#3fb950');
+            termPrint('', '');
+            const dlCsv = document.createElement('div');
+            dlCsv.innerHTML = '<span style="color:#58a6ff; cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/csv\')">[↓ Download CSV]</span>  <span style="color:#d2a8ff; cursor:pointer;" onclick="window.open(\'/download/' + taskId + '/json\')">[↓ Download JSON]</span>';
+            document.getElementById('term-output').appendChild(dlCsv);
+        } else if (data.status === 'failed') {
+            statusEl.textContent = '✗ Gagal';
+            statusEl.style.color = '#f85149';
+            barEl.style.background = '#f85149';
+            eventSource.close();
+            btnScrape.disabled = false;
+            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+            termPrint('[✗] Error: ' + (data.error_message || 'Unknown error'), '#f85149');
+        } else if (data.status === 'cancelled') {
+            statusEl.textContent = '⊘ Dibatalkan';
+            statusEl.style.color = '#8b949e';
+            eventSource.close();
+            btnScrape.disabled = false;
+            btnScrape.innerHTML = '<svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Mulai Scraping';
+            termPrint('[⊘] Task dibatalkan', '#8b949e');
+        } else {
+            statusEl.textContent = 'Berjalan... ' + pct + '%';
+            if (data.current_log) {
+                const log = data.current_log;
+                const parts = log.split('] ');
+                if (parts.length > 1) {
+                    termPrint(log, '#c9d1d9');
+                }
+            }
+        }
+    };
+
+    eventSource.onerror = function() {};
+}
+
+function cancelTask() {
+    if (!currentTaskId) return;
+    fetch('/scrape/' + currentTaskId + '/cancel', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'cancelled') {
+                document.getElementById('term-status').textContent = '⊘ Dibatalkan';
+                document.getElementById('term-status').style.color = '#8b949e';
+            }
+        });
+}
+</script>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+{% endblock %}

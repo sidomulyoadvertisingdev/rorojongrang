@@ -1,0 +1,82 @@
+{
+  "categories": [
+    {
+      "name": "Toko Material Bangunan",
+      "keywords": [
+        "toko material bangunan",
+        "toko besi",
+        "toko cat",
+        "toko plumbing",
+        "toko listrik",
+        "toko bahan bangunan",
+        "toko semen",
+        "toko kayu"
+      ]
+    },
+    {
+      "name": "Toko Bangunan",
+      "keywords": [
+        "toko bangunan",
+        "hardware store",
+        "building supply store"
+      ]
+    },
+    {
+      "name": "Sekolah",
+      "keywords": [
+        "sekolah dasar",
+        "sekolah menengah pertama",
+        "sekolah menengah atas",
+        "sekolah swasta",
+        "madrasah",
+        "pondok pesantren",
+        "sekolah islam"
+      ]
+    },
+    {
+      "name": "Perusahaan",
+      "keywords": [
+        "kantor perusahaan",
+        "PT",
+        "CV",
+        "pabrik",
+        "manufacturing",
+        "factory",
+        "warehouse",
+        "gudang"
+      ]
+    },
+    {
+      "name": "Toko Elektronik",
+      "keywords": [
+        "toko elektronik",
+        "toko handphone",
+        "toko laptop",
+        "toko komputer",
+        "service elektronik"
+      ]
+    },
+    {
+      "name": "Toko furniture",
+      "keywords": [
+        "toko furniture",
+        "toko mebel",
+        "toko sofa",
+        "toko kitchen set",
+        "toko lemari"
+      ]
+    }
+  ],
+  "locations": [
+    "Kabupaten Bandung",
+    "Kabupaten Bandung Barat",
+    "Kabupaten Cimahi",
+    "Kabupaten Sumedang",
+    "Kabupaten Garut",
+    "Kabupaten Tasikmalaya",
+    "Kabupaten Ciamis",
+    "Kabupaten Kuningan",
+    "Kabupaten Majalengka",
+    "Kabupaten Indramayu"
+  ]
+}
