@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block title %}Kelola Pengguna - Admin - RoroJonggrang{% endblock %}
+{% block content %}
+<style>
+    .card-header-row {
+        padding:24px; border-bottom:1px solid var(--border);
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    .table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th {
+        padding:12px 20px; text-align:left; font-size:12px; font-weight:600;
+        color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+        white-space:nowrap; border-bottom:1px solid var(--border);
+    }
+    .data-table td {
+        padding:14px 20px; font-size:13px; white-space:nowrap;
+    }
+    .task-row { border-bottom:1px solid var(--border-light); transition:background .2s; }
+    .admin-users-cards { display:none; }
+    .admin-search-row { display:flex; gap:12px; align-items:center; }
+    .admin-user-card {
+        background:var(--bg-card); border:1px solid var(--border); border-radius:14px;
+        padding:16px; margin-bottom:12px; transition:all .2s;
+    }
+    .admin-user-card:active { transform:scale(0.98); }
+    .admin-user-top {
+        display:flex; align-items:center; gap:12px; margin-bottom:12px;
+    }
+    .admin-user-avatar {
+        width:42px; height:42px; border-radius:11px;
+        background:linear-gradient(135deg,var(--grad-start),var(--grad-end));
+        display:flex; align-items:center; justify-content:center;
+        color:#fff; font-size:16px; font-weight:700; flex-shrink:0;
+    }
+    .admin-user-info { flex:1; min-width:0; }
+    .admin-user-name { font-weight:700; color:var(--text); font-size:14px; }
+    .admin-user-email { color:var(--text-muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .admin-user-chips {
+        display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;
+    }
+    .admin-chip {
+        display:inline-flex; align-items:center; gap:4px;
+        padding:4px 10px; border-radius:8px;
+        background:var(--bg); font-size:11px; font-weight:600;
+        color:var(--text-sec); border:1px solid var(--border-light);
+    }
+    .admin-chip svg { width:12px; height:12px; }
+    .admin-user-actions {
+        display:flex; gap:8px; padding-top:10px; border-top:1px solid var(--border-light);
+    }
+    .admin-user-actions form { margin:0; flex:1; }
+    .admin-action-btn {
+        width:100%; padding:9px; border-radius:10px; border:none;
+        font-size:12px; font-weight:700; cursor:pointer; transition:all .2s;
+        display:flex; align-items:center; justify-content:center; gap:6px;
+        min-height:40px;
+    }
+    .admin-action-btn svg { width:14px; height:14px; }
+    .admin-action-btn.btn-ban { background:rgba(251,191,36,0.1); color:#fbbf24; }
+    .admin-action-btn.btn-ban:active { background:rgba(251,191,36,0.2); }
+    .admin-action-btn.btn-unban { background:rgba(6,182,148,0.1); color:#06b694; }
+    .admin-action-btn.btn-unban:active { background:rgba(6,182,148,0.2); }
+    .admin-action-btn.btn-delete { background:rgba(248,113,113,0.1); color:#f87171; }
+    .admin-action-btn.btn-delete:active { background:rgba(248,113,113,0.2); }
+    .admin-pagination {
+        display:flex; align-items:center; justify-content:center; gap:8px; margin-top:24px;
+    }
+    .admin-pagination-info {
+        display:flex; align-items:center; justify-content:space-between; margin-top:16px;
+    }
+    @media(max-width:768px) {
+        .admin-users-cards { display:block !important; }
+        .admin-users-table { display:none !important; }
+        .admin-search-row { flex-direction:column !important; }
+        .admin-search-row .btn-primary { width:100% !important; justify-content:center !important; }
+        .admin-pagination { flex-wrap:wrap !important; }
+    }
+</style>
+
+<div style="margin-bottom:28px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Kelola Pengguna</h1>
+    <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Manajemen akun dan status pengguna</p>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px;">
+    <div class="card" style="padding:20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <p style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Total Users</p>
+                <p style="font-size:28px; font-weight:800; color:var(--text); margin-top:4px;">{{ pagination.total }}</p>
+            </div>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(139,92,246,0.12);">
+                <svg style="width:22px; height:22px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="padding:20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <p style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Aktif</p>
+                <p style="font-size:28px; font-weight:800; color:#06b694; margin-top:4px;">{{ users|selectattr('is_banned', 'false')|list|length }}</p>
+            </div>
+            <div style="width:44px; height:44px; border-radius:12px; background:rgba(6,182,148,0.1); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(6,182,148,0.1);">
+                <svg style="width:22px; height:22px; color:#06b694;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="padding:20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <p style="font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Di-Ban</p>
+                <p style="font-size:28px; font-weight:800; color:#f87171; margin-top:4px;">{{ users|selectattr('is_banned', 'true')|list|length }}</p>
+            </div>
+            <div style="width:44px; height:44px; border-radius:12px; background:rgba(248,113,113,0.1); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(248,113,113,0.1);">
+                <svg style="width:22px; height:22px; color:#f87171;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom:20px; padding:16px 20px;">
+    <form method="GET" class="admin-search-row">
+        <div style="position:relative; flex:1;">
+            <svg style="position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" name="q" value="{{ search }}" class="input" placeholder="Cari username, email, atau nama..." style="margin:0; padding-left:36px;">
+        </div>
+        <button type="submit" class="btn-primary" style="padding:10px 20px; white-space:nowrap;">Cari</button>
+        {% if search %}
+        <a href="{{ url_for('admin.user_list') }}" class="btn-secondary" style="padding:10px 16px; white-space:nowrap;">Reset</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card" style="overflow:hidden;">
+    <div class="card-header-row">
+        <h2 style="font-size:15px; font-weight:700; color:var(--text); font-family:'Playfair Display',serif;">Daftar Pengguna</h2>
+        <span style="font-size:13px; color:var(--text-sec);">{{ pagination.total }} pengguna</span>
+    </div>
+
+    {# Desktop table #}
+    <div class="table-container admin-users-table">
+        <table class="data-table">
+            <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Role</th>
+                    <th>Bergabung</th>
+                    <th style="text-align:right;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="task-row" style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='transparent'">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:34px; height:34px; border-radius:9px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:700; flex-shrink:0;">
+                                {{ user.username[0]|upper }}
+                            </div>
+                            <div>
+                                <p style="font-weight:600; color:var(--text); font-size:13px;">{{ user.full_name or user.username }}</p>
+                                <p style="color:var(--text-muted); font-size:11px;">@{{ user.username }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="color:var(--text-sec); font-size:13px;">{{ user.email }}</td>
+                    <td>
+                        {% if user.is_banned %}
+                        <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171;">
+                            <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            Di-Ban
+                        </span>
+                        {% else %}
+                        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">
+                            <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/></svg>
+                            Aktif
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_admin %}
+                        <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Admin</span>
+                        {% elif user.google_id %}
+                        <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Google</span>
+                        {% else %}
+                        <span class="status-badge" style="background:var(--accent-light); color:var(--accent);">User</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--text-sec); font-size:13px;">{{ user.created_at.strftime('%d %b %Y') if user.created_at else '-' }}</td>
+                    <td style="text-align:right;">
+                        <div style="display:flex; gap:6px; justify-content:flex-end; align-items:center;">
+                            {% if user.id != current_user.id and not user.is_admin %}
+                                {% if user.is_banned %}
+                                <form method="POST" action="{{ url_for('admin.unban_user', user_id=user.id) }}" style="margin:0;">
+                                    <button type="submit" class="btn-primary" style="font-size:12px; padding:6px 14px; background:rgba(6,182,148,0.15); color:#06b694; box-shadow:none;">
+                                        <svg style="width:13px; height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Unban
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="POST" action="{{ url_for('admin.ban_user', user_id=user.id) }}" style="margin:0;">
+                                    <button type="submit" class="btn-primary" style="font-size:12px; padding:6px 14px; background:rgba(251,191,36,0.12); color:#fbbf24; box-shadow:none;" onclick="return confirm('Ban akun {{ user.username }}?')">
+                                        <svg style="width:13px; height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/></svg>
+                                        Ban
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="margin:0;">
+                                    <button type="submit" class="btn-danger" style="font-size:11px; padding:5px 10px;" onclick="return confirm('Hapus permanen akun {{ user.username }}? Semua data akan ikut terhapus.')">
+                                        <svg style="width:13px; height:13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        Hapus
+                                    </button>
+                                </form>
+                            {% else %}
+                            <span style="font-size:12px; color:var(--text-muted);">-</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not users %}
+                <tr>
+                    <td colspan="6" style="padding:48px 20px; text-align:center;">
+                        <svg style="width:48px; height:48px; margin:0 auto 16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <p style="color:var(--text-sec); font-size:14px;">Tidak ada pengguna ditemukan</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Mobile card layout #}
+    <div class="admin-users-cards">
+        {% for user in users %}
+        <div class="admin-user-card">
+            <div class="admin-user-top">
+                <div class="admin-user-avatar">{{ user.username[0]|upper }}</div>
+                <div class="admin-user-info">
+                    <div class="admin-user-name">{{ user.full_name or user.username }}</div>
+                    <div class="admin-user-email">{{ user.email }}</div>
+                </div>
+                {% if user.is_banned %}
+                <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171; flex-shrink:0;">Di-Ban</span>
+                {% else %}
+                <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694; flex-shrink:0;">Aktif</span>
+                {% endif %}
+            </div>
+            <div class="admin-user-chips">
+                <div class="admin-chip">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    @{{ user.username }}
+                </div>
+                {% if user.is_admin %}
+                <div class="admin-chip" style="background:rgba(139,92,246,0.08); color:#8b5cf6; border-color:rgba(139,92,246,0.2);">Admin</div>
+                {% elif user.google_id %}
+                <div class="admin-chip" style="background:rgba(251,191,36,0.08); color:#fbbf24; border-color:rgba(251,191,36,0.2);">Google</div>
+                {% endif %}
+                <div class="admin-chip">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    {{ user.created_at.strftime('%d %b %Y') if user.created_at else '' }}
+                </div>
+            </div>
+            {% if user.id != current_user.id and not user.is_admin %}
+            <div class="admin-user-actions">
+                {% if user.is_banned %}
+                <form method="POST" action="{{ url_for('admin.unban_user', user_id=user.id) }}">
+                    <button type="submit" class="admin-action-btn btn-unban">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Unban
+                    </button>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('admin.ban_user', user_id=user.id) }}">
+                    <button type="submit" class="admin-action-btn btn-ban" onclick="return confirm('Ban akun {{ user.username }}?')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/></svg>
+                        Ban
+                    </button>
+                </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}">
+                    <button type="submit" class="admin-action-btn btn-delete" onclick="return confirm('Hapus permanen akun {{ user.username }}? Semua data akan ikut terhapus.')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Hapus
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if not users %}
+        <div class="card" style="padding:48px 20px; text-align:center;">
+            <svg style="width:48px; height:48px; margin:0 auto 16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <p style="color:var(--text-sec); font-size:14px;">Tidak ada pengguna ditemukan</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div style="padding:16px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <p style="font-size:13px; color:var(--text-sec);">Halaman {{ pagination.page }} dari {{ pagination.pages }}</p>
+        <div style="display:flex; gap:6px;">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('admin.user_list', page=pagination.prev_num, q=search) }}" class="btn-secondary" style="font-size:13px;">Sebelumnya</a>
+            {% endif %}
+            {% if pagination.has_next %}
+            <a href="{{ url_for('admin.user_list', page=pagination.next_num, q=search) }}" class="btn-secondary" style="font-size:13px;">Selanjutnya</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

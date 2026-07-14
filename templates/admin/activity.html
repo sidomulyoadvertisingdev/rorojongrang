@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Log Aktivitas - Admin - RoroJonggrang{% endblock %}
+{% block content %}
+<style>
+    .card-header-row {
+        padding:24px; border-bottom:1px solid var(--border);
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    .table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th {
+        padding:12px 20px; text-align:left; font-size:12px; font-weight:600;
+        color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+        white-space:nowrap; border-bottom:1px solid var(--border);
+    }
+    .data-table td {
+        padding:14px 20px; font-size:13px; white-space:nowrap;
+    }
+    .task-row { border-bottom:1px solid var(--border-light); transition:background .2s; }
+    .activity-cards { display:none; }
+    .activity-card {
+        background:var(--bg-card); border:1px solid var(--border); border-radius:14px;
+        padding:16px; margin-bottom:12px; transition:all .2s;
+    }
+    .activity-card:active { transform:scale(0.98); }
+    .activity-card-top {
+        display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+    }
+    .activity-card-body {
+        display:flex; align-items:center; gap:10px;
+    }
+    .activity-admin-avatar {
+        width:28px; height:28px; border-radius:7px;
+        background:linear-gradient(135deg,var(--grad-start),var(--grad-end));
+        display:flex; align-items:center; justify-content:center;
+        color:#fff; font-size:11px; font-weight:700; flex-shrink:0;
+    }
+    .activity-arrow {
+        width:24px; height:24px; border-radius:6px;
+        display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .activity-arrow svg { width:14px; height:14px; }
+    .activity-target-avatar {
+        width:28px; height:28px; border-radius:7px;
+        background:var(--bg); border:1px solid var(--border);
+        display:flex; align-items:center; justify-content:center;
+        color:var(--text-sec); font-size:11px; font-weight:700; flex-shrink:0;
+    }
+    .activity-card-detail {
+        margin-top:8px; padding-top:8px; border-top:1px solid var(--border-light);
+        font-size:12px; color:var(--text-muted);
+    }
+    @media(max-width:768px) {
+        .activity-cards { display:block !important; }
+        .activity-table { display:none !important; }
+    }
+</style>
+
+<div style="margin-bottom:28px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Log Aktivitas</h1>
+    <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Riwayat tindakan admin terhadap akun pengguna</p>
+</div>
+
+<div class="card" style="overflow:hidden;">
+    <div class="card-header-row">
+        <h2 style="font-size:15px; font-weight:700; color:var(--text); font-family:'Playfair Display',serif;">Riwayat Tindakan</h2>
+        <span style="font-size:13px; color:var(--text-sec);">{{ pagination.total }} aktivitas</span>
+    </div>
+
+    {# Desktop table #}
+    <div class="table-container activity-table">
+        <table class="data-table">
+            <thead>
+                <tr style="border-bottom:1px solid var(--border);">
+                    <th>Waktu</th>
+                    <th>Admin</th>
+                    <th>Aksi</th>
+                    <th>Target</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="task-row" style="border-bottom:1px solid var(--border-light);" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='transparent'">
+                    <td style="font-size:13px; color:var(--text-sec); white-space:nowrap;">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <svg style="width:14px; height:14px; color:var(--text-muted); flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {{ log.created_at.strftime('%d %b %Y, %H:%M') if log.created_at else '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:700; flex-shrink:0;">
+                                {{ log.admin.username[0]|upper }}
+                            </div>
+                            <span style="font-weight:600; color:var(--text); font-size:13px;">{{ log.admin.username }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if log.action == 'ban' %}
+                        <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">
+                            <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/></svg>
+                            Ban
+                        </span>
+                        {% elif log.action == 'unban' %}
+                        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">
+                            <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Unban
+                        </span>
+                        {% elif log.action == 'delete' %}
+                        <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171;">
+                            <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Hapus
+                        </span>
+                        {% else %}
+                        <span class="status-badge" style="background:var(--accent-light); color:var(--accent);">{{ log.action }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <div style="width:22px; height:22px; border-radius:6px; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-sec); font-size:9px; font-weight:700; flex-shrink:0;">
+                                {{ log.target[0]|upper if log.target else '?' }}
+                            </div>
+                            <span style="font-weight:600; color:var(--text); font-size:13px;">{{ log.target }}</span>
+                        </div>
+                    </td>
+                    <td style="color:var(--text-sec); font-size:13px;">{{ log.detail or '-' }}</td>
+                </tr>
+                {% endfor %}
+                {% if not logs %}
+                <tr>
+                    <td colspan="5" style="padding:48px 20px; text-align:center;">
+                        <svg style="width:48px; height:48px; margin:0 auto 16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <p style="color:var(--text-sec); font-size:14px;">Belum ada aktivitas tercatat</p>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Mobile card layout #}
+    <div class="activity-cards">
+        {% for log in logs %}
+        <div class="activity-card">
+            <div class="activity-card-top">
+                {% if log.action == 'ban' %}
+                <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">
+                    <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/></svg>
+                    Ban
+                </span>
+                {% elif log.action == 'unban' %}
+                <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">
+                    <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Unban
+                </span>
+                {% elif log.action == 'delete' %}
+                <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171;">
+                    <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Hapus
+                </span>
+                {% else %}
+                <span class="status-badge" style="background:var(--accent-light); color:var(--accent);">{{ log.action }}</span>
+                {% endif %}
+                <span style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:4px;">
+                    <svg style="width:11px; height:11px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ log.created_at.strftime('%d %b %Y, %H:%M') if log.created_at else '' }}
+                </span>
+            </div>
+            <div class="activity-card-body">
+                <div class="activity-admin-avatar">{{ log.admin.username[0]|upper }}</div>
+                <div class="activity-arrow" style="background:rgba(139,92,246,0.08); color:var(--accent);">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </div>
+                <div class="activity-target-avatar">{{ log.target[0]|upper if log.target else '?' }}</div>
+                <div style="flex:1; min-width:0;">
+                    <p style="font-size:12px; color:var(--text-sec); margin:0;">
+                        <strong style="color:var(--text);">{{ log.admin.username }}</strong>
+                        &rarr;
+                        <strong style="color:var(--text);">{{ log.target }}</strong>
+                    </p>
+                </div>
+            </div>
+            {% if log.detail %}
+            <div class="activity-card-detail">{{ log.detail }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if not logs %}
+        <div class="card" style="padding:48px 20px; text-align:center;">
+            <svg style="width:48px; height:48px; margin:0 auto 16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <p style="color:var(--text-sec); font-size:14px;">Belum ada aktivitas tercatat</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div style="padding:16px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <p style="font-size:13px; color:var(--text-sec);">Halaman {{ pagination.page }} dari {{ pagination.pages }}</p>
+        <div style="display:flex; gap:6px;">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('admin.activity_log', page=pagination.prev_num) }}" class="btn-secondary" style="font-size:13px;">Sebelumnya</a>
+            {% endif %}
+            {% if pagination.has_next %}
+            <a href="{{ url_for('admin.activity_log', page=pagination.next_num) }}" class="btn-secondary" style="font-size:13px;">Selanjutnya</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

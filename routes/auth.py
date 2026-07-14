@@ -39,6 +39,10 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
+        if user and user.is_banned:
+            flash("Akun Anda telah dibanned. Hubungi admin untuk informasi lebih lanjut.", "danger")
+            return render_template("auth/login.html")
+
         if user and user.check_password(password):
             login_user(user, remember=True)
             user.last_login = datetime.utcnow()
@@ -143,6 +147,10 @@ def google_callback():
 
     if not user:
         user = User.query.filter_by(email=email).first()
+
+    if user and user.is_banned:
+        flash("Akun Anda telah dibanned. Hubungi admin untuk informasi lebih lanjut.", "danger")
+        return redirect(url_for("auth.login"))
 
     if user:
         user.google_id = google_id

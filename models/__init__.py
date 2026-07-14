@@ -14,3 +14,4 @@ from models.wa_link import WaLink
 from models.wa_click import WaClick
 from models.data_upload import DataUpload
 from models.data_record import DataRecord
+from models.activity_log import ActivityLog

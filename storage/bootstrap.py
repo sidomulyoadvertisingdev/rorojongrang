@@ -30,6 +30,9 @@ BUSINESS_COLUMNS = [
 USER_COLUMNS = [
     ("google_id", "VARCHAR(100) UNIQUE"),
     ("avatar_url", "VARCHAR(500)"),
+    ("is_banned", "BOOLEAN DEFAULT FALSE"),
+    ("banned_at", "DATETIME"),
+    ("banned_by", "INT"),
 ]
 
 
@@ -150,6 +153,30 @@ def migrate_users_schema():
             logger.warning("Could not modify password_hash: %s", exc)
 
 
+def ensure_activity_logs_table():
+    try:
+        db.session.execute(text(
+            """
+            CREATE TABLE IF NOT EXISTS activity_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                admin_id INT NOT NULL,
+                action VARCHAR(50) NOT NULL,
+                target VARCHAR(255),
+                detail TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (admin_id) REFERENCES users(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            """
+        ))
+        db.session.commit()
+        logger.info("Ensured activity_logs table exists")
+    except Exception as exc:
+        db.session.rollback()
+        logger.warning("Could not create activity_logs table: %s", exc)
+
+
 def bootstrap_database(app, seed=True):
     ensure_database_exists()
 
@@ -158,5 +185,6 @@ def bootstrap_database(app, seed=True):
         migrate_scraping_tasks_schema()
         migrate_businesses_schema()
         migrate_users_schema()
+        ensure_activity_logs_table()
         if seed:
             seed_default_admin()
