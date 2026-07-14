@@ -21,12 +21,15 @@ class TeamBoard(db.Model):
         return BoardColumn.query.filter_by(board_id=self.id, name=name).first()
 
     def task_count(self):
+        from models.board_task import BoardTask
         return BoardTask.query.filter_by(board_id=self.id).count()
 
     def tasks_by_column(self, column_id):
+        from models.board_task import BoardTask
         return BoardTask.query.filter_by(board_id=self.id, column_id=column_id).order_by(BoardTask.created_at.desc()).all()
 
     def assigned_users(self):
         from models.user import User
+        from models.board_task import BoardTask
         user_ids = db.session.query(BoardTask.assigned_to).filter_by(board_id=self.id).distinct().all()
         return User.query.filter(User.id.in_([u[0] for u in user_ids if u[0]])).all()
