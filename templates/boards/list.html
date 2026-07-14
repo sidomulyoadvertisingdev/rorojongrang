@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Boards - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Boards</h1>
+        <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Kolaborasi tim marketing lapangan</p>
+    </div>
+    {% if current_user.is_admin %}
+    <button onclick="document.getElementById('createBoardModal').style.display='flex'" class="btn-primary" style="font-size:13px; padding:8px 16px;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Buat Board
+    </button>
+    {% endif %}
+</div>
+
+{% if boards %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+    {% for board in boards %}
+    <a href="{{ url_for('boards.view_board', board_id=board.id) }}" class="card" style="padding:24px; cursor:pointer; text-decoration:none; transition:transform .2s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-hover)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:var(--accent-light); display:flex; align-items:center; justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+            </div>
+            <span style="font-size:11px; color:var(--text-muted);">{{ board.created_at.strftime('%d %b %Y') }}</span>
+        </div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px;">{{ board.name }}</h3>
+        {% if board.description %}
+        <p style="font-size:12px; color:var(--text-sec); margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ board.description }}</p>
+        {% endif %}
+        <div style="display:flex; gap:16px; font-size:12px; color:var(--text-muted);">
+            <span>{{ board.task_count() }} task</span>
+            <span>{{ board.assigned_users()|length }} anggota</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="padding:60px 28px; text-align:center;">
+    <div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></div>
+    <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Belum ada board</h3>
+    <p style="color:var(--text-sec); margin-bottom:24px; font-size:14px;">
+        {% if current_user.is_admin %}Buat board pertama untuk mulai kolaborasi{% else %}Anda belum ditugaskan di board mana pun{% endif %}
+    </p>
+</div>
+{% endif %}
+
+{% if current_user.is_admin %}
+<div id="createBoardModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; max-width:480px; width:100%; padding:32px; position:relative; box-shadow:0 25px 60px rgba(0,0,0,0.5);">
+        <button onclick="this.closest('#createBoardModal').style.display='none'" style="position:absolute; top:12px; right:12px; background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">&#10005;</button>
+        <h2 style="font-size:18px; font-weight:700; margin-bottom:20px; color:var(--text);">Buat Board Baru</h2>
+        <form method="POST" action="{{ url_for('boards.create_board') }}" style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nama Board</label>
+                <input type="text" name="name" required class="input" placeholder="Contoh: Marketing Q3 - Jakarta" autofocus>
+            </div>
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Deskripsi (opsional)</label>
+                <textarea name="description" rows="3" class="input" placeholder="Jelaskan tujuan board ini..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px;">Buat Board</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

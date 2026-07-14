@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} - Boards{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('boards.view_board', board_id=board.id) }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        {{ board.name }}
+    </a>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 320px; gap:24px;">
+    <div>
+        <div class="card" style="padding:28px;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
+                <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        {% set priority_colors = {'low': '#6b6480', 'medium': '#f59e0b', 'high': '#f97316', 'urgent': '#ef4444'} %}
+                        <span style="font-size:11px; padding:3px 8px; border-radius:5px; background:{{ priority_colors.get(task.priority, '#6b6480') }}20; color:{{ priority_colors.get(task.priority, '#6b6480') }}; font-weight:700; text-transform:uppercase;">{{ task.priority }}</span>
+                        {% set col_obj = task.column %}
+                        <span style="font-size:11px; padding:3px 8px; border-radius:5px; background:{{ col_obj.color }}20; color:{{ col_obj.color }}; font-weight:600;">{{ col_obj.name }}</span>
+                    </div>
+                    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">{{ task.title }}</h1>
+                </div>
+                {% if current_user.is_admin %}
+                <button onclick="deleteTask()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:6px;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-muted)'" title="Hapus task">
+                    <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                {% endif %}
+            </div>
+
+            {% if task.description %}
+            <div style="margin-bottom:20px; padding:14px 16px; background:var(--bg); border-radius:10px; border:1px solid var(--border);">
+                <div style="font-size:12px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Deskripsi</div>
+                <div style="font-size:13px; color:var(--text); line-height:1.6; white-space:pre-wrap;">{{ task.description }}</div>
+            </div>
+            {% endif %}
+
+            {% if task.business %}
+            <div style="margin-bottom:20px; padding:14px 16px; background:var(--accent-light); border-radius:10px; border:1px solid rgba(245,158,11,0.15);">
+                <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:8px; display:flex; align-items:center; gap:4px;">
+                    <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Data dari Scraping
+                </div>
+                <div style="font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px;">{{ task.business.name }}</div>
+                {% if task.business.address %}<div style="font-size:12px; color:var(--text-sec);">{{ task.business.address }}</div>{% endif %}
+                {% if task.business.phone %}<div style="font-size:12px; color:var(--text-sec);">Telp: {{ task.business.phone }}</div>{% endif %}
+                {% if task.business.rating %}<div style="font-size:12px; color:var(--text-sec);">Rating: {{ task.business.rating }}/5</div>{% endif %}
+                {% if task.business.google_maps_url %}
+                <a href="{{ task.business.google_maps_url }}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; font-size:11px; color:var(--accent); font-weight:600; text-decoration:none;">
+                    Buka di Google Maps
+                    <svg style="width:10px; height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <span style="font-size:13px; font-weight:600; color:var(--text-sec);">Progress</span>
+                    <span style="font-size:13px; font-weight:700; color:var(--accent);" id="progressText">{{ task.progress_percent|int }}%</span>
+                </div>
+                <div style="height:8px; background:var(--border); border-radius:100px; overflow:hidden; margin-bottom:8px;">
+                    <div id="progressBar" style="height:100%; width:{{ task.progress_percent }}%; background:linear-gradient(90deg, var(--grad-start), var(--grad-end)); border-radius:100px; transition:width .3s;"></div>
+                </div>
+                {% if task.assigned_to == current_user.id or current_user.is_admin %}
+                <input type="range" min="0" max="100" value="{{ task.progress_percent|int }}" style="width:100%; accent-color:var(--accent);" oninput="updateProgress(this.value)">
+                {% endif %}
+            </div>
+
+            <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <span style="font-size:13px; font-weight:600; color:var(--text-sec);">Checklist</span>
+                    {% if task.assigned_to == current_user.id or current_user.is_admin %}
+                    <button onclick="addChecklistItem()" style="background:none; border:none; color:var(--accent); font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                        <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah
+                    </button>
+                    {% endif %}
+                </div>
+                <div id="checklistContainer" style="display:flex; flex-direction:column; gap:4px;">
+                    {% for item in task.checklists %}
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; cursor:pointer; transition:background .15s; background:{{ 'var(--accent-light)' if item.is_done else 'transparent' }};" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='{{ 'var(--accent-light)' if item.is_done else 'transparent' }}'">
+                        <input type="checkbox" {{ 'checked' if item.is_done }} onchange="toggleChecklist({{ item.id }})" style="accent-color:var(--accent); width:16px; height:16px; cursor:pointer;">
+                        <span style="font-size:13px; color:{{ 'var(--text-muted)' if item.is_done else 'var(--text)' }}; {{ 'text-decoration:line-through;' if item.is_done else '' }}">{{ item.title }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="card" style="padding:20px;">
+            <h3 style="font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:12px;">Detail</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Ditugaskan ke</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        {% if task.assignee %}
+                        <div style="width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,var(--grad-start),var(--grad-mid)); display:flex; align-items:center; justify-content:center; color:#111; font-size:10px; font-weight:700;">{{ task.assignee.username[0]|upper }}</div>
+                        <span style="font-size:13px; color:var(--text); font-weight:500;">{{ task.assignee.full_name or task.assignee.username }}</span>
+                        {% else %}
+                        <span style="font-size:13px; color:var(--text-muted);">Belum ditugaskan</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if current_user.is_admin %}
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Reassign</div>
+                    <select onchange="reassign(this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        <option value="">-- Pilih User --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}" {{ 'selected' if task.assigned_to == u.id }}>{{ u.full_name or u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Prioritas</div>
+                    <select onchange="updatePriority(this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        {% for p in ['low', 'medium', 'high', 'urgent'] %}
+                        <option value="{{ p }}" {{ 'selected' if task.priority == p }}>{{ p|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Pindah ke kolom</div>
+                    <select onchange="moveToColumn(this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        {% for col in columns %}
+                        <option value="{{ col.id }}" {{ 'selected' if task.column_id == col.id }}>{{ col.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Dibuat</div>
+                    <div style="font-size:12px; color:var(--text);">{{ task.created_at.strftime('%d %b %Y %H:%M') }}</div>
+                </div>
+                {% if task.due_date %}
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Deadline</div>
+                    <div style="font-size:12px; color:{{ '#ef4444' if task.due_date < now() else 'var(--text)' }};">{{ task.due_date.strftime('%d %b %Y') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card" style="padding:20px; flex:1;">
+            <h3 style="font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:12px;">Aktivitas</h3>
+            <div id="activityLog" style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:12px;">
+                {% for act in activities %}
+                <div style="display:flex; gap:8px; font-size:12px;">
+                    <div style="width:20px; height:20px; border-radius:6px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
+                        <svg style="width:10px; height:10px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <span style="font-weight:600; color:var(--text);">{{ act.user.full_name or act.user.username }}</span>
+                        <span style="color:var(--text-sec);"> {{ act.detail }}</span>
+                        <div style="font-size:10px; color:var(--text-muted); margin-top:1px;">{{ act.created_at.strftime('%d %b %H:%M') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if task.assigned_to == current_user.id or current_user.is_admin %}
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="commentInput" placeholder="Tambah catatan..." class="input" style="flex:1; padding:8px 12px; font-size:12px;" onkeydown="if(event.key==='Enter')addComment()">
+                <button onclick="addComment()" style="background:var(--accent); color:#111; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;">Kirim</button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function updateProgress(val) {
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/progress', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({progress: parseInt(val)})
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        document.getElementById('progressBar').style.width = d.progress + '%';
+        document.getElementById('progressText').textContent = Math.round(d.progress) + '%';
+    });
+}
+function toggleChecklist(itemId) {
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/checklist', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({item_id: itemId})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function addChecklistItem() {
+    var title = prompt('Nama checklist:');
+    if (!title) return;
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/checklist/add', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title: title})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function addComment() {
+    var input = document.getElementById('commentInput');
+    var msg = input.value.trim();
+    if (!msg) return;
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/comment', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: msg})
+    }).then(function(r) { if (r.ok) { input.value = ''; location.reload(); } });
+}
+function reassign(userId) {
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/reassign', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({user_id: parseInt(userId) || null})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function updatePriority(p) {
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/priority', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({priority: p})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function moveToColumn(colId) {
+    fetch('/api/boards/{{ board.id }}/task/move', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({task_id: {{ task.id }}, column_id: parseInt(colId)})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function deleteTask() {
+    if (!confirm('Hapus task ini?')) return;
+    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/delete', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
+    }).then(function(r) { if (r.ok) window.location.href = '{{ url_for("boards.view_board", board_id=board.id) }}'; });
+}
+</script>
+{% endblock %}

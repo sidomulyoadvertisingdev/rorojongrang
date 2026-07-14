@@ -16,3 +16,8 @@ from models.data_upload import DataUpload
 from models.data_record import DataRecord
 from models.activity_log import ActivityLog
 from models.feedback import Feedback
+from models.team_board import TeamBoard
+from models.board_column import BoardColumn
+from models.board_task import BoardTask
+from models.task_checklist import TaskChecklist
+from models.task_activity import TaskActivity

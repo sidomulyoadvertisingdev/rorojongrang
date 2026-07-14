@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ board.name }} - Boards{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+        <a href="{{ url_for('boards.board_list') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+            <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Boards
+        </a>
+        <div style="width:1px; height:20px; background:var(--border);"></div>
+        <h1 style="font-size:20px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">{{ board.name }}</h1>
+    </div>
+    {% if current_user.is_admin %}
+    <a href="{{ url_for('boards.create_task', board_id=board.id) }}" class="btn-primary" style="font-size:13px; padding:8px 16px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Tambah Task
+    </a>
+    {% endif %}
+</div>
+
+<div class="kanban-board" id="kanbanBoard" style="display:flex; gap:16px; overflow-x:auto; padding-bottom:16px; min-height:calc(100vh - 200px);">
+    {% for col in columns %}
+    <div class="kanban-column" data-column-id="{{ col.id }}" style="min-width:280px; max-width:300px; flex:1; background:var(--bg-sidebar); border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; max-height:calc(100vh - 200px);">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:8px; height:8px; border-radius:50%; background:{{ col.color }};"></div>
+                <span style="font-size:13px; font-weight:700; color:var(--text);">{{ col.name }}</span>
+                <span style="font-size:11px; color:var(--text-muted); background:var(--border); padding:1px 7px; border-radius:6px;">{{ tasks_by_col[col.id]|length }}</span>
+            </div>
+        </div>
+        <div class="kanban-cards" data-column-id="{{ col.id }}" style="flex:1; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; min-height:60px;">
+            {% for task in tasks_by_col[col.id] %}
+            <div class="task-card" data-task-id="{{ task.id }}" draggable="{{ 'true' if current_user.is_admin or task.assigned_to == current_user.id else 'false' }}" style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:all .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                {% if task.business %}
+                <div style="font-size:10px; color:var(--accent); font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                    <svg style="width:10px; height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    {{ task.business.name }}
+                </div>
+                {% endif %}
+                <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px; line-height:1.3;">{{ task.title }}</div>
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                    {% set priority_colors = {'low': '#6b6480', 'medium': '#f59e0b', 'high': '#f97316', 'urgent': '#ef4444'} %}
+                    <span style="font-size:10px; padding:2px 6px; border-radius:4px; background:{{ priority_colors.get(task.priority, '#6b6480') }}20; color:{{ priority_colors.get(task.priority, '#6b6480') }}; font-weight:600; text-transform:uppercase;">{{ task.priority }}</span>
+                    {% if task.due_date %}
+                    <span style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:2px;">
+                        <svg style="width:10px; height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        {{ task.due_date.strftime('%d %b') }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% if task.checklist_total() > 0 %}
+                <div style="margin-bottom:8px;">
+                    <div style="height:4px; background:var(--border); border-radius:100px; overflow:hidden;">
+                        <div style="height:100%; width:{{ task.checklist_progress() }}%; background:var(--accent); border-radius:100px; transition:width .3s;"></div>
+                    </div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">{{ task.checklist_done_count() }}/{{ task.checklist_total() }} checklist</div>
+                </div>
+                {% endif %}
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    {% if task.assignee %}
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div style="width:20px; height:20px; border-radius:6px; background:linear-gradient(135deg,var(--grad-start),var(--grad-mid)); display:flex; align-items:center; justify-content:center; color:#111; font-size:9px; font-weight:700;">{{ task.assignee.username[0]|upper }}</div>
+                        <span style="font-size:10px; color:var(--text-muted);">{{ task.assignee.full_name or task.assignee.username }}</span>
+                    </div>
+                    {% else %}
+                    <span style="font-size:10px; color:var(--text-muted);">Belum ditugaskan</span>
+                    {% endif %}
+                    <a href="{{ url_for('boards.task_detail', board_id=board.id, task_id=task.id) }}" style="color:var(--text-muted); display:flex;" onclick="event.stopPropagation();">
+                        <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let draggedCard = null;
+    document.querySelectorAll('.task-card[draggable="true"]').forEach(function(card) {
+        card.addEventListener('dragstart', function(e) {
+            draggedCard = this;
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function() {
+            this.style.opacity = '1';
+            draggedCard = null;
+            document.querySelectorAll('.kanban-cards').forEach(function(col) { col.style.background = ''; });
+        });
+    });
+    document.querySelectorAll('.kanban-cards').forEach(function(col) {
+        col.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.style.background = 'rgba(245,158,11,0.05)';
+        });
+        col.addEventListener('dragleave', function() { this.style.background = ''; });
+        col.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.background = '';
+            if (!draggedCard) return;
+            var taskId = draggedCard.dataset.taskId;
+            var columnId = this.dataset.columnId;
+            fetch('/api/boards/{{ board.id }}/task/move', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({task_id: parseInt(taskId), column_id: parseInt(columnId)})
+            }).then(function(r) { if (r.ok) location.reload(); });
+        });
+    });
+});
+</script>
+{% endblock %}
