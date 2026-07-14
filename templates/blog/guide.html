@@ -24,25 +24,29 @@
                     </h3>
                     <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
                         {% if lang == 'id' %}
-                        Buka halaman registrasi dan isi form dengan data Anda. Gunakan email aktif untuk verifikasi.
+                        Buka halaman registrasi dan isi form dengan data Anda. Gunakan email aktif untuk verifikasi. Anda juga bisa mendaftar langsung menggunakan akun Google.
                         {% else %}
-                        Open the registration page and fill in the form with your data. Use an active email for verification.
+                        Open the registration page and fill in the form with your data. Use an active email for verification. You can also sign up directly using your Google account.
                         {% endif %}
                     </p>
                     <div class="guide-visual">
-                        <pre>{% if lang == 'id' %}1. Klik "Daftar Sekarang" di halaman login
-2. Isi Username (minimal 3 karakter)
-3. Isi Nama Lengkap
-4. Isi Email yang valid
-5. Buat Password (minimal 6 karakter)
-6. Konfirmasi Password
-7. Klik "Daftar Sekarang"{% else %}1. Click "Register Now" on the login page
-2. Fill in Username (minimum 3 characters)
-3. Fill in Full Name
-4. Fill in valid Email
-5. Create Password (minimum 6 characters)
-6. Confirm Password
-7. Click "Register Now"{% endif %}</pre>
+                        <pre>{% if lang == 'id' %}1. Klik "Daftar dengan Google" (langsung pakai akun Google)
+   ATAU
+2. Klik "Daftar Sekarang" untuk daftar manual:
+   - Isi Username (minimal 3 karakter)
+   - Isi Nama Lengkap
+   - Isi Email yang valid
+   - Buat Password (minimal 6 karakter)
+   - Konfirmasi Password
+   - Klik "Daftar Sekarang"{% else %}1. Click "Sign up with Google" (directly use Google account)
+   OR
+2. Click "Register Now" for manual registration:
+   - Fill in Username (minimum 3 characters)
+   - Fill in Full Name
+   - Fill in valid Email
+   - Create Password (minimum 6 characters)
+   - Confirm Password
+   - Click "Register Now"{% endif %}</pre>
                     </div>
                 </div>
             </div>
@@ -58,21 +62,33 @@
                     </h3>
                     <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px;">
                         {% if lang == 'id' %}
-                        Masuk dengan email dan password yang sudah didaftarkan. Anda akan diarahkan ke dashboard utama.
+                        Masuk dengan email dan password yang sudah didaftarkan. Anda juga bisa login langsung menggunakan akun Google. Setelah login, Anda akan diarahkan ke dashboard utama.
                         {% else %}
-                        Login with your registered email and password. You will be redirected to the main dashboard.
+                        Login with your registered email and password. You can also login directly using your Google account. After login, you will be redirected to the main dashboard.
                         {% endif %}
                     </p>
                     <div class="guide-visual">
-                        <pre>{% if lang == 'id' %}Email:    anda@email.com
-Password: ********
+                        <pre>{% if lang == 'id' %}Cara Login:
+┌─────────────────────────────┐
+│  [ Login dengan Google ]    │  ← Klik tombol ini
+│  ──────── atau ────────     │
+│  Email:    anda@email.com   │
+│  Password: ********         │
+│  [ Masuk ]                  │
+└─────────────────────────────┘
 
 → Dashboard menampilkan:
   • Total task scraping
   • Total data terscraping
   • Task yang sedang berjalan
-  • Riwayat task terbaru{% else %}Email:    you@email.com
-Password: ********
+  • Riwayat task terbaru{% else %}Login Methods:
+┌─────────────────────────────┐
+│  [ Login with Google ]      │  ← Click this button
+│  ──────── or ────────       │
+│  Email:    you@email.com    │
+│  Password: ********         │
+│  [ Login ]                  │
+└─────────────────────────────┘
 
 → Dashboard shows:
   • Total scraping tasks
