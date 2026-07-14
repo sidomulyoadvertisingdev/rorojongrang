@@ -15,6 +15,9 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
+    from routes.auth import _init_google_oauth
+    _init_google_oauth(app)
+
     @login_manager.unauthorized_handler
     def unauthorized():
         wants_json = (

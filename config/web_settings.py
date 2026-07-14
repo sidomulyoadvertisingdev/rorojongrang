@@ -23,3 +23,6 @@ class Config:
     WTF_CSRF_ENABLED = True
     UPLOAD_FOLDER = str(BASE_DIR / "data" / "output")
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")

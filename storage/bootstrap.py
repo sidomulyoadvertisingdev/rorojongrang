@@ -27,6 +27,11 @@ BUSINESS_COLUMNS = [
     ("last_contacted_at", "DATETIME"),
 ]
 
+USER_COLUMNS = [
+    ("google_id", "VARCHAR(100) UNIQUE"),
+    ("avatar_url", "VARCHAR(500)"),
+]
+
 
 def ensure_database_exists():
     connection = pymysql.connect(
@@ -118,6 +123,33 @@ def migrate_businesses_schema():
             logger.warning("Could not add businesses column %s: %s", col_name, exc)
 
 
+def migrate_users_schema():
+    existing_columns = _table_columns("users")
+    for col_name, col_def in USER_COLUMNS:
+        if col_name in existing_columns:
+            continue
+        try:
+            db.session.execute(
+                text(f"ALTER TABLE users ADD COLUMN {col_name} {col_def}")
+            )
+            db.session.commit()
+            logger.info("Added missing users column: %s", col_name)
+        except Exception as exc:
+            db.session.rollback()
+            logger.warning("Could not add users column %s: %s", col_name, exc)
+
+    if "password_hash" in existing_columns:
+        try:
+            db.session.execute(
+                text("ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL")
+            )
+            db.session.commit()
+            logger.info("Made users.password_hash nullable")
+        except Exception as exc:
+            db.session.rollback()
+            logger.warning("Could not modify password_hash: %s", exc)
+
+
 def bootstrap_database(app, seed=True):
     ensure_database_exists()
 
@@ -125,5 +157,6 @@ def bootstrap_database(app, seed=True):
         db.create_all()
         migrate_scraping_tasks_schema()
         migrate_businesses_schema()
+        migrate_users_schema()
         if seed:
             seed_default_admin()
