@@ -6,7 +6,7 @@
 <section class="page-header">
     <div class="container">
         <h1>{% if lang == 'id' %}Fitur Unggulan{% else %}Key Features{% endif %}</h1>
-        <p>{% if lang == 'id' %}Semua yang Anda butuhkan untuk scraping data Google Maps secara efisien.{% else %}Everything you need to scrape Google Maps data efficiently.{% endif %}</p>
+        <p>{% if lang == 'id' %}Semua yang Anda butuhkan untuk digital marketing — dari scraping data hingga kolaborasi tim.{% else %}Everything you need for digital marketing — from data scraping to team collaboration.{% endif %}</p>
     </div>
 </section>
 
@@ -294,6 +294,127 @@
                 </div>
                 <div style="margin-top: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); color: #ffffff; font-size: 12px;">✓ Toko Besi Mulya — terkirim via Promosi Toko</div>
                 <div style="margin-top: 4px; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.15); color: #ffffff; font-size: 12px;">✓ Gudang Besi — terkirim via Promosi Toko</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Analytics Dashboard -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Dashboard Analytics{% else %}Analytics Dashboard{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Upload data CSV dan dapatkan visualisasi interaktif secara otomatis. Pie chart kategori bisnis, bar chart distribusi rating, dan peta lokasi bisnis — semuanya dalam satu dashboard.
+                    {% else %}
+                    Upload CSV data and get automatic interactive visualizations. Business category pie charts, rating distribution bar charts, and business location maps — all in one dashboard.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Upload CSV & otomatis generate chart{% else %}Upload CSV & auto-generate charts{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Pie chart proporsi kategori bisnis{% else %}Business category proportion pie chart{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Bar chart distribusi rating{% else %}Rating distribution bar chart{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Peta lokasi bisnis interaktif{% else %}Interactive business location map{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Tabel data lengkap dengan pencarian{% else %}Full data table with search{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Analytics dashboard preview</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="padding: 16px; border-radius: 8px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);">
+                        <div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">Total Data</div>
+                        <div style="font-size: 22px; font-weight: 800; color: #f59e0b;">1,247</div>
+                    </div>
+                    <div style="padding: 16px; border-radius: 8px; background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2);">
+                        <div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">Rating Rata-rata</div>
+                        <div style="font-size: 22px; font-weight: 800; color: #58a6ff;">4.6 ⭐</div>
+                    </div>
+                </div>
+                <div style="padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                    <div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Kategori Terbanyak</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="padding: 4px 10px; border-radius: 6px; background: rgba(63,185,80,0.15); color: #3fb950; font-size: 11px; font-weight: 600;">Toko Bangunan 34%</span>
+                        <span style="padding: 4px 10px; border-radius: 6px; background: rgba(88,166,255,0.15); color: #58a6ff; font-size: 11px; font-weight: 600;">Bengkel 22%</span>
+                        <span style="padding: 4px 10px; border-radius: 6px; background: rgba(210,168,255,0.15); color: #d2a8ff; font-size: 11px; font-weight: 600;">Restoran 18%</span>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                    <div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Distribusi Rating</div>
+                    <div style="display: flex; align-items: end; gap: 6px; height: 60px;">
+                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:100%; height:20px; border-radius:3px; background:#3fb950;"></div><span style="font-size:9px; color:#8b949e;">5★</span></div>
+                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:100%; height:45px; border-radius:3px; background:#58a6ff;"></div><span style="font-size:9px; color:#8b949e;">4★</span></div>
+                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:100%; height:30px; border-radius:3px; background:#f59e0b;"></div><span style="font-size:9px; color:#8b949e;">3★</span></div>
+                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:100%; height:10px; border-radius:3px; background:#d2a8ff;"></div><span style="font-size:9px; color:#8b949e;">2★</span></div>
+                        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:100%; height:5px; border-radius:3px; background:#f778ba;"></div><span style="font-size:9px; color:#8b949e;">1★</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanban Collaboration -->
+        <div class="feature-row reverse fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Kanban Collaboration{% else %}Kanban Collaboration{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Kelola tugas tim marketing lapangan dengan papan Kanban yang intuitif. Admin bisa membuat board, assign task dari data scraping, dan pantau progres anggota tim secara real-time.
+                    {% else %}
+                    Manage field marketing team tasks with an intuitive Kanban board. Admins can create boards, assign tasks from scraping data, and monitor team progress in real-time.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}5 kolom default: Backlog → To Do → In Progress → Review → Done{% else %}5 default columns: Backlog → To Do → In Progress → Review → Done{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Drag & drop task antar kolom{% else %}Drag & drop tasks between columns{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Buat task dari data scraping atau manual{% else %}Create tasks from scraping data or manual{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Checklist, progress bar, & activity log{% else %}Checklists, progress bar, & activity log{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Reassign & update prioritas (admin){% else %}Reassign & update priority (admin){% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Kanban board preview</div>
+                <div style="display: flex; gap: 8px; overflow: hidden;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 11px; font-weight: 700; color: #8b949e; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #6b6480;"></span> Backlog
+                        </div>
+                        <div style="padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; margin-bottom: 6px;">
+                            <div style="font-size: 11px; font-weight: 600; color: #c9d1d9;">Toko Bangunan Jaya</div>
+                            <div style="font-size: 10px; color: #8b949e; margin-top: 2px;">High priority</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 11px; font-weight: 700; color: #f59e0b; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;"></span> To Do
+                        </div>
+                        <div style="padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; margin-bottom: 6px;">
+                            <div style="font-size: 11px; font-weight: 600; color: #c9d1d9;">Bengkel Motor Abadi</div>
+                            <div style="font-size: 10px; color: #8b949e; margin-top: 2px;">Med priority</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 11px; font-weight: 700; color: #3b82f6; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #3b82f6;"></span> In Progress
+                        </div>
+                        <div style="padding: 10px; border-radius: 8px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); margin-bottom: 6px;">
+                            <div style="font-size: 11px; font-weight: 600; color: #c9d1d9;">Restoran Padang Sari</div>
+                            <div style="margin-top: 4px; height: 3px; border-radius: 2px; background: #30363d; overflow: hidden;">
+                                <div style="width: 60%; height: 100%; background: #3b82f6; border-radius: 2px;"></div>
+                            </div>
+                            <div style="font-size: 9px; color: #8b949e; margin-top: 2px;">60% • Andi</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; padding: 8px 12px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; font-size: 10px; color: #8b949e;">
+                    ✓ 3 anggota aktif • 12 task • 5 selesai hari ini
+                </div>
             </div>
         </div>
     </div>

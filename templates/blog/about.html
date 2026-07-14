@@ -6,7 +6,7 @@
 <section class="page-header">
     <div class="container">
         <h1>{% if lang == 'id' %}Tentang RoroJonggrang{% else %}About RoroJonggrang{% endif %}</h1>
-        <p>{% if lang == 'id' %}Platform scraping data Google Maps yang dirancang untuk kebutuhan digital marketing Indonesia.{% else %}Google Maps data scraping platform designed for Indonesian digital marketing needs.{% endif %}</p>
+        <p>{% if lang == 'id' %}Platform digital marketing lengkap untuk UMKM Indonesia — scraping, analytics, WhatsApp, dan kolaborasi tim dalam satu dashboard.{% else %}Complete digital marketing platform for Indonesian SMEs — scraping, analytics, WhatsApp, and team collaboration in one dashboard.{% endif %}</p>
     </div>
 </section>
 
@@ -21,7 +21,7 @@
                 </h2>
                 <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
                     {% if lang == 'id' %}
-                    RoroJonggrang hadir sebagai solusi untuk para digital marketer Indonesia yang membutuhkan data bisnis lokal secara cepat dan akurat. Nama "Roro Jonggrang" terinspirasi dari legenda Jawa yang menggambarkan kekuatan dan ketekunan.
+                    RoroJonggrang hadir sebagai solusi all-in-one untuk digital marketing Indonesia. Mulai dari scraping data bisnis dari Google Maps, visualisasi data dengan grafik interaktif, kelola pesan WhatsApp otomatis, hingga kolaborasi tim dengan papan Kanban — semua dalam satu platform. Nama "Roro Jonggrang" terinspirasi dari legenda Jawa yang menggambarkan kekuatan dan ketekunan.
                     {% else %}
                     RoroJonggrang is a solution for Indonesian digital marketers who need local business data quickly and accurately. The name "Roro Jonggrang" is inspired by Javanese legend that depicts strength and perseverance.
                     {% endif %}
@@ -55,8 +55,10 @@
                     </h3>
                     <ul style="font-size: 15px; color: var(--text-secondary); line-height: 2;">
                         <li>• {% if lang == 'id' %}Menyediakan tools scraping yang mudah digunakan{% else %}Provide easy-to-use scraping tools{% endif %}</li>
+                        <li>• {% if lang == 'id' %}Menganalisis data dengan visualisasi interaktif{% else %}Analyze data with interactive visualizations{% endif %}</li>
+                        <li>• {% if lang == 'id' %}Mengelola pesan WhatsApp secara otomatis{% else %}Manage WhatsApp messages automatically{% endif %}</li>
+                        <li>• {% if lang == 'id' %}Memfasilitasi kolaborasi tim marketing lapangan{% else %}Facilitate field marketing team collaboration{% endif %}</li>
                         <li>• {% if lang == 'id' %}Menjamin keamanan dan privasi data pengguna{% else %}Ensure user data security and privacy{% endif %}</li>
-                        <li>• {% if lang == 'id' %}Terus mengembangkan fitur sesuai kebutuhan pasar{% else %}Continuously develop features according to market needs{% endif %}</li>
                     </ul>
                 </div>
             </div>
@@ -137,7 +139,7 @@
     <div class="container">
         <div class="cta-box fade-in">
             <h2>{% if lang == 'id' %}Bergabung dengan Kami{% else %}Join Us{% endif %}</h2>
-            <p>{% if lang == 'id' %}Mulai gunakan RoroJonggrang dan rasakan kemudahan scraping data Google Maps.{% else %}Start using RoroJonggrang and experience the ease of scraping Google Maps data.{% endif %}</p>
+            <p>{% if lang == 'id' %}Mulai gunakan RoroJonggrang dan rasakan kemudahan digital marketing dalam satu platform.{% else %}Start using RoroJonggrang and experience the ease of digital marketing in one platform.{% endif %}</p>
             <a href="{{ url_for('auth.register') }}" class="btn-white">
                 {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
             </a>
