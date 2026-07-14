@@ -182,3 +182,59 @@ def google_callback():
     flash("Selamat datang, " + (user.full_name or user.username) + "!", "success")
     next_page = request.args.get("next")
     return redirect(next_page or url_for("dashboard.index"))
+
+
+@auth_bp.route("/profile/edit", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
+        email = request.form.get("email", "").strip()
+
+        errors = []
+        if not email:
+            errors.append("Email tidak boleh kosong")
+        if email != current_user.email and User.query.filter_by(email=email).first():
+            errors.append("Email sudah digunakan")
+
+        if errors:
+            for err in errors:
+                flash(err, "danger")
+            return render_template("auth/edit_profile.html")
+
+        current_user.full_name = full_name
+        current_user.email = email
+        db.session.commit()
+        flash("Profil berhasil diperbarui!", "success")
+        return redirect(url_for("auth.edit_profile"))
+
+    return render_template("auth/edit_profile.html")
+
+
+@auth_bp.route("/profile/password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        errors = []
+        if not current_user.check_password(current_password):
+            errors.append("Password saat ini salah")
+        if len(new_password) < 6:
+            errors.append("Password baru minimal 6 karakter")
+        if new_password != confirm_password:
+            errors.append("Password baru tidak cocok")
+
+        if errors:
+            for err in errors:
+                flash(err, "danger")
+            return render_template("auth/change_password.html")
+
+        current_user.set_password(new_password)
+        db.session.commit()
+        flash("Password berhasil diubah!", "success")
+        return redirect(url_for("auth.change_password"))
+
+    return render_template("auth/change_password.html")
