@@ -15,3 +15,4 @@ from models.wa_click import WaClick
 from models.data_upload import DataUpload
 from models.data_record import DataRecord
 from models.activity_log import ActivityLog
+from models.feedback import Feedback

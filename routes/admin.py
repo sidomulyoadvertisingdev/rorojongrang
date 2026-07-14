@@ -156,3 +156,52 @@ def activity_log():
         logs=pagination.items,
         pagination=pagination,
     )
+
+
+@admin_bp.route("/feedback")
+@admin_required
+def feedback_list():
+    from models.feedback import Feedback
+
+    page = request.args.get("page", 1, type=int)
+    filter_type = request.args.get("filter", "").strip()
+    per_page = 20
+
+    query = Feedback.query
+
+    if filter_type == "unread":
+        query = query.filter_by(is_read=False)
+    elif filter_type in ("feature", "complaint", "suggestion"):
+        query = query.filter_by(category=filter_type)
+
+    pagination = query.order_by(
+        Feedback.created_at.desc()
+    ).paginate(page=page, per_page=per_page, error_out=False)
+
+    total = Feedback.query.count()
+    unread = Feedback.query.filter_by(is_read=False).count()
+    feature_count = Feedback.query.filter_by(category="feature").count()
+    complaint_count = Feedback.query.filter_by(category="complaint").count()
+
+    return render_template(
+        "admin/feedback.html",
+        feedbacks=pagination.items,
+        pagination=pagination,
+        total=total,
+        unread=unread,
+        feature_count=feature_count,
+        complaint_count=complaint_count,
+        filter_type=filter_type,
+    )
+
+
+@admin_bp.route("/feedback/<int:fb_id>/read", methods=["POST"])
+@admin_required
+def mark_read(fb_id):
+    from models.feedback import Feedback
+
+    fb = Feedback.query.get_or_404(fb_id)
+    fb.is_read = True
+    db.session.commit()
+    flash("Masukan ditandai sudah dibaca.", "success")
+    return redirect(url_for("admin.feedback_list"))

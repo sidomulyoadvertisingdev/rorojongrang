@@ -597,3 +597,33 @@ def delete_businesses():
     ).delete(synchronize_session=False)
     db.session.commit()
     return jsonify({"deleted": deleted})
+
+
+@api_bp.route("/feedback", methods=["POST"])
+def submit_feedback():
+    from models.feedback import Feedback
+    data = request.get_json() or {}
+    category = data.get("category", "feature")
+    message = (data.get("message") or "").strip()
+    contact_email = (data.get("contact_email") or "").strip()
+
+    if not message:
+        return jsonify({"error": "Message is required"}), 400
+
+    if category not in ("feature", "complaint", "suggestion"):
+        return jsonify({"error": "Invalid category"}), 400
+
+    user_id = None
+    if current_user.is_authenticated:
+        user_id = current_user.id
+
+    fb = Feedback(
+        user_id=user_id,
+        category=category,
+        message=message,
+        contact_email=contact_email or None,
+    )
+    db.session.add(fb)
+    db.session.commit()
+
+    return jsonify({"success": True, "id": fb.id})
