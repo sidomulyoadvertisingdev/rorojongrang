@@ -2,18 +2,20 @@
 {% block title %}Roadmap Project - RoroJonggrang{% endblock %}
 {% block content %}
 <div class="page-header">
-    <div class="hero-badge fade-in">
-        <span class="dot"></span>
-        {% if lang == 'id' %}Sedang Dikembangkan{% else %}In Development{% endif %}
+    <div class="container">
+        <div class="hero-badge fade-in">
+            <span class="dot"></span>
+            {% if lang == 'id' %}Sedang Dikembangkan{% else %}In Development{% endif %}
+        </div>
+        <h1 class="fade-in fade-in-delay-1">Roadmap Project</h1>
+        <p class="fade-in fade-in-delay-2">
+            {% if lang == 'id' %}
+            Rencana pengembangan fitur RoroJonggrang sepanjang tahun 2026. Setiap kuartal membawa kemampuan baru untuk membantu bisnis Anda berkembang.
+            {% else %}
+            RoroJonggrang development roadmap for 2026. Each quarter brings new capabilities to help your business grow.
+            {% endif %}
+        </p>
     </div>
-    <h1 class="fade-in fade-in-delay-1">Roadmap Project</h1>
-    <p class="fade-in fade-in-delay-2">
-        {% if lang == 'id' %}
-        Rencana pengembangan fitur RoroJonggrang sepanjang tahun 2026. Setiap kuartal membawa kemampuan baru untuk membantu bisnis Anda berkembang.
-        {% else %}
-        RoroJonggrang development roadmap for 2026. Each quarter brings new capabilities to help your business grow.
-        {% endif %}
-    </p>
 </div>
 
 <section class="section" style="padding-top:0;">
