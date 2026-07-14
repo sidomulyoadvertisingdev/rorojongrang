@@ -279,12 +279,55 @@
                 We always listen to user feedback. Don't hesitate to reach out to us.
                 {% endif %}
             </p>
-            <a href="{{ url_for('blog.about', lang=lang) }}" class="btn-white">
+            <button class="btn-white" onclick="openFeedbackModal()">
                 {% if lang == 'id' %}Hubungi Kami{% else %}Contact Us{% endif %}
-            </a>
+            </button>
         </div>
     </div>
 </section>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:20px; max-width:520px; width:100%; padding:40px; position:relative; box-shadow:0 25px 60px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto;">
+        <button onclick="closeFeedbackModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text-muted); font-size:24px; cursor:pointer; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:all .2s;">&#10005;</button>
+        <div style="text-align:center; margin-bottom:28px;">
+            <div style="font-size:40px; margin-bottom:12px;">&#128161;</div>
+            <h2 style="font-size:24px; font-weight:800; font-family:'Playfair Display',serif; margin-bottom:8px;">
+                {% if lang == 'id' %}Kirim Saran Fitur{% else %}Send Feature Suggestion{% endif %}
+            </h2>
+            <p style="font-size:14px; color:var(--text-secondary);">
+                {% if lang == 'id' %}Masukkan saran atau kritik Anda di bawah ini.{% else %}Enter your suggestion or feedback below.{% endif %}
+            </p>
+        </div>
+        <form id="feedbackForm" onsubmit="submitFeedback(event)">
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">
+                    {% if lang == 'id' %}Kategori{% else %}Category{% endif %}
+                </label>
+                <select id="fbCategory" required style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; outline:none; transition:border .2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+                    <option value="feature">{% if lang == 'id' %}Saran Fitur{% else %}Feature Request{% endif %}</option>
+                    <option value="complaint">{% if lang == 'id' %}Keluhan{% else %}Complaint{% endif %}</option>
+                    <option value="suggestion">{% if lang == 'id' %}Saran Umum{% else %}General Suggestion{% endif %}</option>
+                </select>
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">
+                    {% if lang == 'id' %}Email (opsional){% else %}Email (optional){% endif %}
+                </label>
+                <input type="email" id="fbEmail" placeholder="anda@email.com" style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; outline:none; transition:border .2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+            </div>
+            <div style="margin-bottom:24px;">
+                <label style="display:block; font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">
+                    {% if lang == 'id' %}Pesan{% else %}Message{% endif %} *
+                </label>
+                <textarea id="fbMessage" required rows="4" placeholder="{% if lang == 'id' %}Tulis saran atau kritik Anda di sini...{% else %}Write your suggestion or feedback here...{% endif %}" style="width:100%; padding:12px 16px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; outline:none; resize:vertical; min-height:100px; font-family:inherit; transition:border .2s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            </div>
+            <button type="submit" id="fbSubmitBtn" class="btn-white" style="width:100%;">
+                {% if lang == 'id' %}Kirim{% else %}Submit{% endif %}
+            </button>
+        </form>
+    </div>
+</div>
 
 <style>
     .roadmap-timeline {
@@ -504,4 +547,51 @@
         .feature-tag { font-size: 12px; padding: 5px 10px; }
     }
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+document.getElementById('feedbackModal').addEventListener('click', function(e) {
+    if (e.target === this) closeFeedbackModal();
+});
+function submitFeedback(e) {
+    e.preventDefault();
+    const btn = document.getElementById('fbSubmitBtn');
+    const origText = btn.textContent;
+    btn.textContent = '...';
+    btn.disabled = true;
+    fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            category: document.getElementById('fbCategory').value,
+            contact_email: document.getElementById('fbEmail').value,
+            message: document.getElementById('fbMessage').value
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('feedbackForm').innerHTML = '<div style="text-align:center; padding:20px 0;"><div style="font-size:48px; margin-bottom:12px;">&#9989;</div><h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Terima Kasih!</h3><p style="font-size:14px; color:var(--text-secondary);">Saran Anda berhasil dikirim. Kami akan meninjaunya segera.</p></div>';
+        } else {
+            alert(data.error || 'Terjadi kesalahan. Coba lagi.');
+            btn.textContent = origText;
+            btn.disabled = false;
+        }
+    })
+    .catch(() => {
+        alert('Terjadi kesalahan. Coba lagi.');
+        btn.textContent = origText;
+        btn.disabled = false;
+    });
+}
+</script>
 {% endblock %}
