@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Campaigns - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Campaigns</h1>
+        <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Kelola kampanye marketing Anda</p>
+    </div>
+    {% if current_user.is_admin %}
+    <a href="{{ url_for('campaigns.create_campaign') }}" class="btn-primary" style="font-size:13px; padding:8px 16px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Baru
+    </a>
+    {% endif %}
+</div>
+
+{% if campaigns %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px;">
+    {% for c in campaigns %}
+    <a href="{{ url_for('campaigns.dashboard', campaign_id=c.id) }}" class="card" style="padding:24px; text-decoration:none; display:block;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--text);">{{ c.name }}</h3>
+            <span style="font-size:11px; padding:3px 10px; border-radius:100px; font-weight:600; 
+                {% if c.status == 'active' %}background:rgba(34,197,94,0.1); color:#22c55e;
+                {% elif c.status == 'paused' %}background:rgba(251,191,36,0.1); color:#fbbf24;
+                {% else %}background:var(--border); color:var(--text-sec);{% endif %}">
+                {{ c.status|capitalize }}
+            </span>
+        </div>
+        {% if c.description %}
+        <p style="font-size:13px; color:var(--text-sec); margin-bottom:12px; line-height:1.5;">{{ c.description[:100] }}{% if c.description|length > 100 %}...{% endif %}</p>
+        {% endif %}
+        <div style="display:flex; gap:16px; font-size:12px; color:var(--text-muted);">
+            {% if c.start_date %}<span>Start: {{ c.start_date.strftime('%d %b %Y') }}</span>{% endif %}
+            {% if c.end_date %}<span>End: {{ c.end_date.strftime('%d %b %Y') }}</span>{% endif %}
+            {% if c.target_leads %}<span>Target: {{ c.target_leads }}</span>{% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="padding:60px 28px; text-align:center;">
+    <div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+    <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Belum ada campaign</h3>
+    <p style="color:var(--text-sec); font-size:14px; margin-bottom:16px;">Buat campaign pertama untuk melacak performa leads</p>
+    {% if current_user.is_admin %}
+    <a href="{{ url_for('campaigns.create_campaign') }}" class="btn-primary" style="text-decoration:none;">Buat Campaign</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

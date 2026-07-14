@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Jadwalkan Follow-up - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('followups.dashboard') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Follow-up
+    </a>
+</div>
+
+<div style="max-width:600px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif; margin-bottom:20px;">Jadwalkan Follow-up</h1>
+
+    <div class="card" style="padding:28px;">
+        <form method="POST" style="display:flex; flex-direction:column; gap:20px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Lead</label>
+                <select name="lead_id" class="input" required style="padding:10px 12px;">
+                    <option value="">-- Pilih Lead --</option>
+                    {% for l in leads %}
+                    <option value="{{ l.id }}" {% if selected_lead and selected_lead.id == l.id %}selected{% endif %}>
+                        {{ l.business.name if l.business else 'Unknown' }} — {{ l.status|capitalize }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Tipe</label>
+                    <select name="type" class="input" required style="padding:10px 12px;">
+                        <option value="call">Telepon</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="email">Email</option>
+                        <option value="meeting">Meeting</option>
+                        <option value="survey">Survey</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Jadwal</label>
+                    <input type="datetime-local" name="scheduled_at" class="input" required value="{{ default_date }}">
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Catatan (opsional)</label>
+                <textarea name="notes" rows="3" class="input" placeholder="Tujuan follow-up..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px;">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Jadwalkan
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -627,6 +627,19 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     <span class="menu-label">Data Analitik</span>
                 </a>
+                <div class="nav-divider"></div>
+                <a href="{{ url_for('leads.lead_pipeline') }}" class="nav-item {% if request.endpoint and 'leads' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span class="menu-label">Leads</span>
+                </a>
+                <a href="{{ url_for('followups.dashboard') }}" class="nav-item {% if request.endpoint and 'followups' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span class="menu-label">Follow-up</span>
+                </a>
+                <a href="{{ url_for('campaigns.list_campaigns') }}" class="nav-item {% if request.endpoint and 'campaigns' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    <span class="menu-label">Campaigns</span>
+                </a>
                 {% if current_user.is_admin %}
                 <div class="nav-divider"></div>
                 <a href="{{ url_for('admin.user_list') }}" class="nav-item {% if request.endpoint and 'admin' in request.endpoint %}active{% endif %}">
@@ -682,6 +695,18 @@
                 <a href="{{ url_for('analytics.index') }}" class="more-item {% if request.endpoint and 'analytics' in request.endpoint %}active{% endif %}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     Data Analitik
+                </a>
+                <a href="{{ url_for('leads.lead_pipeline') }}" class="more-item {% if request.endpoint and 'leads' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Leads
+                </a>
+                <a href="{{ url_for('followups.dashboard') }}" class="more-item {% if request.endpoint and 'followups' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Follow-up
+                </a>
+                <a href="{{ url_for('campaigns.list_campaigns') }}" class="more-item {% if request.endpoint and 'campaigns' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    Campaigns
                 </a>
                 {% if current_user.is_admin %}
                 <a href="{{ url_for('admin.user_list') }}" class="more-item {% if request.endpoint and 'admin' in request.endpoint %}active{% endif %}">

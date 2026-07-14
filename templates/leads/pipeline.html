@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Lead Pipeline - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Lead Pipeline</h1>
+        <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Kelola prospek penjualan</p>
+    </div>
+    <a href="{{ url_for('leads.create_lead') }}" class="btn-primary" style="font-size:13px; padding:8px 16px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Tambah Lead
+    </a>
+</div>
+
+<div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:16px; min-height:calc(100vh - 200px);">
+    {% for s in statuses %}
+    <div style="min-width:260px; max-width:280px; flex:1; background:var(--bg-sidebar); border:1px solid var(--border); border-radius:14px; display:flex; flex-direction:column; max-height:calc(100vh - 200px);">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:8px; height:8px; border-radius:50%; background:{{ s.color }};"></div>
+                <span style="font-size:13px; font-weight:700; color:var(--text);">{{ s.label }}</span>
+                <span style="font-size:11px; color:var(--text-muted); background:var(--border); padding:1px 7px; border-radius:6px;">{{ leads_by_status[s.key]|length }}</span>
+            </div>
+        </div>
+        <div class="lead-cards" data-status="{{ s.key }}" style="flex:1; padding:8px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; min-height:60px;">
+            {% for lead in leads_by_status[s.key] %}
+            <a href="{{ url_for('leads.lead_detail', lead_id=lead.id) }}" class="lead-card" draggable="true" data-lead-id="{{ lead.id }}" style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:all .15s; text-decoration:none; display:block;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px;">{{ lead.business.name if lead.business else 'Unknown' }}</div>
+                {% if lead.business and lead.business.phone %}
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">{{ lead.business.phone }}</div>
+                {% endif %}
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    {% set priority_colors = {'low': '#6b6480', 'medium': '#f59e0b', 'high': '#f97316', 'urgent': '#ef4444'} %}
+                    <span style="font-size:10px; padding:2px 6px; border-radius:4px; background:{{ priority_colors.get(lead.priority, '#6b6480') }}20; color:{{ priority_colors.get(lead.priority, '#6b6480') }}; font-weight:600; text-transform:uppercase;">{{ lead.priority }}</span>
+                    {% if lead.value > 0 %}
+                    <span style="font-size:10px; color:var(--accent); font-weight:600;">Rp {{ "{:,.0f}".format(lead.value) }}</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    {% if lead.assignee %}
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <div style="width:18px; height:18px; border-radius:5px; background:linear-gradient(135deg,var(--grad-start),var(--grad-mid)); display:flex; align-items:center; justify-content:center; color:#111; font-size:8px; font-weight:700;">{{ lead.assignee.username[0]|upper }}</div>
+                        <span style="font-size:10px; color:var(--text-muted);">{{ lead.assignee.full_name or lead.assignee.username }}</span>
+                    </div>
+                    {% else %}
+                    <span style="font-size:10px; color:var(--text-muted);">Belum ditugaskan</span>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let draggedCard = null;
+    document.querySelectorAll('.lead-card[draggable="true"]').forEach(function(card) {
+        card.addEventListener('dragstart', function(e) {
+            draggedCard = this;
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function() {
+            this.style.opacity = '1';
+            draggedCard = null;
+            document.querySelectorAll('.lead-cards').forEach(function(col) { col.style.background = ''; });
+        });
+    });
+    document.querySelectorAll('.lead-cards').forEach(function(col) {
+        col.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.style.background = 'rgba(245,158,11,0.05)';
+        });
+        col.addEventListener('dragleave', function() { this.style.background = ''; });
+        col.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.background = '';
+            if (!draggedCard) return;
+            var leadId = draggedCard.dataset.leadId;
+            var status = this.dataset.status;
+            fetch('/api/leads/move', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({lead_id: parseInt(leadId), status: status})
+            }).then(function(r) { if (r.ok) location.reload(); });
+        });
+    });
+});
+</script>
+{% endblock %}

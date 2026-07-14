@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Buat Campaign - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('campaigns.list_campaigns') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Campaigns
+    </a>
+</div>
+
+<div style="max-width:600px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif; margin-bottom:20px;">Buat Campaign Baru</h1>
+
+    <div class="card" style="padding:28px;">
+        <form method="POST" style="display:flex; flex-direction:column; gap:20px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nama Campaign</label>
+                <input type="text" name="name" class="input" required placeholder="Contoh: Promosi Ramadhan 2026" style="padding:10px 12px;">
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Deskripsi (opsional)</label>
+                <textarea name="description" rows="3" class="input" placeholder="Jelaskan tujuan campaign..."></textarea>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="input" style="padding:10px 12px;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="input" style="padding:10px 12px;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Target Leads</label>
+                <input type="number" name="target_leads" class="input" placeholder="0" style="padding:10px 12px;">
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px;">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Buat Campaign
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

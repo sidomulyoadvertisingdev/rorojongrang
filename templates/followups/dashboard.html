@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Follow-up Dashboard - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Follow-up</h1>
+        <p style="color:var(--text-sec); margin-top:4px; font-size:13px;">Jadwal follow-up prospek Anda</p>
+    </div>
+    <a href="{{ url_for('followups.create') }}" class="btn-primary" style="font-size:13px; padding:8px 16px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Jadwalkan
+    </a>
+</div>
+
+{% if overdue %}
+<div style="margin-bottom:24px;">
+    <h2 style="font-size:16px; font-weight:700; color:#ef4444; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+        <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        Overdue ({{ overdue|length }})
+    </h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:12px;">
+        {% for fu in overdue %}
+        <div class="card" style="padding:16px; border-color:rgba(239,68,68,0.3);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:12px; padding:3px 8px; border-radius:5px; background:rgba(239,68,68,0.1); color:#ef4444; font-weight:600;">{{ fu.type|capitalize }}</span>
+                    <span style="font-size:12px; color:var(--text); font-weight:600;">{{ fu.lead.business.name if fu.lead and fu.lead.business else 'Unknown' }}</span>
+                </div>
+                <button onclick="completeFollowup({{ fu.id }})" style="background:var(--accent); color:#111; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px; font-weight:600;">Selesai</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted);">{{ fu.scheduled_at.strftime('%d %b %Y %H:%M') }}</div>
+            {% if fu.notes %}<div style="font-size:12px; color:var(--text-sec); margin-top:4px;">{{ fu.notes }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if today %}
+<div style="margin-bottom:24px;">
+    <h2 style="font-size:16px; font-weight:700; color:var(--accent); margin-bottom:12px;">Hari Ini ({{ today|length }})</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:12px;">
+        {% for fu in today %}
+        <div class="card" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:12px; padding:3px 8px; border-radius:5px; background:var(--accent-light); color:var(--accent); font-weight:600;">{{ fu.type|capitalize }}</span>
+                    <span style="font-size:12px; color:var(--text); font-weight:600;">{{ fu.lead.business.name if fu.lead and fu.lead.business else 'Unknown' }}</span>
+                </div>
+                <button onclick="completeFollowup({{ fu.id }})" style="background:var(--accent); color:#111; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px; font-weight:600;">Selesai</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted);">{{ fu.scheduled_at.strftime('%H:%M') }}</div>
+            {% if fu.notes %}<div style="font-size:12px; color:var(--text-sec); margin-top:4px;">{{ fu.notes }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if upcoming %}
+<div style="margin-bottom:24px;">
+    <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:12px;">Mendatang ({{ upcoming|length }})</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:12px;">
+        {% for fu in upcoming %}
+        <div class="card" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:12px; padding:3px 8px; border-radius:5px; background:var(--border); color:var(--text-sec); font-weight:600;">{{ fu.type|capitalize }}</span>
+                    <span style="font-size:12px; color:var(--text); font-weight:600;">{{ fu.lead.business.name if fu.lead and fu.lead.business else 'Unknown' }}</span>
+                </div>
+                <button onclick="completeFollowup({{ fu.id }})" style="background:var(--accent); color:#111; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px; font-weight:600;">Selesai</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted);">{{ fu.scheduled_at.strftime('%d %b %Y %H:%M') }}</div>
+            {% if fu.notes %}<div style="font-size:12px; color:var(--text-sec); margin-top:4px;">{{ fu.notes }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if not overdue and not today and not upcoming %}
+<div class="card" style="padding:60px 28px; text-align:center;">
+    <div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+    <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Tidak ada follow-up</h3>
+    <p style="color:var(--text-sec); font-size:14px;">Jadwalkan follow-up pertama Anda</p>
+</div>
+{% endif %}
+
+<script>
+function completeFollowup(fuId) {
+    fetch('/followups/' + fuId + '/complete', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+</script>
+{% endblock %}

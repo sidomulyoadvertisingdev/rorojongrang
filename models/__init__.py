@@ -21,3 +21,7 @@ from models.board_column import BoardColumn
 from models.board_task import BoardTask
 from models.task_checklist import TaskChecklist
 from models.task_activity import TaskActivity
+from models.lead_pipeline import LeadPipeline
+from models.lead_activity import LeadActivity
+from models.followup import FollowUp
+from models.campaign import Campaign, CampaignMetric

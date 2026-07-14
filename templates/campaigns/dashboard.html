@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }} - Campaign Dashboard{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('campaigns.list_campaigns') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Campaigns
+    </a>
+</div>
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">{{ campaign.name }}</h1>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:6px;">
+            <span style="font-size:12px; padding:3px 10px; border-radius:100px; font-weight:600; 
+                {% if campaign.status == 'active' %}background:rgba(34,197,94,0.1); color:#22c55e;
+                {% elif campaign.status == 'paused' %}background:rgba(251,191,36,0.1); color:#fbbf24;
+                {% else %}background:var(--border); color:var(--text-sec);{% endif %}">
+                {{ campaign.status|capitalize }}
+            </span>
+            {% if campaign.start_date %}<span style="font-size:12px; color:var(--text-muted);">{{ campaign.start_date.strftime('%d %b %Y') }} — {{ campaign.end_date.strftime('%d %b %Y') if campaign.end_date else '...' }}</span>{% endif %}
+        </div>
+    </div>
+    {% if current_user.is_admin %}
+    <div style="display:flex; gap:8px;">
+        {% if campaign.status == 'active' %}
+        <button onclick="updateCampaign({{ campaign.id }}, 'paused')" class="btn-secondary" style="font-size:12px;">Pause</button>
+        {% else %}
+        <button onclick="updateCampaign({{ campaign.id }}, 'active')" class="btn-primary" style="font-size:12px; padding:8px 14px;">Aktifkan</button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:24px;">
+    <div class="card kpi-card" style="padding:20px;">
+        <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Total Leads</div>
+        <div style="font-size:28px; font-weight:800; color:var(--accent);">{{ metrics.total_leads }}</div>
+        {% if campaign.target_leads %}
+        <div style="margin-top:8px;">
+            <div class="progress-bar"><div class="progress-fill" style="width:{{ [(metrics.total_leads / campaign.target_leads * 100)|int, 100]|min }}%"></div></div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Target: {{ campaign.target_leads }}</div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card kpi-card" style="padding:20px;">
+        <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Conversion Rate</div>
+        <div style="font-size:28px; font-weight:800; color:var(--text);">{{ metrics.conversion_rate }}%</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">{{ metrics.won_leads }} won / {{ metrics.total_leads }} total</div>
+    </div>
+    <div class="card kpi-card" style="padding:20px;">
+        <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Total Nilai</div>
+        <div style="font-size:28px; font-weight:800; color:#22c55e;">Rp {{ "{:,.0f}".format(metrics.total_value).replace(",", ".") }}</div>
+    </div>
+    <div class="card kpi-card" style="padding:20px;">
+        <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Responded</div>
+        <div style="font-size:28px; font-weight:800; color:var(--text);">{{ metrics.responded_leads }}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">{{ metrics.contacted_leads }} dihubungi</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+    <div class="card" style="padding:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px;">Leads per Status</h3>
+        {% for status, count in leads_by_status.items() %}
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div style="width:12px; height:12px; border-radius:3px; 
+                {% if status == 'new' %}background:#60a5fa;
+                {% elif status == 'contacted' %}background:#fbbf24;
+                {% elif status == 'negotiation' %}background:#f97316;
+                {% elif status == 'won' %}background:#22c55e;
+                {% else %}background:#ef4444;{% endif %}"></div>
+            <div style="flex:1; font-size:13px; color:var(--text);">{{ status|capitalize }}</div>
+            <div style="font-size:14px; font-weight:700; color:var(--text);">{{ count }}</div>
+            {% if metrics.total_leads > 0 %}
+            <div style="width:80px;">
+                <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="width:{{ (count / metrics.total_leads * 100)|int }}%"></div></div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card" style="padding:24px;">
+        <h3 style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px;">Detail</h3>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-sec);">Leads dihubungi</span>
+                <span style="font-weight:600; color:var(--text);">{{ metrics.contacted_leads }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-sec);">Leads merespon</span>
+                <span style="font-weight:600; color:var(--text);">{{ metrics.responded_leads }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-sec);">Menang</span>
+                <span style="font-weight:600; color:#22c55e;">{{ metrics.won_leads }}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-sec);">Kalah</span>
+                <span style="font-weight:600; color:#ef4444;">{{ metrics.lost_leads }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if leads %}
+<h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:12px;">Leads ({{ leads|length }})</h2>
+<div class="card" style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Business</th>
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted);">Status</th>
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted);">Prioritas</th>
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted);">Nilai</th>
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted);">Assigned</th>
+                <th style="text-align:left; padding:12px 16px; font-size:12px; font-weight:600; color:var(--text-muted);">Dibuat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in leads %}
+            <tr style="border-bottom:1px solid var(--border); cursor:pointer;" onclick="window.location='{{ url_for('leads.lead_detail', lead_id=l.id) }}'">
+                <td style="padding:12px 16px; font-size:13px; font-weight:600; color:var(--text);">{{ l.business.name if l.business else 'Unknown' }}</td>
+                <td style="padding:12px 16px;">
+                    <span style="font-size:11px; padding:3px 8px; border-radius:5px; font-weight:600;
+                        {% if l.status == 'new' %}background:rgba(96,165,250,0.1); color:#60a5fa;
+                        {% elif l.status == 'contacted' %}background:rgba(251,191,36,0.1); color:#fbbf24;
+                        {% elif l.status == 'negotiation' %}background:rgba(249,115,22,0.1); color:#f97316;
+                        {% elif l.status == 'won' %}background:rgba(34,197,94,0.1); color:#22c55e;
+                        {% else %}background:rgba(239,68,68,0.1); color:#ef4444;{% endif %}">
+                        {{ l.status|capitalize }}
+                    </span>
+                </td>
+                <td style="padding:12px 16px;">
+                    <span style="font-size:11px; padding:3px 8px; border-radius:5px; font-weight:600;
+                        {% if l.priority == 'urgent' %}background:rgba(239,68,68,0.1); color:#ef4444;
+                        {% elif l.priority == 'high' %}background:rgba(249,115,22,0.1); color:#f97316;
+                        {% elif l.priority == 'medium' %}background:rgba(251,191,36,0.1); color:#fbbf24;
+                        {% else %}background:var(--border); color:var(--text-sec);{% endif %}">
+                        {{ l.priority|capitalize }}
+                    </span>
+                </td>
+                <td style="padding:12px 16px; font-size:13px; color:var(--text);">Rp {{ "{:,.0f}".format(l.value or 0).replace(",", ".") }}</td>
+                <td style="padding:12px 16px; font-size:13px; color:var(--text-sec);">{{ l.assigned_user.full_name or l.assigned_user.username if l.assigned_user else '-' }}</td>
+                <td style="padding:12px 16px; font-size:12px; color:var(--text-muted);">{{ l.created_at.strftime('%d %b') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<script>
+function updateCampaign(id, status) {
+    fetch('/campaigns/' + id + '/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: status})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+</script>
+{% endblock %}

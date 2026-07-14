@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Tambah Lead - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('leads.lead_pipeline') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Pipeline
+    </a>
+</div>
+
+<div style="max-width:700px;">
+    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif; margin-bottom:20px;">Tambah Lead Baru</h1>
+
+    <div class="card" style="padding:28px;">
+        <form method="POST" style="display:flex; flex-direction:column; gap:20px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Cari Business</label>
+                <input type="text" id="businessSearch" placeholder="Ketik nama business..." class="input" oninput="searchBusiness(this.value)">
+                <input type="hidden" name="business_id" id="businessId">
+                <div id="searchResults" style="display:none; margin-top:4px; border:1px solid var(--border); border-radius:10px; overflow:hidden; max-height:200px; overflow-y:auto;"></div>
+                <div id="selectedBusiness" style="display:none; margin-top:8px; padding:12px; background:var(--accent-light); border:1px solid rgba(245,158,11,0.15); border-radius:10px;">
+                    <div style="font-size:13px; font-weight:700; color:var(--text);" id="selBizName"></div>
+                    <div style="font-size:12px; color:var(--text-sec);" id="selBizAddr"></div>
+                    <div style="font-size:12px; color:var(--text-sec);" id="selBizPhone"></div>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Assign ke</label>
+                    <select name="assigned_to" class="input" style="padding:10px 12px;">
+                        <option value="">-- Pilih User --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.full_name or u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Prioritas</label>
+                    <select name="priority" class="input" style="padding:10px 12px;">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nilai (Rp)</label>
+                    <input type="number" name="value" class="input" placeholder="0" style="padding:10px 12px;">
+                </div>
+                <div>
+                    <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Deadline (opsional)</label>
+                    <input type="date" name="due_date" class="input" style="padding:10px 12px;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Campaign (opsional)</label>
+                <select name="campaign_id" class="input" style="padding:10px 12px;">
+                    <option value="">-- Tanpa Campaign --</option>
+                    {% for c in campaigns %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Catatan (opsional)</label>
+                <textarea name="notes" rows="3" class="input" placeholder="Catatan tentang lead ini..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px;">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Buat Lead
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+var searchTimer;
+function searchBusiness(q) {
+    clearTimeout(searchTimer);
+    if (q.length < 2) { document.getElementById('searchResults').style.display = 'none'; return; }
+    searchTimer = setTimeout(function() {
+        fetch('/api/leads/search-business?q=' + encodeURIComponent(q))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var el = document.getElementById('searchResults');
+            if (!data.length) { el.style.display = 'none'; return; }
+            el.innerHTML = data.map(function(b) {
+                var badge = b.in_pipeline ? '<span style="font-size:10px; color:#f59e0b; font-weight:600;">Sudah di pipeline</span>' : '';
+                return '<div style="padding:10px 14px; cursor:pointer; border-bottom:1px solid var(--border); transition:background .15s;" onmouseover="this.style.background=\'var(--accent-light)\'" onmouseout="this.style.background=\'transparent\'" onclick="selectBusiness(' + b.id + ', \'' + b.name.replace(/'/g, "\\'") + '\', \'' + (b.address||'').replace(/'/g, "\\'") + '\', \'' + (b.phone||'').replace(/'/g, "\\'") + '\')">' +
+                    '<div style="font-size:13px; font-weight:600; color:var(--text);">' + b.name + ' ' + badge + '</div>' +
+                    '<div style="font-size:11px; color:var(--text-muted);">' + (b.address || 'No address') + '</div>' +
+                    '</div>';
+            }).join('');
+            el.style.display = 'block';
+        });
+    }, 300);
+}
+function selectBusiness(id, name, addr, phone) {
+    document.getElementById('businessId').value = id;
+    document.getElementById('businessSearch').value = name;
+    document.getElementById('selBizName').textContent = name;
+    document.getElementById('selBizAddr').textContent = addr;
+    document.getElementById('selBizPhone').textContent = phone ? 'Telp: ' + phone : '';
+    document.getElementById('selectedBusiness').style.display = 'block';
+    document.getElementById('searchResults').style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#searchResults') && e.target.id !== 'businessSearch') {
+        document.getElementById('searchResults').style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

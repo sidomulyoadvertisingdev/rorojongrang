@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.business.name if lead.business else 'Lead' }} - Lead Pipeline{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+    <a href="{{ url_for('leads.lead_pipeline') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px; text-decoration:none;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Pipeline
+    </a>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 320px; gap:24px;">
+    <div>
+        <div class="card" style="padding:28px;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
+                <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                        {% set priority_colors = {'low': '#6b6480', 'medium': '#f59e0b', 'high': '#f97316', 'urgent': '#ef4444'} %}
+                        <span style="font-size:11px; padding:3px 8px; border-radius:5px; background:{{ priority_colors.get(lead.priority, '#6b6480') }}20; color:{{ priority_colors.get(lead.priority, '#6b6480') }}; font-weight:700; text-transform:uppercase;">{{ lead.priority }}</span>
+                        {% set status_colors = {'new': '#6b6480', 'contacted': '#3b82f6', 'negotiation': '#f59e0b', 'won': '#22c55e', 'lost': '#ef4444'} %}
+                        <span style="font-size:11px; padding:3px 8px; border-radius:5px; background:{{ status_colors.get(lead.status, '#6b6480') }}20; color:{{ status_colors.get(lead.status, '#6b6480') }}; font-weight:600;">{{ lead.status|capitalize }}</span>
+                    </div>
+                    <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">{{ lead.business.name if lead.business else 'Unknown' }}</h1>
+                </div>
+                {% if current_user.is_admin %}
+                <button onclick="deleteLead()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:6px;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-muted)'" title="Hapus lead">
+                    <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                {% endif %}
+            </div>
+
+            {% if lead.business %}
+            <div style="margin-bottom:20px; padding:14px 16px; background:var(--accent-light); border-radius:10px; border:1px solid rgba(245,158,11,0.15);">
+                <div style="font-size:12px; font-weight:600; color:var(--accent); margin-bottom:8px; display:flex; align-items:center; gap:4px;">
+                    <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Data Bisnis
+                </div>
+                {% if lead.business.phone %}<div style="font-size:12px; color:var(--text-sec);">Telp: {{ lead.business.phone }}</div>{% endif %}
+                {% if lead.business.address %}<div style="font-size:12px; color:var(--text-sec);">{{ lead.business.address }}</div>{% endif %}
+                {% if lead.business.rating %}<div style="font-size:12px; color:var(--text-sec);">Rating: {{ lead.business.rating }}/5</div>{% endif %}
+                {% if lead.business.google_maps_url %}
+                <a href="{{ lead.business.google_maps_url }}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; font-size:11px; color:var(--accent); font-weight:600; text-decoration:none;">
+                    Buka di Google Maps
+                    <svg style="width:10px; height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if lead.notes %}
+            <div style="margin-bottom:20px; padding:14px 16px; background:var(--bg); border-radius:10px; border:1px solid var(--border);">
+                <div style="font-size:12px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Catatan</div>
+                <div style="font-size:13px; color:var(--text); line-height:1.6; white-space:pre-wrap;">{{ lead.notes }}</div>
+            </div>
+            {% endif %}
+
+            <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <span style="font-size:13px; font-weight:600; color:var(--text-sec);">Aktivitas</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:12px;">
+                    {% for act in activities %}
+                    <div style="display:flex; gap:8px; font-size:12px;">
+                        <div style="width:20px; height:20px; border-radius:6px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
+                            <svg style="width:10px; height:10px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <span style="font-weight:600; color:var(--text);">{{ act.user.full_name or act.user.username }}</span>
+                            <span style="color:var(--text-sec);"> {{ act.detail }}</span>
+                            <div style="font-size:10px; color:var(--text-muted); margin-top:1px;">{{ act.created_at.strftime('%d %b %H:%M') }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <select id="activityType" class="input" style="padding:8px 10px; font-size:12px; width:120px;">
+                        <option value="note">Catatan</option>
+                        <option value="call">Telepon</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="email">Email</option>
+                        <option value="meeting">Meeting</option>
+                    </select>
+                    <input type="text" id="activityInput" placeholder="Tambah catatan..." class="input" style="flex:1; padding:8px 12px; font-size:12px;" onkeydown="if(event.key==='Enter')addActivity()">
+                    <button onclick="addActivity()" style="background:var(--accent); color:#111; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;">Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="card" style="padding:20px;">
+            <h3 style="font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:12px;">Detail</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Ditugaskan ke</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        {% if lead.assignee %}
+                        <div style="width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,var(--grad-start),var(--grad-mid)); display:flex; align-items:center; justify-content:center; color:#111; font-size:10px; font-weight:700;">{{ lead.assignee.username[0]|upper }}</div>
+                        <span style="font-size:13px; color:var(--text); font-weight:500;">{{ lead.assignee.full_name or lead.assignee.username }}</span>
+                        {% else %}
+                        <span style="font-size:13px; color:var(--text-muted);">Belum ditugaskan</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if current_user.is_admin %}
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Reassign</div>
+                    <select onchange="updateLead('assigned_to', this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        <option value="">-- Pilih User --</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}" {{ 'selected' if lead.assigned_to == u.id }}>{{ u.full_name or u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Prioritas</div>
+                    <select onchange="updateLead('priority', this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        {% for p in ['low', 'medium', 'high', 'urgent'] %}
+                        <option value="{{ p }}" {{ 'selected' if lead.priority == p }}>{{ p|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Nilai (Rp)</div>
+                    <input type="number" value="{{ lead.value|int }}" onchange="updateLead('value', this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Campaign</div>
+                    <select onchange="updateLead('campaign_id', this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        <option value="">-- Tanpa Campaign --</option>
+                        {% for c in campaigns %}
+                        <option value="{{ c.id }}" {{ 'selected' if lead.campaign_id == c.id }}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Deadline</div>
+                    <input type="date" value="{{ lead.due_date.strftime('%Y-%m-%d') if lead.due_date else '' }}" onchange="updateLead('due_date', this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                </div>
+                {% endif %}
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Status</div>
+                    <select onchange="moveToStatus(this.value)" class="input" style="padding:8px 10px; font-size:12px;">
+                        {% for s in statuses %}
+                        <option value="{{ s.key }}" {{ 'selected' if lead.status == s.key }}>{{ s.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:3px;">Dibuat</div>
+                    <div style="font-size:12px; color:var(--text);">{{ lead.created_at.strftime('%d %b %Y %H:%M') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="padding:20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                <h3 style="font-size:13px; font-weight:600; color:var(--text-sec);">Follow-up</h3>
+                <a href="{{ url_for('followups.create') }}" style="font-size:11px; color:var(--accent); font-weight:600; text-decoration:none;">+ Jadwalkan</a>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                {% for fu in followups[:5] %}
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:8px; background:{{ 'var(--accent-light)' if fu.status == 'pending' else 'transparent' }}; border:1px solid {{ 'var(--border)' if fu.status == 'pending' else 'transparent' }};">
+                    <div>
+                        <div style="font-size:12px; font-weight:600; color:var(--text);">{{ fu.type|capitalize }}</div>
+                        <div style="font-size:10px; color:var(--text-muted);">{{ fu.scheduled_at.strftime('%d %b %H:%M') }}</div>
+                    </div>
+                    {% if fu.status == 'pending' %}
+                    <button onclick="completeFollowup({{ fu.id }})" style="background:var(--accent); color:#111; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px; font-weight:600;">Selesai</button>
+                    {% else %}
+                    <span style="font-size:10px; color:var(--text-muted);">{{ fu.status }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if not followups %}
+                <div style="font-size:12px; color:var(--text-muted); text-align:center; padding:16px;">Belum ada follow-up</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateLead(field, value) {
+    fetch('/api/leads/{{ lead.id }}/update', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({[field]: value || null})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function moveToStatus(status) {
+    fetch('/api/leads/move', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({lead_id: {{ lead.id }}, status: status})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function addActivity() {
+    var input = document.getElementById('activityInput');
+    var type = document.getElementById('activityType').value;
+    var msg = input.value.trim();
+    if (!msg) return;
+    fetch('/api/leads/{{ lead.id }}/activity', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: type, detail: msg})
+    }).then(function(r) { if (r.ok) { input.value = ''; location.reload(); } });
+}
+function completeFollowup(fuId) {
+    fetch('/followups/' + fuId + '/complete', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function deleteLead() {
+    if (!confirm('Hapus lead ini?')) return;
+    fetch('/api/leads/{{ lead.id }}/delete', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
+    }).then(function(r) { if (r.ok) window.location.href = '{{ url_for("leads.lead_pipeline") }}'; });
+}
+</script>
+{% endblock %}
