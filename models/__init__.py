@@ -12,3 +12,5 @@ from models.business import Business
 from models.wa_template import WaTemplate
 from models.wa_link import WaLink
 from models.wa_click import WaClick
+from models.data_upload import DataUpload
+from models.data_record import DataRecord

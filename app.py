@@ -35,6 +35,7 @@ def create_app():
     from routes.api import api_bp
     from routes.blog import blog_bp
     from routes.wa_templates import wa_templates_bp
+    from routes.analytics import analytics_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -42,6 +43,7 @@ def create_app():
     app.register_blueprint(api_bp)
     app.register_blueprint(blog_bp)
     app.register_blueprint(wa_templates_bp)
+    app.register_blueprint(analytics_bp)
 
     return app
 

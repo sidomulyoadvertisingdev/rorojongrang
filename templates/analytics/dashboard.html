@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+{% block title %}Analitik {{ data_types[upload.data_type].label }} - RoroJonggrang{% endblock %}
+{% block content %}
+<style>
+    .kpi-card { padding:20px 24px; border-radius:14px; background:var(--bg-card); border:1px solid var(--border); position:relative; overflow:hidden; transition:all .3s; }
+    .kpi-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+    .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .kpi-card.green::before { background:linear-gradient(90deg,#06b694,#14b8a6); }
+    .kpi-card.blue::before { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+    .kpi-card.purple::before { background:linear-gradient(90deg,#6366f1,#818cf8); }
+    .kpi-card.amber::before { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+    .kpi-card.red::before { background:linear-gradient(90deg,#ef4444,#f87171); }
+    .kpi-card.cyan::before { background:linear-gradient(90deg,#06b6d4,#22d3ee); }
+    .kpi-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .kpi-label { font-size:12px; font-weight:600; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+    .kpi-value { font-size:28px; font-weight:800; color:var(--text); line-height:1; }
+    .kpi-sub { font-size:12px; color:var(--text-sec); margin-top:6px; display:flex; align-items:center; gap:4px; }
+    .kpi-trend-up { color:#06b694; }
+    .kpi-trend-down { color:#ef4444; }
+    .chart-panel { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; transition:all .3s; }
+    .chart-panel:hover { box-shadow:var(--shadow-hover); }
+    .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .panel-title { font-size:15px; font-weight:700; color:var(--text); }
+    .panel-badge { font-size:11px; font-weight:600; padding:4px 10px; border-radius:100px; background:var(--accent-light); color:var(--accent); }
+    .insight-card { display:flex; gap:12px; padding:14px 16px; border-radius:10px; border:1px solid var(--border); margin-bottom:10px; transition:all .2s; }
+    .insight-card:hover { background:var(--accent-light); border-color:var(--accent); }
+    .insight-icon { min-width:24px; display:flex; align-items:center; justify-content:center; }
+    .insight-text { font-size:13px; color:var(--text); line-height:1.5; }
+    .insight-type { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
+    .insight-type.warning { color:#f59e0b; }
+    .insight-type.success { color:#06b694; }
+    .insight-type.info { color:#8b5cf6; }
+    .table-container { overflow-x:auto; }
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th { padding:12px 16px; text-align:left; font-size:11px; font-weight:700; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid var(--border); background:var(--bg); }
+    .data-table td { padding:12px 16px; font-size:13px; color:var(--text); border-bottom:1px solid var(--border-light); }
+    .data-table tr:hover td { background:var(--accent-light); }
+    .tab-btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:none; background:transparent; color:var(--text-sec); transition:all .2s; }
+    .tab-btn.active { background:var(--accent-light); color:var(--accent); }
+    .tab-btn:hover { background:var(--accent-light); }
+    .progress-mini { height:6px; background:var(--border); border-radius:100px; overflow:hidden; }
+    .progress-mini-fill { height:100%; border-radius:100px; transition:width .5s; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .animate-in { animation:fadeInUp .4s ease-out forwards; }
+    input[type="date"]::-webkit-calendar-picker-indicator { cursor:pointer; opacity:0.6; }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity:1; }
+</style>
+
+<div style="margin-bottom:28px; display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+    <div>
+        <a href="{{ url_for('analytics.index') }}" style="color:var(--text-sec); font-size:13px; display:inline-flex; align-items:center; gap:4px; margin-bottom:8px;">← Kembali ke Daftar</a>
+        <h1 style="font-size:26px; font-weight:800; color:var(--text); letter-spacing:-0.5px; font-family:'Playfair Display',serif;">Dashboard Analitik</h1>
+        <p style="color:var(--text-sec); margin-top:4px; font-size:14px;">
+            <span style="font-weight:600;">{{ data_types[upload.data_type].label }}</span> · {{ upload.filename }} · {{ upload.row_count }} data · {{ upload.created_at.strftime('%d %b %Y') }}
+        </p>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:10px; border:1.5px solid var(--border); background:var(--bg-card);">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-sec);"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="date" id="date-from" class="input" style="border:none; padding:0; width:130px; font-size:13px; background:transparent;" onchange="applyDateFilter()">
+            <span style="color:var(--text-sec); font-size:12px;">s/d</span>
+            <input type="date" id="date-to" class="input" style="border:none; padding:0; width:130px; font-size:13px; background:transparent;" onchange="applyDateFilter()">
+        </div>
+        <button class="tab-btn active" onclick="setPeriod('all',this)">Semua</button>
+        <button class="tab-btn" onclick="setPeriod('7',this)">7 Hari</button>
+        <button class="tab-btn" onclick="setPeriod('30',this)">30 Hari</button>
+        <button class="tab-btn" onclick="setPeriod('90',this)">90 Hari</button>
+    </div>
+</div>
+
+<div id="kpi-cards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:28px;"></div>
+
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:20px; margin-bottom:24px;">
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="main-chart-title">Tren Utama</div>
+            <div class="panel-badge" id="main-chart-badge">Overview</div>
+        </div>
+        <div style="position:relative; height:320px;"><canvas id="mainChart"></canvas></div>
+    </div>
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="side-chart1-title">Distribusi</div>
+        </div>
+        <div style="position:relative; height:320px;"><canvas id="sideChart1"></canvas></div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="chart3-title">Analisis 1</div>
+        </div>
+        <div style="position:relative; height:280px;"><canvas id="chart3"></canvas></div>
+    </div>
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="chart4-title">Analisis 2</div>
+        </div>
+        <div style="position:relative; height:280px;"><canvas id="chart4"></canvas></div>
+    </div>
+</div>
+
+<div id="extra-charts-row" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; display:none;">
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="chart5-title">Analisis 3</div>
+        </div>
+        <div style="position:relative; height:280px;"><canvas id="chart5"></canvas></div>
+    </div>
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title" id="chart6-title">Analisis 4</div>
+        </div>
+        <div style="position:relative; height:280px;"><canvas id="chart6"></canvas></div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title">Insights & Rekomendasi</div>
+            <div class="panel-badge" id="insight-count">0 insight</div>
+        </div>
+        <div id="insights-container" style="max-height:360px; overflow-y:auto;"></div>
+    </div>
+    <div class="chart-panel">
+        <div class="panel-header">
+            <div class="panel-title">Top Performer</div>
+        </div>
+        <div id="top-performer-container" style="max-height:360px; overflow-y:auto;"></div>
+    </div>
+</div>
+
+<div class="chart-panel" style="margin-bottom:24px;">
+    <div class="panel-header">
+        <div class="panel-title" id="table-title">Detail Data</div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" class="input" placeholder="Cari data..." id="table-search" style="width:200px; padding:8px 12px; font-size:12px;" oninput="filterTable()">
+            <button class="btn-secondary" onclick="exportTableCSV()" style="font-size:12px; padding:8px 12px; display:inline-flex; align-items:center; gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export CSV</button>
+        </div>
+    </div>
+    <div class="table-container">
+        <table class="data-table" id="data-table">
+            <thead><tr id="table-head"></tr></thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+    <div id="table-pagination" style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; font-size:13px; color:var(--text-sec);"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+(function() {
+    var UPLOAD_ID = {{ upload.id }};
+    var DATA_TYPE = '{{ upload.data_type }}';
+    var RAW_DATA = null;
+    var ALL_RECORDS = [];
+    var filteredRecords = [];
+    var charts = {};
+    var ROWS_PER_PAGE = 15;
+    var currentPage = 1;
+    var filteredRows = [];
+
+    var PALETTE = ['#8b5cf6','#06b694','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6','#e879f9','#84cc16','#f97316','#06b6d4','#a78bfa'];
+    var GRADIENTS = {
+        green: ['rgba(6,182,148,0.15)','rgba(6,182,148,0.02)'],
+        blue: ['rgba(139,92,246,0.15)','rgba(139,92,246,0.02)'],
+        purple: ['rgba(99,102,241,0.15)','rgba(99,102,241,0.02)'],
+        amber: ['rgba(245,158,11,0.15)','rgba(245,158,11,0.02)'],
+    };
+
+    var ICONS = {
+        box: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>',
+        currency: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+        chart: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>',
+        alert: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        tag: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+        diamond: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M2 9h20"/><path d="M12 22L6 3M12 22l6-19"/></svg>',
+        trending: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+        cart: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
+        users: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+        target: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        star: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        clipboard: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+        dollar: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+        arrowUp: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+        arrowDown: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>',
+        fire: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 23c-4.97 0-9-3.58-9-8 0-3.19 2.13-6.11 4-8 0 0 1.5 2 3 2 0-4 3-8 6-10 0 0 2.5 3 3 6 1-1 2-2 2-3 1.5 2 3 4.5 3 7 0 4.42-4.03 8-9 8z"/></svg>',
+        clock: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        check: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+        x: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        info: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+        zap: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        layers: '<svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
+    };
+
+    function fmt(n) {
+        if (n === null || n === undefined) return '0';
+        if (Math.abs(n) >= 1000000000) return (n/1000000000).toFixed(1) + 'B';
+        if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1) + 'M';
+        if (Math.abs(n) >= 1000) return (n/1000).toFixed(1) + 'K';
+        return n.toLocaleString('id-ID');
+    }
+    function fmtRp(n) { return 'Rp ' + fmt(n); }
+    function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+    function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+    function makeGradient(ctx, color) {
+        var g = ctx.createLinearGradient(0, 0, 0, 300);
+        g.addColorStop(0, GRADIENTS[color][0]);
+        g.addColorStop(1, GRADIENTS[color][1]);
+        return g;
+    }
+
+    var chartDefaults = { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false, labels:{ font:{ family:'Inter', size:11 }, padding:12, usePointStyle:true, pointStyleWidth:8 } } }, scales:{ x:{ grid:{ display:false }, ticks:{ font:{ family:'Inter', size:11 } } }, y:{ grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ font:{ family:'Inter', size:11 } } } } };
+
+    function renderKPIs(d) {
+        var el = document.getElementById('kpi-cards');
+        var h = '';
+        if (DATA_TYPE === 'product') {
+            h += kpi(ICONS.box, 'Total Produk', fmt(d.total), '', 'green', 'var(--accent-light)');
+            h += kpi(ICONS.currency, 'Harga Rata-rata', fmtRp(d.avg_price), 'Median: ' + fmtRp(d.median_price), 'blue', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.layers, 'Total Stok', fmt(d.total_stock), 'Rata-rata: ' + fmt(d.avg_stock) + ' unit', 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.alert, 'Stok Rendah', d.low_stock, d.low_stock > 0 ? 'Perlu restock!' : 'Aman', 'red', 'rgba(239,68,68,0.1)');
+            h += kpi(ICONS.tag, 'Kategori', d.cat_stats.total_categories, 'Maks: ' + d.cat_stats.max_category + ' produk/kategori', 'amber', 'rgba(245,158,11,0.1)');
+            var totalValue = d.total_stock * d.avg_price;
+            h += kpi(ICONS.diamond, 'Total Nilai Inventori', fmtRp(totalValue), '', 'cyan', 'rgba(6,182,212,0.1)');
+        } else if (DATA_TYPE === 'sales') {
+            h += kpi(ICONS.currency, 'Total Omzet', fmtRp(d.total_revenue), fmt(d.total) + ' transaksi', 'green', 'var(--accent-light)');
+            h += kpi(ICONS.chart, 'Rata-rata/Transaksi', fmtRp(d.avg_transaction), 'Median: ' + fmtRp(d.median_transaction), 'blue', 'rgba(139,92,246,0.1)');
+            var growthIcon = d.growth_rate >= 0 ? ICONS.arrowUp : ICONS.arrowDown;
+            var growthColor = d.growth_rate >= 0 ? 'kpi-trend-up' : 'kpi-trend-down';
+            h += kpi(ICONS.zap, 'Growth Rate', fmtPct(d.growth_rate), '<span class="' + growthColor + '" style="display:inline-flex;align-items:center;gap:2px;">' + (d.growth_rate >= 0 ? '↑' : '↓') + ' vs periode lalu</span>', d.growth_rate >= 0 ? 'green' : 'red', d.growth_rate >= 0 ? 'var(--accent-light)' : 'rgba(239,68,68,0.1)');
+            h += kpi(ICONS.cart, 'Total Unit Terjual', fmt(d.total_quantity), 'Avg: ' + fmt(d.avg_quantity) + ' unit/trx', 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.users, 'Unique Customers', fmt(d.unique_customers), d.unique_products + ' produk terjual', 'amber', 'rgba(245,158,11,0.1)');
+            h += kpi(ICONS.target, 'Top Customer Share', fmtPct(d.customer_concentration), 'Kontribusi pelanggan #1', 'cyan', 'rgba(6,182,212,0.1)');
+        } else if (DATA_TYPE === 'customer') {
+            h += kpi(ICONS.users, 'Total Pelanggan', fmt(d.total), '', 'green', 'var(--accent-light)');
+            h += kpi(ICONS.currency, 'Total Pembelian', fmtRp(d.total_purchase), '', 'blue', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.chart, 'Avg/Pelanggan', fmtRp(d.avg_purchase), 'Median: ' + fmtRp(d.median_purchase), 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.star, 'VIP Customers', fmt(d.segments.values[0]), '>Rp 2M pembelian', 'amber', 'rgba(245,158,11,0.1)');
+            h += kpi(ICONS.target, 'Pareto (20/80)', fmtPct(d.pareto_ratio), 'Top 20% kontribusi', 'cyan', 'rgba(6,182,212,0.1)');
+            var completenessPct = Math.round(((d.completeness.phone + d.completeness.email + d.completeness.address) / (d.total * 3)) * 100);
+            h += kpi(ICONS.clipboard, 'Data Completeness', fmtPct(completenessPct), 'Telepon: ' + fmtPct(d.completeness.phone/d.total*100), 'green', 'var(--accent-light)');
+        } else if (DATA_TYPE === 'finance') {
+            h += kpi(ICONS.arrowUp, 'Total Pemasukan', fmtRp(d.total_income), '', 'green', 'var(--accent-light)');
+            h += kpi(ICONS.arrowDown, 'Total Pengeluaran', fmtRp(d.total_expense), '', 'red', 'rgba(239,68,68,0.1)');
+            h += kpi(ICONS.layers, 'Saldo', fmtRp(d.balance), d.balance >= 0 ? 'Surplus' : 'Defisit', d.balance >= 0 ? 'green' : 'red', d.balance >= 0 ? 'var(--accent-light)' : 'rgba(239,68,68,0.1)');
+            h += kpi(ICONS.trending, 'Profit Margin', fmtPct(d.profit_margin), '', 'blue', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.fire, 'Burn Rate', fmtRp(d.burn_rate), '/bulan', 'amber', 'rgba(245,158,11,0.1)');
+            h += kpi(ICONS.clock, 'Runway', d.runway_months.toFixed(0) + ' bulan', 'Berdasarkan burn rate', 'purple', 'rgba(139,92,246,0.1)');
+        }
+        el.innerHTML = h;
+    }
+
+    function kpi(icon, label, value, sub, color, bgColor) {
+        return '<div class="kpi-card ' + color + ' animate-in"><div style="display:flex; align-items:flex-start; justify-content:space-between;"><div><div class="kpi-label">' + label + '</div><div class="kpi-value">' + value + '</div>' + (sub ? '<div class="kpi-sub">' + sub + '</div>' : '') + '</div><div class="kpi-icon" style="background:' + bgColor + '; color:' + (color === 'green' ? '#06b694' : color === 'blue' ? '#8b5cf6' : color === 'purple' ? '#6366f1' : color === 'amber' ? '#f59e0b' : color === 'red' ? '#ef4444' : '#06b6d4') + ';">' + icon + '</div></div></div>';
+    }
+
+    function renderMainChart(d) {
+        destroyChart('main');
+        var ctx = document.getElementById('mainChart').getContext('2d');
+        if (DATA_TYPE === 'product') {
+            document.getElementById('main-chart-title').textContent = 'Distribusi Harga Produk';
+            document.getElementById('main-chart-badge').textContent = 'Price Distribution';
+            charts.main = new Chart(ctx, { type:'bar', data:{ labels:d.price_ranges.labels, datasets:[{label:'Jumlah Produk', data:d.price_ranges.values, backgroundColor:PALETTE.slice(0,5), borderRadius:6, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'sales') {
+            document.getElementById('main-chart-title').textContent = 'Tren Omzet Bulanan';
+            document.getElementById('main-chart-badge').textContent = 'Revenue Trend';
+            charts.main = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Omzet', data:d.monthly.values, borderColor:'#06b694', backgroundColor:makeGradient(ctx,'green'), fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#06b694', pointBorderColor:'#fff', pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, tooltip:{backgroundColor:'rgba(0,0,0,0.8)',titleFont:{family:'Inter'},bodyFont:{family:'Inter'},callbacks:{label:function(c){return 'Omzet: Rp ' + c.parsed.y.toLocaleString('id-ID')}}}} } });
+        } else if (DATA_TYPE === 'customer') {
+            document.getElementById('main-chart-title').textContent = 'Distribusi Pembelian';
+            document.getElementById('main-chart-badge').textContent = 'Purchase Distribution';
+            charts.main = new Chart(ctx, { type:'bar', data:{ labels:d.purchase_ranges.labels, datasets:[{label:'Pelanggan', data:d.purchase_ranges.values, backgroundColor:PALETTE.slice(0,5), borderRadius:6, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'finance') {
+            document.getElementById('main-chart-title').textContent = 'Pemasukan vs Pengeluaran';
+            document.getElementById('main-chart-badge').textContent = 'Cash Flow';
+            charts.main = new Chart(ctx, { type:'bar', data:{ labels:d.monthly.labels, datasets:[{label:'Pemasukan', data:d.monthly.income, backgroundColor:'rgba(6,182,148,0.8)', borderRadius:4, borderSkipped:false}, {label:'Pengeluaran', data:d.monthly.expense, backgroundColor:'rgba(239,68,68,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:true, position:'top'}}} });
+        }
+    }
+
+    function renderSideChart(d) {
+        destroyChart('side1');
+        var ctx = document.getElementById('sideChart1').getContext('2d');
+        if (DATA_TYPE === 'product') {
+            document.getElementById('side-chart1-title').textContent = 'Produk per Kategori';
+            charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.categories.labels, datasets:[{data:d.categories.values, backgroundColor:PALETTE, borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+        } else if (DATA_TYPE === 'sales') {
+            document.getElementById('side-chart1-title').textContent = 'Top Produk (Revenue)';
+            charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.top_products.labels.slice(0,6), datasets:[{data:d.top_products.revenue.slice(0,6), backgroundColor:PALETTE, borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+        } else if (DATA_TYPE === 'customer') {
+            document.getElementById('side-chart1-title').textContent = 'Customer Segmentation';
+            charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.segments.labels, datasets:[{data:d.segments.values, backgroundColor:['#f59e0b','#8b5cf6','#06b694','#ef4444'], borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+        } else if (DATA_TYPE === 'finance') {
+            document.getElementById('side-chart1-title').textContent = 'Saldo Kumulatif';
+            charts.side1 = new Chart(ctx, { type:'line', data:{ labels:d.cumulative_balance.map(function(c){return c.date.slice(5)}), datasets:[{label:'Saldo', data:d.cumulative_balance.map(function(c){return c.balance}), borderColor:'#8b5cf6', backgroundColor:makeGradient(ctx,'purple'), fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#8b5cf6'}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        }
+    }
+
+    function renderChart3(d) {
+        destroyChart('chart3');
+        var ctx = document.getElementById('chart3').getContext('2d');
+        if (DATA_TYPE === 'product') {
+            document.getElementById('chart3-title').textContent = 'Health Stok Produk';
+            charts.chart3 = new Chart(ctx, { type:'doughnut', data:{ labels:d.stock_health.labels, datasets:[{data:d.stock_health.values, backgroundColor:['#ef4444','#f59e0b','#8b5cf6','#06b694'], borderWidth:0}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+        } else if (DATA_TYPE === 'sales') {
+            document.getElementById('chart3-title').textContent = 'Unit Terjual per Produk';
+            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.labels, datasets:[{label:'Qty', data:d.top_products.quantity, backgroundColor:'rgba(139,92,246,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'customer') {
+            document.getElementById('chart3-title').textContent = 'Top 10 Pelanggan';
+            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return c.name||'N/A'}), datasets:[{label:'Pembelian', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(6,182,148,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'finance') {
+            document.getElementById('chart3-title').textContent = 'Pengeluaran per Kategori';
+            charts.chart3 = new Chart(ctx, { type:'doughnut', data:{ labels:d.expense_categories.labels, datasets:[{data:d.expense_categories.values, backgroundColor:PALETTE, borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+        }
+    }
+
+    function renderChart4(d) {
+        destroyChart('chart4');
+        var ctx = document.getElementById('chart4').getContext('2d');
+        if (DATA_TYPE === 'product') {
+            document.getElementById('chart4-title').textContent = 'Top 10 Produk (Harga)';
+            charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.map(function(p){return p.name||'N/A'}), datasets:[{label:'Harga', data:d.top_products.map(function(p){return p.price||0}), backgroundColor:PALETTE.slice(0,10), borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'sales') {
+            document.getElementById('chart4-title').textContent = 'Revenue per Produk';
+            charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.labels, datasets:[{label:'Revenue', data:d.top_products.revenue, backgroundColor:'rgba(245,158,11,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'customer') {
+            document.getElementById('chart4-title').textContent = 'Top 10 Pelanggan (Detail)';
+            charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return (c.name||'').substring(0,12)}), datasets:[{label:'Total Beli', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(139,92,246,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        } else if (DATA_TYPE === 'finance') {
+            document.getElementById('chart4-title').textContent = 'Tren Saldo Bulanan';
+            charts.chart4 = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Saldo', data:d.monthly.balance, borderColor:d.monthly.balance.some(function(v){return v<0}) ? '#ef4444' : '#06b694', backgroundColor:d.monthly.balance.some(function(v){return v<0}) ? 'rgba(239,68,68,0.1)' : 'rgba(6,182,148,0.1)', fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#fff', pointBorderColor:d.monthly.balance.map(function(v){return v>=0?'#06b694':'#ef4444'}), pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+        }
+    }
+
+    function renderChart5(d) {
+        var row = document.getElementById('extra-charts-row');
+        if (DATA_TYPE === 'sales' || DATA_TYPE === 'finance') {
+            row.style.display = 'grid';
+            destroyChart('chart5');
+            var ctx = document.getElementById('chart5').getContext('2d');
+            if (DATA_TYPE === 'sales') {
+                document.getElementById('chart5-title').textContent = 'Top 10 Pelanggan';
+                charts.chart5 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.labels, datasets:[{label:'Revenue', data:d.top_customers.values, backgroundColor:'rgba(6,182,212,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            } else if (DATA_TYPE === 'finance') {
+                document.getElementById('chart5-title').textContent = 'Pemasukan per Kategori';
+                charts.chart5 = new Chart(ctx, { type:'doughnut', data:{ labels:d.income_categories.labels, datasets:[{data:d.income_categories.values, backgroundColor:PALETTE, borderWidth:0}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+            }
+        }
+    }
+
+    function renderChart6(d) {
+        if (DATA_TYPE === 'sales') {
+            var row = document.getElementById('extra-charts-row');
+            row.style.display = 'grid';
+            destroyChart('chart6');
+            var ctx = document.getElementById('chart6').getContext('2d');
+            document.getElementById('chart6-title').textContent = 'Pendapatan Harian (30 Hari)';
+            if (d.daily && d.daily.labels.length) {
+                charts.chart6 = new Chart(ctx, { type:'line', data:{ labels:d.daily.labels.map(function(l){return l.slice(5)}), datasets:[{label:'Harian', data:d.daily.values, borderColor:'#f59e0b', backgroundColor:makeGradient(ctx,'amber'), fill:true, tension:.4, pointRadius:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            }
+        }
+    }
+
+    function renderInsights(insights) {
+        var el = document.getElementById('insights-container');
+        document.getElementById('insight-count').textContent = insights.length + ' insight';
+        if (!insights.length) { el.innerHTML = '<p style="color:var(--text-sec); font-size:13px; padding:16px;">Belum ada insight untuk data ini.</p>'; return; }
+        var iconMap = {'⚠️': ICONS.alert, '💰': ICONS.currency, '📊': ICONS.chart, '📈': ICONS.trending, '🚀': ICONS.zap, '📉': ICONS.arrowDown, '🏆': ICONS.star, '👥': ICONS.users, '⭐': ICONS.star, '📞': ICONS.info, '✅': ICONS.check};
+        var typeColors = {'warning': '#f59e0b', 'success': '#06b694', 'info': '#8b5cf6'};
+        var h = '';
+        insights.forEach(function(i) {
+            var svgIcon = iconMap[i.icon] || ICONS.info;
+            var color = typeColors[i.type] || '#8b5cf6';
+            h += '<div class="insight-card"><div class="insight-icon" style="color:' + color + ';">' + svgIcon + '</div><div><div class="insight-type ' + i.type + '">' + i.type + '</div><div class="insight-text">' + i.text + '</div></div></div>';
+        });
+        el.innerHTML = h;
+    }
+
+    function renderTopPerformer(d) {
+        var el = document.getElementById('top-performer-container');
+        var items = [];
+        if (DATA_TYPE === 'product') items = (d.top_products || []).slice(0,8).map(function(p,i){ return {name:p.name||'N/A', value:fmtRp(p.price||0), sub:'Stok: '+(p.stock||0), pct:Math.min(100,((p.price||0)/d.max_price*100))}; });
+        else if (DATA_TYPE === 'sales') items = d.top_products.labels.slice(0,8).map(function(l,i){ return {name:l, value:fmt(d.top_products.revenue[i]||0), sub:fmt(d.top_products.quantity[i]||0)+' unit', pct:Math.min(100,((d.top_products.revenue[i]||0)/(d.top_products.revenue[0]||1)*100))}; });
+        else if (DATA_TYPE === 'customer') items = d.top_customers.slice(0,8).map(function(c,i){ return {name:c.name||'N/A', value:fmtRp(c.total_purchase||0), sub:c.email||c.phone||'', pct:Math.min(100,((c.total_purchase||0)/(d.top_customers[0]?d.top_customers[0].total_purchase:1)*100))}; });
+        else if (DATA_TYPE === 'finance') items = d.top_expense_cats.slice(0,8).map(function(c,i){ return {name:c.category, value:fmtRp(c.amount), sub:fmtPct(c.percent), pct:c.percent}; });
+
+        if (!items.length) { el.innerHTML = '<p style="color:var(--text-sec); font-size:13px; padding:16px;">Tidak ada data.</p>'; return; }
+        var h = '';
+        items.forEach(function(item, i) {
+            var colors = ['#06b694','#8b5cf6','#6366f1','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+            h += '<div style="display:flex; align-items:center; gap:12px; padding:10px 0; ' + (i < items.length-1 ? 'border-bottom:1px solid var(--border-light);' : '') + '">';
+            h += '<div style="width:28px; height:28px; border-radius:8px; background:' + colors[i%colors.length] + '20; color:' + colors[i%colors.length] + '; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">' + (i+1) + '</div>';
+            h += '<div style="flex:1; min-width:0;"><div style="font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + item.name + '</div><div style="font-size:11px; color:var(--text-sec);">' + item.sub + '</div></div>';
+            h += '<div style="text-align:right;"><div style="font-size:13px; font-weight:700; color:var(--text);">' + item.value + '</div>';
+            h += '<div class="progress-mini" style="width:60px; margin-top:4px;"><div class="progress-mini-fill" style="width:' + item.pct + '%; background:' + colors[i%colors.length] + ';"></div></div></div></div>';
+        });
+        el.innerHTML = h;
+    }
+
+    function renderTable(d) {
+        var thead = document.getElementById('table-head');
+        var fields = {
+            product: [['name','Produk'],['price','Harga'],['stock','Stok'],['category','Kategori']],
+            sales: [['date','Tanggal'],['product_name','Produk'],['quantity','Qty'],['total_price','Total'],['customer_name','Pelanggan']],
+            customer: [['name','Nama'],['email','Email'],['phone','Telepon'],['address','Alamat'],['total_purchase','Total Beli']],
+            finance: [['date','Tanggal'],['type','Jenis'],['description','Deskripsi'],['amount','Jumlah'],['category','Kategori']]
+        };
+        var cols = fields[DATA_TYPE] || [];
+        thead.innerHTML = cols.map(function(c){ return '<th>' + c[1] + '</th>'; }).join('');
+
+        var rows = [];
+        var dataToUse = filteredRecords.length ? filteredRecords : ALL_RECORDS;
+        if (dataToUse) {
+            dataToUse.forEach(function(r) {
+                var row = cols.map(function(c){
+                    var v = r[c[0]];
+                    if (c[0]==='price'||c[0]==='total_price'||c[0]==='amount'||c[0]==='total_purchase') return v ? 'Rp '+Number(v).toLocaleString('id-ID') : '-';
+                    if (c[0]==='date') return v || '-';
+                    return v || '-';
+                });
+                rows.push(row);
+            });
+        }
+        filteredRows = rows;
+        currentPage = 1;
+        renderTablePage();
+    }
+
+    function renderTablePage() {
+        var tbody = document.getElementById('table-body');
+        var total = filteredRows.length;
+        var pages = Math.ceil(total / ROWS_PER_PAGE);
+        var start = (currentPage - 1) * ROWS_PER_PAGE;
+        var pageRows = filteredRows.slice(start, start + ROWS_PER_PAGE);
+
+        tbody.innerHTML = pageRows.map(function(r) {
+            return '<tr>' + r.map(function(c){ return '<td>' + c + '</td>'; }).join('') + '</tr>';
+        }).join('');
+
+        var pag = document.getElementById('table-pagination');
+        pag.innerHTML = '<span>Menampilkan ' + (start+1) + '-' + Math.min(start+ROWS_PER_PAGE, total) + ' dari ' + total + '</span>';
+        if (pages > 1) {
+            var btns = '';
+            if (currentPage > 1) btns += '<button class="tab-btn" onclick="goPage(' + (currentPage-1) + ')">← Prev</button>';
+            btns += '<span style="padding:0 8px;">Halaman ' + currentPage + ' / ' + pages + '</span>';
+            if (currentPage < pages) btns += '<button class="tab-btn" onclick="goPage(' + (currentPage+1) + ')">Next →</button>';
+            pag.innerHTML += btns;
+        }
+    }
+
+    window.goPage = function(p) { currentPage = p; renderTablePage(); };
+    window.filterTable = function() {
+        var q = document.getElementById('table-search').value.toLowerCase();
+        if (!RAW_DATA) return;
+        var cols = {product:[['name','Produk'],['price','Harga'],['stock','Stok'],['category','Kategori']],sales:[['date','Tanggal'],['product_name','Produk'],['quantity','Qty'],['total_price','Total'],['customer_name','Pelanggan']],customer:[['name','Nama'],['email','Email'],['phone','Telepon'],['address','Alamat'],['total_purchase','Total Beli']],finance:[['date','Tanggal'],['type','Jenis'],['description','Deskripsi'],['amount','Jumlah'],['category','Kategori']]};
+        var fields = cols[DATA_TYPE] || [];
+        filteredRows = RAW_DATA.filter(function(r) {
+            return fields.some(function(f) { return (r[f[0]]||'').toString().toLowerCase().includes(q); });
+        }).map(function(r) {
+            return fields.map(function(c){
+                var v = r[c[0]];
+                if (c[0]==='price'||c[0]==='total_price'||c[0]==='amount'||c[0]==='total_purchase') return v ? 'Rp '+Number(v).toLocaleString('id-ID') : '-';
+                return v || '-';
+            });
+        });
+        currentPage = 1;
+        renderTablePage();
+    };
+    window.exportTableCSV = function() {
+        var rows = filteredRows.length ? filteredRows : [];
+        if (!rows.length) return;
+        var csv = rows.map(function(r){ return r.map(function(c){ return '"'+c.replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+        var blob = new Blob([csv], {type:'text/csv'});
+        var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'analytics_export.csv'; a.click();
+    };
+
+    window.setPeriod = function(period, btn) {
+        document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        var now = new Date();
+        var from = new Date();
+        if (period === 'all') {
+            document.getElementById('date-from').value = '';
+            document.getElementById('date-to').value = '';
+        } else {
+            from.setDate(now.getDate() - parseInt(period));
+            document.getElementById('date-from').value = from.toISOString().slice(0,10);
+            document.getElementById('date-to').value = now.toISOString().slice(0,10);
+        }
+        applyDateFilter();
+    };
+
+    window.applyDateFilter = function() {
+        var fromVal = document.getElementById('date-from').value;
+        var toVal = document.getElementById('date-to').value;
+        if (ALL_RECORDS.length) {
+            filteredRecords = ALL_RECORDS.filter(function(r) {
+                var dateField = r.date || r.tanggal || r.tgl;
+                if (!dateField) return true;
+                var d = dateField.slice(0,10);
+                if (fromVal && d < fromVal) return false;
+                if (toVal && d > toVal) return false;
+                return true;
+            });
+            var d = {type: DATA_TYPE};
+            if (DATA_TYPE === 'product') {
+                d.top_products = filteredRecords;
+                var categories = {};
+                var prices = [];
+                var stocks = [];
+                filteredRecords.forEach(function(r) {
+                    var cat = r.category || 'Lainnya';
+                    categories[cat] = (categories[cat] || 0) + 1;
+                    if (r.price) prices.push(r.price);
+                    if (r.stock !== null && r.stock !== undefined) stocks.push(r.stock);
+                });
+                d.categories = {labels: Object.keys(categories), values: Object.values(categories)};
+                d.total = filteredRecords.length;
+                d.avg_price = prices.length ? prices.reduce(function(a,b){return a+b;},0)/prices.length : 0;
+                d.median_price = prices.length ? prices.sort(function(a,b){return a-b;})[Math.floor(prices.length/2)] : 0;
+                d.total_stock = stocks.reduce(function(a,b){return a+b;},0);
+                d.avg_stock = stocks.length ? d.total_stock/stocks.length : 0;
+                d.low_stock = stocks.filter(function(s){return s<10;}).length;
+                d.min_price = prices.length ? Math.min.apply(null,prices) : 0;
+                d.max_price = prices.length ? Math.max.apply(null,prices) : 0;
+                var priceRanges = {'< 25K':0,'25K-50K':0,'50K-100K':0,'100K-250K':0,'> 250K':0};
+                prices.forEach(function(p){
+                    if(p<25000)priceRanges['< 25K']++;
+                    else if(p<50000)priceRanges['25K-50K']++;
+                    else if(p<100000)priceRanges['50K-100K']++;
+                    else if(p<250000)priceRanges['100K-250K']++;
+                    else priceRanges['> 250K']++;
+                });
+                d.price_ranges = {labels:Object.keys(priceRanges),values:Object.values(priceRanges)};
+                var stockHealth = {critical:0,low:0,medium:0,high:0};
+                stocks.forEach(function(s){if(s<5)stockHealth.critical++;else if(s<10)stockHealth.low++;else if(s<50)stockHealth.medium++;else stockHealth.high++;});
+                d.stock_health = {labels:['Kritis (<5)','Rendah (5-10)','Sedang (10-50)','Tinggi (>50)'],values:[stockHealth.critical,stockHealth.low,stockHealth.medium,stockHealth.high]};
+                var catKeys = Object.keys(categories);
+                d.cat_stats = {total_categories:catKeys.length,avg_per_category:catKeys.length?filteredRecords.length/catKeys.length:0,max_category:Math.max.apply(null,Object.values(categories)),min_category:Math.min.apply(null,Object.values(categories))};
+            } else if (DATA_TYPE === 'sales') {
+                var monthly = {};
+                var productSales = {};
+                var productRevenue = {};
+                var totalRev = 0;
+                var totalQty = 0;
+                var customerSales = {};
+                filteredRecords.forEach(function(r){
+                    var total = parseFloat(r.total_price)||0;
+                    var qty = parseInt(r.quantity)||0;
+                    var pname = r.product_name||'Unknown';
+                    var cust = r.customer_name||'Unknown';
+                    var dateStr = r.date||'';
+                    totalRev += total;
+                    totalQty += qty;
+                    productSales[pname] = (productSales[pname]||0) + qty;
+                    productRevenue[pname] = (productRevenue[pname]||0) + total;
+                    customerSales[cust] = (customerSales[cust]||0) + total;
+                    if(dateStr.length>=7){var mk=dateStr.slice(0,7);monthly[mk]=(monthly[mk]||0)+total;}
+                });
+                var sortedMonths = Object.keys(monthly).sort();
+                d.total = filteredRecords.length;
+                d.total_revenue = totalRev;
+                d.avg_transaction = totalRev/filteredRecords.length||0;
+                d.total_quantity = totalQty;
+                d.avg_quantity = totalQty/filteredRecords.length||0;
+                d.unique_products = Object.keys(productSales).length;
+                d.unique_customers = Object.keys(customerSales).length;
+                d.monthly = {labels:sortedMonths,values:sortedMonths.map(function(m){return monthly[m];})};
+                var prodLabels = Object.keys(productSales).sort(function(a,b){return productSales[b]-productSales[a];}).slice(0,10);
+                d.top_products = {labels:prodLabels,quantity:prodLabels.map(function(p){return productSales[p];}),revenue:prodLabels.map(function(p){return productRevenue[p]||0;})};
+                var custSorted = Object.keys(customerSales).sort(function(a,b){return customerSales[b]-customerSales[a];});
+                d.top_customers = {labels:custSorted.slice(0,10),values:custSorted.slice(0,10).map(function(c){return customerSales[c];})};
+                d.customer_concentration = custSorted.length && totalRev > 0 ? (customerSales[custSorted[0]]/totalRev*100) : 0;
+                d.growth_rate = sortedMonths.length>=2 ? ((monthly[sortedMonths[sortedMonths.length-1]]-monthly[sortedMonths[sortedMonths.length-2]])/monthly[sortedMonths[sortedMonths.length-2]]*100) : 0;
+                d.median_transaction = filteredRecords.map(function(r){return parseFloat(r.total_price)||0;}).sort(function(a,b){return a-b;})[Math.floor(filteredRecords.length/2)]||0;
+                d.revenue_percentiles = {};
+                d.daily = {labels:[],values:[]};
+            } else if (DATA_TYPE === 'customer') {
+                d.total = filteredRecords.length;
+                var totalPurchase = filteredRecords.reduce(function(s,r){return s+(parseFloat(r.total_purchase)||0);},0);
+                d.total_purchase = totalPurchase;
+                d.avg_purchase = totalPurchase/filteredRecords.length||0;
+                d.purchase_ranges = {'< 100K':0,'100K-500K':0,'500K-1M':0,'1M-2M':0,'> 2M':0};
+                var segments = {vip:0,regular:0,new:0,at_risk:0};
+                var purchases = filteredRecords.map(function(r){return parseFloat(r.total_purchase)||0;});
+                purchases.forEach(function(v){
+                    if(v>=2000000)segments.vip++;
+                    else if(v>=500000)segments.regular++;
+                    else if(v>=100000)segments["new"]++;
+                    else segments.at_risk++;
+                    if(v<100000)d.purchase_ranges['< 100K']++;
+                    else if(v<500000)d.purchase_ranges['100K-500K']++;
+                    else if(v<1000000)d.purchase_ranges['500K-1M']++;
+                    else if(v<2000000)d.purchase_ranges['1M-2M']++;
+                    else d.purchase_ranges['> 2M']++;
+                });
+                d.segments = {labels:['VIP (>2M)','Regular (500K-2M)','New (100K-500K)','At Risk (<100K)'],values:[segments.vip,segments.regular,segments["new"],segments.at_risk]};
+                d.top_customers = filteredRecords.filter(function(r){return r.name;}).sort(function(a,b){return (parseFloat(b.total_purchase)||0)-(parseFloat(a.total_purchase)||0);}).slice(0,10);
+                var hasPhone = filteredRecords.filter(function(r){return r.phone;}).length;
+                var hasEmail = filteredRecords.filter(function(r){return r.email;}).length;
+                var hasAddr = filteredRecords.filter(function(r){return r.address;}).length;
+                d.completeness = {phone:hasPhone,email:hasEmail,address:hasAddr,total:filteredRecords.length};
+                var sorted = purchases.sort(function(a,b){return b-a;});
+                var top20Count = Math.max(1,Math.floor(filteredRecords.length*0.2));
+                d.pareto_ratio = totalPurchase>0?(sorted.slice(0,top20Count).reduce(function(a,b){return a+b;},0)/totalPurchase*100):0;
+                d.median_purchase = sorted[Math.floor(sorted.length/2)]||0;
+                d.max_purchase = sorted[0]||0;
+                d.min_purchase = sorted[sorted.length-1]||0;
+            } else if (DATA_TYPE === 'finance') {
+                var monthlyInc = {};
+                var monthlyExp = {};
+                var catExp = {};
+                var catInc = {};
+                var totalInc = 0;
+                var totalExp = 0;
+                filteredRecords.forEach(function(r){
+                    var amount = parseFloat(r.amount)||0;
+                    var ftype = (r.type||'').toLowerCase();
+                    var cat = r.category||'Lainnya';
+                    var dateStr = r.date||'';
+                    var isInc = ftype.indexOf('masuk')>=0||ftype.indexOf('income')>=0||ftype.indexOf('pemasukan')>=0;
+                    if(isInc){
+                        totalInc+=amount;catInc[cat]=(catInc[cat]||0)+amount;
+                        if(dateStr.length>=7){var mk=dateStr.slice(0,7);monthlyInc[mk]=(monthlyInc[mk]||0)+amount;}
+                    } else {
+                        totalExp+=amount;catExp[cat]=(catExp[cat]||0)+amount;
+                        if(dateStr.length>=7){var mk2=dateStr.slice(0,7);monthlyExp[mk2]=(monthlyExp[mk2]||0)+amount;}
+                    }
+                });
+                var allMonths = Object.keys(Object.assign({},monthlyInc,monthlyExp)).sort();
+                d.total = filteredRecords.length;
+                d.total_income = totalInc;
+                d.total_expense = totalExp;
+                d.balance = totalInc - totalExp;
+                d.profit_margin = totalInc>0?((totalInc-totalExp)/totalInc*100):0;
+                d.monthly = {labels:allMonths,income:allMonths.map(function(m){return monthlyInc[m]||0;}),expense:allMonths.map(function(m){return monthlyExp[m]||0;}),balance:allMonths.map(function(m){return (monthlyInc[m]||0)-(monthlyExp[m]||0);})};
+                d.income_categories = {labels:Object.keys(catInc),values:Object.values(catInc)};
+                d.expense_categories = {labels:Object.keys(catExp),values:Object.values(catExp)};
+                d.top_expense_cats = Object.keys(catExp).sort(function(a,b){return catExp[b]-catExp[a];}).slice(0,5).map(function(c){return{category:c,amount:catExp[c],percent:totalExp>0?(catExp[c]/totalExp*100):0};});
+                d.cumulative_balance = [];
+                var running = 0;
+                allMonths.forEach(function(m){running+=(monthlyInc[m]||0)-(monthlyExp[m]||0);d.cumulative_balance.push({date:m,balance:running});});
+                d.burn_rate = totalExp/Math.max(allMonths.length,1);
+                d.runway_months = d.burn_rate>0&&totalInc>totalExp?(totalInc-totalExp)/d.burn_rate:0;
+            }
+            d.insights = [];
+            renderKPIs(d);
+            renderMainChart(d);
+            renderSideChart(d);
+            renderChart3(d);
+            renderChart4(d);
+            renderChart5(d);
+            renderChart6(d);
+            renderInsights(d.insights);
+            renderTopPerformer(d);
+            renderTable(DATA_TYPE);
+        }
+    };
+
+    fetch('/api/analytics/' + UPLOAD_ID + '/chart')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            RAW_DATA = d.type === 'product' ? d.top_products : (d.type === 'customer' ? d.top_customers : []);
+            if (d.type === 'sales') RAW_DATA = [];
+            if (d.type === 'finance') RAW_DATA = [];
+
+            renderKPIs(d);
+            renderMainChart(d);
+            renderSideChart(d);
+            renderChart3(d);
+            renderChart4(d);
+            renderChart5(d);
+            renderChart6(d);
+            renderInsights(d.insights || []);
+            renderTopPerformer(d);
+
+            return fetch('/api/analytics/' + UPLOAD_ID + '/records');
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(records) {
+            if (records && records.length) {
+                ALL_RECORDS = records;
+                filteredRecords = records;
+                RAW_DATA = records;
+                renderTable({type: DATA_TYPE});
+            }
+        })
+        .catch(function(){});
+})();
+</script>
+{% endblock %}

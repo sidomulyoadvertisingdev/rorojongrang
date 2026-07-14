@@ -2,7 +2,7 @@
 {% block title %}History - RoroJonggrang{% endblock %}
 {% block content %}
 <div style="margin-bottom:32px;">
-    <h1 style="font-size:24px; font-weight:800; color:var(--text);">Riwayat Scraping</h1>
+    <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Riwayat Scraping</h1>
     <p style="color:var(--text-sec); margin-top:4px;">Semua task scraping yang pernah Anda jalankan</p>
 </div>
 
@@ -34,13 +34,13 @@
                     <td style="padding:14px 24px; font-size:13px; color:var(--text-sec);">{{ task.category or '-' }}</td>
                     <td style="padding:14px 24px;">
                         {% if task.status == 'completed' %}
-                        <span class="status-badge" style="background:rgba(16,185,129,0.1); color:#10b981;">Selesai</span>
+                        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
                         {% elif task.status == 'running' %}
-                        <span class="status-badge" style="background:rgba(59,130,246,0.1); color:#3b82f6;">Berjalan</span>
+                        <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
                         {% elif task.status == 'pending' %}
-                        <span class="status-badge" style="background:rgba(245,158,11,0.1); color:#f59e0b;">Menunggu</span>
+                        <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
                         {% elif task.status == 'failed' %}
-                        <span class="status-badge" style="background:rgba(239,68,68,0.1); color:#ef4444;">Gagal</span>
+                        <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171;">Gagal</span>
                         {% else %}
                         <span class="status-badge" style="background:var(--border); color:var(--text-sec);">Dibatalkan</span>
                         {% endif %}
@@ -54,7 +54,7 @@
                         {% elif task.status == 'pending' or task.status == 'running' %}
                         <span style="font-size:12px; color:var(--text-muted);">Berjalan...</span>
                         {% elif task.status == 'failed' %}
-                        <span style="font-size:12px; color:#ef4444;">Gagal</span>
+                        <span style="font-size:12px; color:#f87171;">Gagal</span>
                         {% else %}
                         <span style="font-size:12px; color:var(--text-muted);">-</span>
                         {% endif %}

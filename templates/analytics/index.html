@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Data Analitik - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:32px; display:flex; align-items:center; justify-content:space-between;">
+    <div>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Data Analitik</h1>
+        <p style="color:var(--text-sec); margin-top:4px;">Upload dan analisis data bisnis Anda</p>
+    </div>
+    <a href="{{ url_for('analytics.upload') }}" class="btn-primary" style="font-size:13px; padding:10px 20px; display:inline-flex; align-items:center; gap:6px;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Upload Data
+    </a>
+</div>
+
+{% if not uploads %}
+<div class="card" style="padding:60px 28px; text-align:center;">
+    <div style="font-size:48px; margin-bottom:16px;">📊</div>
+    <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Belum ada data</h3>
+    <p style="color:var(--text-sec); margin-bottom:24px;">Upload file CSV atau Excel untuk mulai menganalisis data bisnis Anda</p>
+    <a href="{{ url_for('analytics.upload') }}" class="btn-primary" style="display:inline-flex; align-items:center; gap:6px;">
+        <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Upload Pertama
+    </a>
+</div>
+{% else %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+    {% for u in uploads %}
+    <div class="card" style="padding:24px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="width:40px; height:40px; border-radius:10px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:18px;">
+                    {% if u.data_type == 'product' %}📦{% elif u.data_type == 'sales' %}💰{% elif u.data_type == 'customer' %}👥{% else %}📈{% endif %}
+                </span>
+                <div>
+                    <div style="font-size:14px; font-weight:700; color:var(--text);">{{ data_types[u.data_type].label }}</div>
+                    <div style="font-size:12px; color:var(--text-sec);">{{ u.filename }}</div>
+                </div>
+            </div>
+            <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;
+                {% if u.status == 'processed' %}background:rgba(6,182,148,0.1); color:#06b694;
+                {% elif u.status == 'processing' %}background:rgba(139,92,246,0.1); color:#8b5cf6;
+                {% elif u.status == 'error' %}background:rgba(239,68,68,0.1); color:#ef4444;
+                {% else %}background:var(--border); color:var(--text-sec);{% endif %}">
+                {% if u.status == 'processed' %}Selesai{% elif u.status == 'processing' %}Proses{% elif u.status == 'error' %}Error{% else %}Menunggu{% endif %}
+            </span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-sec); margin-bottom:16px;">
+            <span>{{ u.row_count }} baris</span>
+            <span>{{ u.created_at.strftime('%d %b %Y %H:%M') }}</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+            {% if u.status == 'processed' %}
+            <a href="{{ url_for('analytics.dashboard', upload_id=u.id) }}" class="btn-primary" style="flex:1; text-align:center; font-size:12px; padding:8px;">Buka Analitik</a>
+            {% else %}
+            <a href="{{ url_for('analytics.confirm_mapping', upload_id=u.id) }}" class="btn-secondary" style="flex:1; text-align:center; font-size:12px; padding:8px;">Lanjutkan</a>
+            {% endif %}
+            <form action="{{ url_for('analytics.delete_upload', upload_id=u.id) }}" method="POST" onsubmit="return confirm('Hapus data ini?')">
+                <button type="submit" style="padding:8px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.2); background:rgba(239,68,68,0.06); color:#ef4444; font-size:12px; cursor:pointer;">Hapus</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

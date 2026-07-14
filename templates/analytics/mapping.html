@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Mapping Kolom - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:32px;">
+    <a href="{{ url_for('analytics.upload') }}" style="color:var(--text-sec); font-size:14px; display:inline-flex; align-items:center; gap:4px; margin-bottom:12px;">← Kembali</a>
+    <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Mapping Kolom</h1>
+    <p style="color:var(--text-sec); margin-top:4px;">Konfirmasi mapping kolom file <strong>{{ upload.filename }}</strong></p>
+</div>
+
+<div style="max-width:700px;">
+    <div class="card" style="padding:32px;">
+        <div style="margin-bottom:20px; padding:12px 16px; border-radius:10px; background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.12);">
+            <div style="font-size:13px; color:#8b5cf6; font-weight:600;">💡 Sistem telah mendeteksi kolom secara otomatis. Silakan sesuaikan jika diperlukan.</div>
+        </div>
+
+        <form method="POST" style="display:flex; flex-direction:column; gap:16px;">
+            {% for field_key, field_info in fields.items() %}
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">{{ field_info.label }}</label>
+                <select name="map_{{ field_key }}" class="input">
+                    <option value="">— Tidak di-mapping —</option>
+                    {% for col in columns %}
+                    <option value="{{ col }}" {% if mapping.get(field_key) == col %}selected{% endif %}>{{ col }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; margin-top:8px;">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Konfirmasi & Proses Data
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

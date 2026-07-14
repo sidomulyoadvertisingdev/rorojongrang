@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Upload Data - RoroJonggrang{% endblock %}
+{% block content %}
+<div style="margin-bottom:32px;">
+    <a href="{{ url_for('analytics.index') }}" style="color:var(--text-sec); font-size:14px; display:inline-flex; align-items:center; gap:4px; margin-bottom:12px;">← Kembali</a>
+    <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">Upload Data</h1>
+    <p style="color:var(--text-sec); margin-top:4px;">Pilih tipe data lalu upload file CSV atau Excel</p>
+</div>
+
+<div style="max-width:640px;">
+    <div class="card" style="padding:32px;">
+        <form method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:10px;">Tipe Data</label>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    {% for key, dt in data_types.items() %}
+                    <div>
+                        <label style="display:flex; align-items:center; gap:10px; padding:16px; border-radius:12px; border:1.5px solid var(--border); cursor:pointer; transition:all .2s;" class="type-card" data-type="{{ key }}">
+                            <input type="radio" name="data_type" value="{{ key }}" required style="display:none;">
+                            <span style="font-size:24px;">{% if key == 'product' %}📦{% elif key == 'sales' %}💰{% elif key == 'customer' %}👥{% else %}📈{% endif %}</span>
+                            <div>
+                                <div style="font-size:14px; font-weight:700; color:var(--text);">{{ dt.label }}</div>
+                                <div style="font-size:11px; color:var(--text-sec);">{{ dt.fields|length }} field</div>
+                            </div>
+                        </label>
+                        <a href="{{ url_for('analytics.download_template', data_type=key) }}" style="display:inline-flex; align-items:center; gap:4px; margin-top:6px; font-size:11px; color:var(--accent); font-weight:600; text-decoration:none;" onclick="event.stopPropagation();">
+                            <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            Download Template CSV
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">File</label>
+                <div id="drop-zone" style="border:2px dashed var(--border); border-radius:12px; padding:40px; text-align:center; cursor:pointer; transition:all .2s;">
+                    <input type="file" name="file" id="file-input" accept=".csv,.xlsx,.xls" style="display:none;" required>
+                    <div style="font-size:36px; margin-bottom:12px;">📁</div>
+                    <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px;">Klik atau seret file ke sini</div>
+                    <div style="font-size:12px; color:var(--text-sec);">CSV atau Excel (.xlsx) — Maks 16MB</div>
+                    <div id="file-name" style="font-size:13px; font-weight:600; color:var(--accent); margin-top:12px; display:none;"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px;" id="btn-upload">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Upload & Lanjutkan
+            </button>
+        </form>
+    </div>
+
+    <div style="margin-top:20px; padding:16px 20px; border-radius:12px; background:var(--accent-light); border:1px solid rgba(139,92,246,0.2);">
+        <div style="font-size:13px; font-weight:700; color:var(--accent-dark); margin-bottom:6px;">💡 Tips Format CSV</div>
+        <ul style="font-size:12px; color:var(--text-sec); margin:0; padding-left:16px; line-height:1.8;">
+            <li>Gunakan <b>koma (,)</b> sebagai pemisah kolom</li>
+            <li>Baris pertama harus berisi <b>header kolom</b></li>
+            <li>Download template di atas sebagai referensi format</li>
+            <li>Simpan file sebagai <b>CSV UTF-8</b> dari Excel</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.type-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.type-card').forEach(function(c) {
+            c.style.borderColor = 'var(--border)';
+            c.style.background = 'transparent';
+        });
+        this.style.borderColor = 'var(--accent)';
+        this.style.background = 'var(--accent-light)';
+        this.querySelector('input[type=radio]').checked = true;
+    });
+});
+
+var dropZone = document.getElementById('drop-zone');
+var fileInput = document.getElementById('file-input');
+var fileName = document.getElementById('file-name');
+
+dropZone.addEventListener('click', function() { fileInput.click(); });
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); this.style.borderColor = 'var(--accent)'; });
+dropZone.addEventListener('dragleave', function() { this.style.borderColor = 'var(--border)'; });
+dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'var(--border)';
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        showFileName(e.dataTransfer.files[0].name);
+    }
+});
+fileInput.addEventListener('change', function() {
+    if (this.files.length) showFileName(this.files[0].name);
+});
+
+function showFileName(name) {
+    fileName.textContent = name;
+    fileName.style.display = 'block';
+}
+</script>
+{% endblock %}

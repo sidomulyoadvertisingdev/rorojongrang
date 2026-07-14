@@ -3,7 +3,7 @@
 {% block content %}
 <div style="margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
     <div>
-        <h1 style="font-size:24px; font-weight:800; color:var(--text);">WhatsApp Templates</h1>
+        <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">WhatsApp Templates</h1>
         <p style="color:var(--text-sec); margin-top:2px;">Kelola pesan template untuk WhatsApp</p>
     </div>
     <a href="{{ url_for('wa_templates.create_template') }}" class="btn-primary" style="font-size:13px; padding:8px 16px;">
@@ -40,7 +40,7 @@
                 {% if t.links.count() > 0 %}
                 <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
                     {% for link in t.links.all() %}
-                    <span style="font-size:11px; padding:3px 8px; border-radius:6px; background:rgba(59,130,246,0.08); color:#3b82f6; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ link.url }}">{{ link.name }}</span>
+                    <span style="font-size:11px; padding:3px 8px; border-radius:6px; background:rgba(139,92,246,0.08); color:#8b5cf6; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ link.url }}">{{ link.name }}</span>
                     {% endfor %}
                 </div>
                 {% endif %}
