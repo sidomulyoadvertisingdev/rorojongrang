@@ -420,6 +420,179 @@
     </div>
 </section>
 
+<!-- Lead Pipeline (CRM) -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Lead Pipeline (CRM){% else %}Lead Pipeline (CRM){% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Kelola seluruh siklus prospek dari satu tempat. Papan Kanban intuitif dengan drag-drop untuk mengubah status, assign ke anggota tim, lacak nilai & prioritas, dan lihat activity log lengkap untuk setiap lead.
+                    {% else %}
+                    Manage the entire prospect lifecycle from one place. Intuitive Kanban board with drag-drop to change status, assign to team members, track value & priority, and view full activity logs for each lead.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}5 status: New → Contacted → Negotiation → Won → Lost{% else %}5 statuses: New → Contacted → Negotiation → Won → Lost{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Drag & drop antar kolom status{% else %}Drag & drop between status columns{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Buat lead dari data scraping langsung{% else %}Create leads directly from scraping data{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Priority, value, assignment, & campaign linking{% else %}Priority, value, assignment, & campaign linking{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Activity log lengkap per lead{% else %}Full activity log per lead{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Lead Pipeline Kanban</div>
+                <div style="display: flex; gap: 6px; overflow: hidden;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 10px; font-weight: 700; color: #6b6480; margin-bottom: 4px; display: flex; align-items: center; gap: 3px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; background: #6b6480;"></span> New (2)
+                        </div>
+                        <div style="padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; margin-bottom: 4px;">
+                            <div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Toko Besi Mulya</div>
+                            <div style="font-size: 9px; color: #8b949e; margin-top: 2px;">Rp 2.5jt</div>
+                        </div>
+                        <div style="padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                            <div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Gudang Besi</div>
+                            <div style="font-size: 9px; color: #f59e0b; margin-top: 2px;">High</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 10px; font-weight: 700; color: #3b82f6; margin-bottom: 4px; display: flex; align-items: center; gap: 3px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; background: #3b82f6;"></span> Contacted
+                        </div>
+                        <div style="padding: 8px; border-radius: 6px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); margin-bottom: 4px;">
+                            <div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Bengkel Motor</div>
+                            <div style="font-size: 9px; color: #8b949e; margin-top: 2px;">WA terkirim</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 10px; font-weight: 700; color: #f59e0b; margin-bottom: 4px; display: flex; align-items: center; gap: 3px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; background: #f59e0b;"></span> Won
+                        </div>
+                        <div style="padding: 8px; border-radius: 6px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);">
+                            <div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Restoran Padang</div>
+                            <div style="font-size: 9px; color: #22c55e; margin-top: 2px;">Deal!</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; font-size: 9px; color: #8b949e;">
+                    ✓ 3 leads today • 2 won this week • Rp 7.5jt pipeline
+                </div>
+            </div>
+        </div>
+
+        <!-- Follow-up Scheduler -->
+        <div class="feature-row reverse fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Follow-up Scheduler{% else %}Follow-up Scheduler{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Jangan pernah kehilangan prospek. Jadwalkan follow-up via telepon, WhatsApp, email, atau meeting langsung dari lead pipeline. Dashboard menampilkan overdue, hari ini, dan mendatang — selesai dengan satu klik.
+                    {% else %}
+                    Never lose a prospect. Schedule follow-ups via phone, WhatsApp, email, or meetings directly from the lead pipeline. Dashboard shows overdue, today, and upcoming — complete with one click.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}5 tipe: Telepon, WhatsApp, Email, Meeting, Survey{% else %}5 types: Phone, WhatsApp, Email, Meeting, Survey{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Dashboard: Overdue (merah), Hari Ini, Mendatang{% else %}Dashboard: Overdue (red), Today, Upcoming{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Satu klik "Selesai" tanpa reload halaman{% else %}One-click "Complete" without page reload{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Terhubung langsung ke Lead Pipeline{% else %}Directly connected to Lead Pipeline{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Follow-up Dashboard</div>
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 10px; font-weight: 700; color: #ef4444; margin-bottom: 4px; display: flex; align-items: center; gap: 3px;">Overdue (2)</div>
+                    <div style="padding: 8px 10px; border-radius: 6px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <div><div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Telepon — Toko Besi Mulya</div><div style="font-size: 9px; color: #ef4444;">14 Jul 2026 09:00</div></div>
+                        <span style="font-size: 8px; padding: 2px 6px; border-radius: 4px; background: #22c55e; color: #111; font-weight: 600;">Selesai</span>
+                    </div>
+                    <div style="padding: 8px 10px; border-radius: 6px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);">
+                        <div><div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">WhatsApp — Bengkel Motor</div><div style="font-size: 9px; color: #ef4444;">13 Jul 2026 14:00</div></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 10px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">Hari Ini (1)</div>
+                    <div style="padding: 8px 10px; border-radius: 6px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);">
+                        <div><div style="font-size: 10px; font-weight: 600; color: #c9d1d9;">Meeting — Restoran Padang</div><div style="font-size: 9px; color: #f59e0b;">15:00 hari ini</div></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 10px; font-weight: 700; color: #8b949e; margin-bottom: 4px;">Mendatang (3)</div>
+                    <div style="padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d; font-size: 10px; color: #c9d1d9;">Email — Gudang Besi • 17 Jul</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Analytics -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Campaign Analytics{% else %}Campaign Analytics{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Buat kampanye marketing, hubungkan ke lead pipeline, dan pantau performa real-time. Lihat total leads, conversion rate, nilai pipeline, dan distribusi status dalam satu dashboard visual.
+                    {% else %}
+                    Create marketing campaigns, connect to lead pipeline, and monitor performance in real-time. See total leads, conversion rate, pipeline value, and status distribution in one visual dashboard.
+                    {% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Buat campaign dengan target leads & tanggal{% else %}Create campaigns with target leads & dates{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Dashboard: total, conversion rate, total nilai{% else %}Dashboard: total, conversion rate, total value{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Breakdown leads per status dengan progress bar{% else %}Leads breakdown per status with progress bars{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Pause / Aktifkan campaign kapan saja{% else %}Pause / Activate campaigns anytime{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Campaign Dashboard</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div style="padding: 12px; border-radius: 6px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);">
+                        <div style="font-size: 9px; color: #8b949e;">Total Leads</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #f59e0b;">24</div>
+                    </div>
+                    <div style="padding: 12px; border-radius: 6px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);">
+                        <div style="font-size: 9px; color: #8b949e;">Conversion</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #22c55e;">12.5%</div>
+                    </div>
+                </div>
+                <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                    <div style="font-size: 9px; color: #8b949e; margin-bottom: 6px;">Leads per Status</div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <span style="width: 8px; height: 8px; border-radius: 2px; background: #60a5fa;"></span>
+                        <span style="flex: 1; font-size: 10px; color: #c9d1d9;">New</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #c9d1d9;">8</span>
+                        <div style="width: 50px; height: 4px; border-radius: 2px; background: #30363d;"><div style="width: 33%; height: 100%; background: #60a5fa; border-radius: 2px;"></div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <span style="width: 8px; height: 8px; border-radius: 2px; background: #22c55e;"></span>
+                        <span style="flex: 1; font-size: 10px; color: #c9d1d9;">Won</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #22c55e;">3</span>
+                        <div style="width: 50px; height: 4px; border-radius: 2px; background: #30363d;"><div style="width: 12.5%; height: 100%; background: #22c55e; border-radius: 2px;"></div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; border-radius: 2px; background: #ef4444;"></span>
+                        <span style="flex: 1; font-size: 10px; color: #c9d1d9;">Lost</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #ef4444;">2</span>
+                        <div style="width: 50px; height: 4px; border-radius: 2px; background: #30363d;"><div style="width: 8%; height: 100%; background: #ef4444; border-radius: 2px;"></div></div>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; padding: 6px 10px; border-radius: 6px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); font-size: 9px; color: #f59e0b;">
+                    Nilai Total: Rp 45.000.000
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section">
     <div class="container">
