@@ -13,7 +13,7 @@
                 <p style="font-size:13px; font-weight:500; color:var(--text-sec);">Total Tasks</p>
                 <p style="font-size:32px; font-weight:800; color:var(--text); margin-top:4px;">{{ total_tasks }}</p>
             </div>
-            <div style="width:48px; height:48px; border-radius:14px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px rgba(139,92,246,0.15);">
+            <div style="width:48px; height:48px; border-radius:14px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px rgba(245,158,11,0.15);">
                 <svg style="width:24px; height:24px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 <p style="font-size:13px; font-weight:500; color:var(--text-sec);">Data Terscraped</p>
                 <p style="font-size:32px; font-weight:800; margin-top:4px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">{{ "{:,}".format(total_data) }}</p>
             </div>
-            <div style="width:48px; height:48px; border-radius:14px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px rgba(139,92,246,0.15);">
+            <div style="width:48px; height:48px; border-radius:14px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px rgba(245,158,11,0.15);">
                 <svg style="width:24px; height:24px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
             </div>
         </div>
@@ -70,9 +70,9 @@
                     <td style="color:var(--text-sec);">{{ task.location }}</td>
                     <td>
                         {% if task.status == 'completed' %}
-                        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
+                        <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">Selesai</span>
                         {% elif task.status == 'running' %}
-                        <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
+                        <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Berjalan</span>
                         {% elif task.status == 'pending' %}
                         <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
                         {% elif task.status == 'failed' %}
@@ -122,9 +122,9 @@
                     </div>
                 </div>
                 {% if task.status == 'completed' %}
-                <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
+                <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">Selesai</span>
                 {% elif task.status == 'running' %}
-                <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
+                <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Berjalan</span>
                 {% elif task.status == 'pending' %}
                 <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
                 {% elif task.status == 'failed' %}

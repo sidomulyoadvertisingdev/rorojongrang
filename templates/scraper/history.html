@@ -84,9 +84,9 @@
                         <td style="padding:14px 24px; font-size:13px; color:var(--text-sec);">{{ task.category or '-' }}</td>
                         <td style="padding:14px 24px;">
                             {% if task.status == 'completed' %}
-                            <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
+                            <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">Selesai</span>
                             {% elif task.status == 'running' %}
-                            <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
+                            <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Berjalan</span>
                             {% elif task.status == 'pending' %}
                             <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
                             {% elif task.status == 'failed' %}
@@ -151,9 +151,9 @@
                 </div>
             </div>
             {% if task.status == 'completed' %}
-            <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694; flex-shrink:0;">Selesai</span>
+            <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff; flex-shrink:0;">Selesai</span>
             {% elif task.status == 'running' %}
-            <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6; flex-shrink:0;">Berjalan</span>
+            <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b; flex-shrink:0;">Berjalan</span>
             {% elif task.status == 'pending' %}
             <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24; flex-shrink:0;">Menunggu</span>
             {% elif task.status == 'failed' %}

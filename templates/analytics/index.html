@@ -37,8 +37,8 @@
                 </div>
             </div>
             <span style="padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600;
-                {% if u.status == 'processed' %}background:rgba(6,182,148,0.1); color:#06b694;
-                {% elif u.status == 'processing' %}background:rgba(139,92,246,0.1); color:#8b5cf6;
+                {% if u.status == 'processed' %}background:rgba(255,255,255,0.1); color:#ffffff;
+                {% elif u.status == 'processing' %}background:rgba(245,158,11,0.1); color:#f59e0b;
                 {% elif u.status == 'error' %}background:rgba(239,68,68,0.1); color:#ef4444;
                 {% else %}background:var(--border); color:var(--text-sec);{% endif %}">
                 {% if u.status == 'processed' %}Selesai{% elif u.status == 'processing' %}Proses{% elif u.status == 'error' %}Error{% else %}Menunggu{% endif %}

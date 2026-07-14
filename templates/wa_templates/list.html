@@ -40,7 +40,7 @@
                 {% if t.links.count() > 0 %}
                 <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:6px;">
                     {% for link in t.links.all() %}
-                    <span style="font-size:11px; padding:3px 8px; border-radius:6px; background:rgba(139,92,246,0.08); color:#8b5cf6; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ link.url }}">{{ link.name }}</span>
+                    <span style="font-size:11px; padding:3px 8px; border-radius:6px; background:rgba(245,158,11,0.08); color:#f59e0b; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ link.url }}">{{ link.name }}</span>
                     {% endfor %}
                 </div>
                 {% endif %}

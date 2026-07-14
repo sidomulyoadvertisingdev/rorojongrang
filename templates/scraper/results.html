@@ -11,9 +11,9 @@
     </div>
     <div class="results-header-actions">
         {% if task.status == 'completed' %}
-        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
+        <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">Selesai</span>
         {% elif task.status == 'running' %}
-        <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
+        <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Berjalan</span>
         {% elif task.status == 'pending' %}
         <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
         {% else %}
@@ -26,8 +26,8 @@
     </div>
 </div>
 
-<div id="bulk-toolbar" style="display:none; margin-bottom:16px; padding:12px 20px; border-radius:12px; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.15); display:none; align-items:center; justify-content:space-between;">
-    <span style="font-size:13px; font-weight:600; color:#8b5cf6;"><span id="selected-count">0</span> data dipilih</span>
+<div id="bulk-toolbar" style="display:none; margin-bottom:16px; padding:12px 20px; border-radius:12px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.15); display:none; align-items:center; justify-content:space-between;">
+    <span style="font-size:13px; font-weight:600; color:#f59e0b;"><span id="selected-count">0</span> data dipilih</span>
     <button class="btn-danger" style="font-size:12px; padding:6px 14px;" onclick="bulkDelete()">
         <svg style="width:14px; height:14px; display:inline; vertical-align:-2px; margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
         Hapus Terpilih
@@ -71,7 +71,7 @@
             <thead>
                 <tr style="border-bottom:1px solid var(--border);">
                     <th style="padding:12px 12px 12px 16px; width:40px;">
-                        <input type="checkbox" id="select-all" style="accent-color:#8b5cf6; width:15px; height:15px; cursor:pointer;" onchange="toggleSelectAll(this)">
+                        <input type="checkbox" id="select-all" style="accent-color:#f59e0b; width:15px; height:15px; cursor:pointer;" onchange="toggleSelectAll(this)">
                     </th>
                     <th>Nama</th>
                     <th>Skor</th>
@@ -112,7 +112,7 @@
     <div class="lead-modal-card" onclick="event.stopPropagation()">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px;">
             <div>
-                <div id="playbook-kicker" style="font-size:11px; color:#8b5cf6; font-weight:800; text-transform:uppercase; letter-spacing:.5px;">Lead Playbook</div>
+                <div id="playbook-kicker" style="font-size:11px; color:#f59e0b; font-weight:800; text-transform:uppercase; letter-spacing:.5px;">Lead Playbook</div>
                 <h3 id="playbook-title" style="font-size:20px; font-weight:900; color:var(--text); margin-top:4px;">Lead</h3>
                 <p id="playbook-subtitle" style="font-size:13px; color:var(--text-sec); margin-top:4px;"></p>
             </div>
@@ -162,9 +162,9 @@
 </div>
 
 {% if task.status == 'running' or task.status == 'pending' %}
-<div style="margin-top:16px; padding:12px 16px; border-radius:10px; background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.15); display:flex; align-items:center; gap:8px;">
-    <div style="width:8px; height:8px; border-radius:50%; background:#8b5cf6; animation:pulse 1.5s infinite;"></div>
-    <span style="font-size:13px; color:#8b5cf6; font-weight:500;">Scraping sedang berjalan — data akan otomatis muncul di tabel</span>
+<div style="margin-top:16px; padding:12px 16px; border-radius:10px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.15); display:flex; align-items:center; gap:8px;">
+    <div style="width:8px; height:8px; border-radius:50%; background:#f59e0b; animation:pulse 1.5s infinite;"></div>
+    <span style="font-size:13px; color:#f59e0b; font-weight:500;">Scraping sedang berjalan — data akan otomatis muncul di tabel</span>
 </div>
 <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}</style>
 {% endif %}
@@ -175,17 +175,17 @@
     .action-btn { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; font-size:14px; text-decoration:none; transition:all .2s; }
     .action-wa { background:rgba(37,211,102,0.1); color:#25d366; }
     .action-wa:hover { background:rgba(37,211,102,0.2); }
-    .action-maps { background:rgba(139,92,246,0.1); color:#8b5cf6; }
-    .action-maps:hover { background:rgba(139,92,246,0.2); }
-    .action-web { background:rgba(6,182,148,0.1); color:#06b694; }
-    .action-web:hover { background:rgba(6,182,148,0.2); }
+    .action-maps { background:rgba(245,158,11,0.1); color:#f59e0b; }
+    .action-maps:hover { background:rgba(245,158,11,0.2); }
+    .action-web { background:rgba(255,255,255,0.1); color:#ffffff; }
+    .action-web:hover { background:rgba(255,255,255,0.2); }
     .action-copy { background:rgba(251,191,36,0.1); color:#fbbf24; border:none; cursor:pointer; }
     .action-copy:hover { background:rgba(251,191,36,0.2); }
-    .action-play { background:rgba(139,92,246,0.1); color:#8b5cf6; border:none; cursor:pointer; font-size:11px; font-weight:900; }
-    .action-play:hover { background:rgba(139,92,246,0.2); }
+    .action-play { background:rgba(245,158,11,0.1); color:#f59e0b; border:none; cursor:pointer; font-size:11px; font-weight:900; }
+    .action-play:hover { background:rgba(245,158,11,0.2); }
     .action-disabled { opacity:.3; pointer-events:none; }
-    .row-check { accent-color:#8b5cf6; width:15px; height:15px; cursor:pointer; }
-    tr.row-selected { background:rgba(139,92,246,0.06) !important; }
+    .row-check { accent-color:#f59e0b; width:15px; height:15px; cursor:pointer; }
+    tr.row-selected { background:rgba(245,158,11,0.06) !important; }
     .lead-console {
         display:flex;
         align-items:center;
@@ -194,9 +194,9 @@
         flex-wrap:wrap;
         padding:14px 18px;
         margin-bottom:16px;
-        border:1px solid rgba(139,92,246,0.16);
+        border:1px solid rgba(245,158,11,0.16);
         border-radius:16px;
-        background:linear-gradient(135deg, rgba(139,92,246,0.08), rgba(6,182,148,0.06));
+        background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(255,255,255,0.06));
     }
     .filter-group { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .filter-chip {
@@ -212,9 +212,9 @@
     }
     .filter-chip:hover,
     .filter-chip.active {
-        border-color:rgba(139,92,246,0.35);
-        background:rgba(139,92,246,0.12);
-        color:#8b5cf6;
+        border-color:rgba(245,158,11,0.35);
+        background:rgba(245,158,11,0.12);
+        color:#f59e0b;
     }
     .score-badge {
         display:inline-flex;
@@ -314,7 +314,7 @@
         width:7px;
         height:7px;
         border-radius:50%;
-        background:#8b5cf6;
+        background:#f59e0b;
         margin-top:6px;
         flex-shrink:0;
     }
@@ -324,9 +324,9 @@
         gap:8px;
     }
     .message-actions button {
-        border:1px solid rgba(139,92,246,0.22);
-        background:rgba(139,92,246,0.1);
-        color:#a78bfa;
+        border:1px solid rgba(245,158,11,0.22);
+        background:rgba(245,158,11,0.1);
+        color:#fbbf24;
         border-radius:12px;
         padding:10px 12px;
         cursor:pointer;
@@ -336,7 +336,7 @@
     }
     .message-actions button:hover {
         transform:translateY(-1px);
-        background:rgba(139,92,246,0.18);
+        background:rgba(245,158,11,0.18);
     }
     .objection-actions button {
         border-color:rgba(251,191,36,0.24);
@@ -818,7 +818,7 @@ function renderTable(biz, total, page, pages) {
             var msg = processTemplate(t, b, links.length > 0 ? links[0].url : '');
             var waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
             var title = hasClicked ? 'WhatsApp (sudah dikirim)' : 'WhatsApp';
-            var style = hasClicked ? 'background:rgba(139,92,246,0.15); color:#8b5cf6;' : '';
+            var style = hasClicked ? 'background:rgba(245,158,11,0.15); color:#f59e0b;' : '';
             waBtn = '<a href="' + waLink + '" target="_blank" class="action-btn action-wa" title="' + title + '" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + (links.length > 0 ? links[0].id : 'null') + ',\'' + escHtml(b.phone || '') + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>';
             waBtnMobile = waBtn;
         } else {
@@ -828,7 +828,7 @@ function renderTable(biz, total, page, pages) {
                 var last = clicks[clicks.length - 1];
                 clickDetail = ' via ' + (last.template_name || '') + ' - ' + (last.clicked_at ? new Date(last.clicked_at).toLocaleDateString('id-ID') : '');
             }
-            var badge = hasClicked ? '<span style="position:absolute; top:-4px; right:-4px; width:10px; height:10px; border-radius:50%; background:#8b5cf6; border:2px solid var(--card-bg);"></span>' : '';
+            var badge = hasClicked ? '<span style="position:absolute; top:-4px; right:-4px; width:10px; height:10px; border-radius:50%; background:#f59e0b; border:2px solid var(--card-bg);"></span>' : '';
             var titleAttr = hasClicked ? ' title="Sudah dikirim' + escHtml(clickDetail) + '"' : ' title="Pilih template"';
             waBtn = '<div style="position:relative; display:inline-block;">' + badge +
                 '<button' + titleAttr + ' class="action-btn action-wa" style="cursor:pointer; border:none; padding:0;" onclick="event.preventDefault(); toggleWaDropdown(\'' + dropdownId + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></button>' +
@@ -840,9 +840,9 @@ function renderTable(biz, total, page, pages) {
                         var msg = processTemplate(t, b, linkUrl);
                         var waLink = 'https://wa.me/' + waNum + '?text=' + encodeURIComponent(msg);
                         var linkId = links.length > 0 ? links[0].id : 'null';
-                        return '<a href="' + waLink + '" target="_blank" style="display:block; padding:8px 12px; font-size:12px; color:var(--text); border-radius:6px; text-decoration:none; transition:background .15s;" onmouseover="this.style.background=\'rgba(139,92,246,0.1)\'" onmouseout="this.style.background=\'transparent\'" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + linkId + ',\'' + escHtml(b.phone || '') + '\')">' + escHtml(t.name) + '</a>';
+                        return '<a href="' + waLink + '" target="_blank" style="display:block; padding:8px 12px; font-size:12px; color:var(--text); border-radius:6px; text-decoration:none; transition:background .15s;" onmouseover="this.style.background=\'rgba(245,158,11,0.1)\'" onmouseout="this.style.background=\'transparent\'" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + linkId + ',\'' + escHtml(b.phone || '') + '\')">' + escHtml(t.name) + '</a>';
                     } else {
-                        return '<button onclick="showLinkPicker(' + b.id + ',' + t.id + ',' + waNum + ',\'' + escHtml(b.phone || '') + '\')" style="display:block; width:100%; text-align:left; padding:8px 12px; font-size:12px; color:var(--text); border:none; background:none; border-radius:6px; cursor:pointer; transition:background .15s;" onmouseover="this.style.background=\'rgba(139,92,246,0.1)\'" onmouseout="this.style.background=\'transparent\'">' + escHtml(t.name) + ' <span style="color:var(--text-muted);">(' + links.length + ' link)</span></button>';
+                        return '<button onclick="showLinkPicker(' + b.id + ',' + t.id + ',' + waNum + ',\'' + escHtml(b.phone || '') + '\')" style="display:block; width:100%; text-align:left; padding:8px 12px; font-size:12px; color:var(--text); border:none; background:none; border-radius:6px; cursor:pointer; transition:background .15s;" onmouseover="this.style.background=\'rgba(245,158,11,0.1)\'" onmouseout="this.style.background=\'transparent\'">' + escHtml(t.name) + ' <span style="color:var(--text-muted);">(' + links.length + ' link)</span></button>';
                     }
                 }).join('') +
                 '</div></div>';
@@ -854,7 +854,7 @@ function renderTable(biz, total, page, pages) {
         if (hasClicked) {
             var lastClick = clicks[clicks.length - 1];
             var tip = 'Terkirim via ' + (lastClick.template_name || '-') + (lastClick.link_name ? ' - ' + lastClick.link_name : '') + (lastClick.clicked_at ? ' (' + new Date(lastClick.clicked_at).toLocaleDateString('id-ID') + ')' : '');
-            checkmark = '<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(139,92,246,0.15); color:#8b5cf6; font-size:11px; margin-left:4px; cursor:help;" title="' + escHtml(tip) + '">&#10003;</span>';
+            checkmark = '<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(245,158,11,0.15); color:#f59e0b; font-size:11px; margin-left:4px; cursor:help;" title="' + escHtml(tip) + '">&#10003;</span>';
             checkmarkMobile = checkmark;
         }
 
@@ -1237,8 +1237,8 @@ function updateStatusBadge(status) {
     var badge = document.querySelector('.status-badge');
     if (!badge) return;
     var map = {
-        completed:  { bg: 'rgba(6,182,148,0.1)', color: '#06b694', text: 'Selesai' },
-        running:    { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', text: 'Berjalan' },
+        completed:  { bg: 'rgba(255,255,255,0.1)', color: '#ffffff', text: 'Selesai' },
+        running:    { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', text: 'Berjalan' },
         pending:    { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', text: 'Menunggu' },
         failed:     { bg: 'var(--border)', color: 'var(--text-sec)', text: 'Gagal' },
         cancelled:  { bg: 'var(--border)', color: 'var(--text-sec)', text: 'Dibatalkan' },

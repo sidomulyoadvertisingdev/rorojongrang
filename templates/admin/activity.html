@@ -103,7 +103,7 @@
                             Ban
                         </span>
                         {% elif log.action == 'unban' %}
-                        <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">
+                        <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">
                             <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Unban
                         </span>
@@ -150,7 +150,7 @@
                     Ban
                 </span>
                 {% elif log.action == 'unban' %}
-                <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">
+                <span class="status-badge" style="background:rgba(255,255,255,0.12); color:#ffffff;">
                     <svg style="width:11px; height:11px; margin-right:3px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Unban
                 </span>
@@ -169,7 +169,7 @@
             </div>
             <div class="activity-card-body">
                 <div class="activity-admin-avatar">{{ log.admin.username[0]|upper }}</div>
-                <div class="activity-arrow" style="background:rgba(139,92,246,0.08); color:var(--accent);">
+                <div class="activity-arrow" style="background:rgba(245,158,11,0.08); color:var(--accent);">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </div>
                 <div class="activity-target-avatar">{{ log.target[0]|upper if log.target else '?' }}</div>

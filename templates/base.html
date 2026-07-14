@@ -12,9 +12,9 @@
             --bg: #0e0d13; --bg-card: #16141f; --bg-sidebar: #12101c;
             --text: #d4d0e0; --text-sec: #6b6480; --text-muted: #4a4560;
             --border: #1e1b2e; --border-light: #16141f;
-            --accent: #8b5cf6; --accent-dark: #7c3aed; --accent-light: rgba(139,92,246,0.12);
-            --accent-secondary: #06b694; --glow: #f59e0b;
-            --grad-start: #8b5cf6; --grad-mid: #6366f1; --grad-end: #06b694;
+            --accent: #f59e0b; --accent-dark: #d97706; --accent-light: rgba(245,158,11,0.12);
+            --accent-secondary: #ffffff; --glow: #f59e0b;
+            --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.4); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
             --terminal-bg: #0a0914; --terminal-text: #c0bccf;
         }
@@ -22,9 +22,9 @@
             --bg: #0e0d13; --bg-card: #16141f; --bg-sidebar: #12101c;
             --text: #d4d0e0; --text-sec: #6b6480; --text-muted: #4a4560;
             --border: #1e1b2e; --border-light: #16141f;
-            --accent: #8b5cf6; --accent-dark: #7c3aed; --accent-light: rgba(139,92,246,0.12);
-            --accent-secondary: #06b694; --glow: #f59e0b;
-            --grad-start: #8b5cf6; --grad-mid: #6366f1; --grad-end: #06b694;
+            --accent: #f59e0b; --accent-dark: #d97706; --accent-light: rgba(245,158,11,0.12);
+            --accent-secondary: #ffffff; --glow: #f59e0b;
+            --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.4); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
             --terminal-bg: #0a0914; --terminal-text: #c0bccf;
         }
@@ -32,9 +32,9 @@
             --bg: #1a1726; --bg-card: #221f30; --bg-sidebar: #1e1b2c;
             --text: #d4d0e0; --text-sec: #8a84a0; --text-muted: #5e5878;
             --border: #2a2740; --border-light: #221f30;
-            --accent: #a78bfa; --accent-dark: #8b5cf6; --accent-light: rgba(167,139,250,0.15);
-            --accent-secondary: #34d399; --glow: #fbbf24;
-            --grad-start: #a78bfa; --grad-mid: #818cf8; --grad-end: #34d399;
+            --accent: #fbbf24; --accent-dark: #f59e0b; --accent-light: rgba(251,191,36,0.15);
+            --accent-secondary: #ffffff; --glow: #fbbf24;
+            --grad-start: #fbbf24; --grad-mid: #fde68a; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
             --terminal-bg: #0f0e18; --terminal-text: #c0bccf;
         }
@@ -54,14 +54,14 @@
         }
         body::before {
             background:
-                radial-gradient(ellipse 800px 400px at 20% 50%, rgba(139,92,246,0.06) 0%, transparent 70%),
-                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(6,182,148,0.04) 0%, transparent 70%);
+                radial-gradient(ellipse 800px 400px at 20% 50%, rgba(245,158,11,0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 300px at 80% 30%, rgba(255,255,255,0.04) 0%, transparent 70%);
             animation: fogDrift1 25s ease-in-out infinite alternate;
         }
         body::after {
             background:
-                radial-gradient(ellipse 700px 350px at 60% 70%, rgba(139,92,246,0.04) 0%, transparent 70%),
-                radial-gradient(ellipse 500px 250px at 30% 80%, rgba(6,182,148,0.03) 0%, transparent 70%);
+                radial-gradient(ellipse 700px 350px at 60% 70%, rgba(245,158,11,0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 250px at 30% 80%, rgba(255,255,255,0.03) 0%, transparent 70%);
             animation: fogDrift2 30s ease-in-out infinite alternate;
         }
         @keyframes fogDrift1 {
@@ -122,7 +122,7 @@
             background:linear-gradient(135deg,var(--grad-start),var(--grad-end));
             display:flex; align-items:center; justify-content:center;
             color:#fff; font-weight:800; font-size:18px;
-            box-shadow:0 0 20px rgba(139,92,246,0.3);
+            box-shadow:0 0 20px rgba(245,158,11,0.3);
             animation: subtleFlicker 4s ease-in-out infinite;
         }
         .nav-item {
@@ -163,11 +163,11 @@
         }
         .card::before {
             content:''; position:absolute; top:0; left:0; right:0; height:1px;
-            background:linear-gradient(90deg, transparent, rgba(139,92,246,0.2), transparent);
+            background:linear-gradient(90deg, transparent, rgba(245,158,11,0.2), transparent);
         }
         .card:hover {
             box-shadow:var(--shadow-hover);
-            border-color:rgba(139,92,246,0.15);
+            border-color:rgba(245,158,11,0.15);
         }
 
         /* ═══ Buttons ═══ */
@@ -177,11 +177,11 @@
             border-radius:10px; border:none; cursor:pointer;
             transition:transform .2s,box-shadow .2s; display:inline-flex;
             align-items:center; gap:8px; font-size:14px;
-            box-shadow:0 2px 12px rgba(139,92,246,0.25);
+            box-shadow:0 2px 12px rgba(245,158,11,0.25);
         }
         .btn-primary:hover {
             transform:translateY(-1px);
-            box-shadow:0 4px 20px rgba(139,92,246,0.4);
+            box-shadow:0 4px 20px rgba(245,158,11,0.4);
         }
         .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
         .btn-secondary {
@@ -206,7 +206,7 @@
         }
         .input:focus {
             border-color:var(--accent);
-            box-shadow:0 0 0 3px var(--accent-light), 0 0 15px rgba(139,92,246,0.1);
+            box-shadow:0 0 0 3px var(--accent-light), 0 0 15px rgba(245,158,11,0.1);
         }
         select.input {
             appearance:none;
@@ -253,14 +253,14 @@
             background:linear-gradient(135deg,var(--grad-start),var(--grad-mid));
             display:flex; align-items:center; justify-content:center;
             color:#fff; font-weight:700; font-size:14px;
-            box-shadow:0 0 12px rgba(139,92,246,0.2);
+            box-shadow:0 0 12px rgba(245,158,11,0.2);
         }
 
         /* ═══ Flash Messages ═══ */
         .flash-msg { padding:12px 16px; border-radius:10px; font-size:14px; font-weight:500; margin-bottom:16px; animation:fadeIn .3s ease; }
-        .flash-success { background:rgba(6,182,148,0.1); color:#06b694; border:1px solid rgba(6,182,148,0.2); }
+        .flash-success { background:rgba(255,255,255,0.1); color:#ffffff; border:1px solid rgba(255,255,255,0.2); }
         .flash-danger { background:rgba(239,68,68,0.08); color:#f87171; border:1px solid rgba(239,68,68,0.15); }
-        .flash-info { background:rgba(139,92,246,0.1); color:#a78bfa; border:1px solid rgba(139,92,246,0.2); }
+        .flash-info { background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); }
 
         /* ═══ Persistent Terminal ═══ */
         #persistent-terminal {
@@ -303,15 +303,15 @@
             padding: 10px 16px; border-top: 1px solid #1a1830;
         }
         .term-progress-bar { height: 4px; background: #1a1830; border-radius: 100px; overflow: hidden; margin-bottom: 6px; }
-        .term-progress-fill { height: 100%; background: linear-gradient(90deg, #8b5cf6, #06b694); border-radius: 100px; transition: width .5s; }
+        .term-progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #ffffff); border-radius: 100px; transition: width .5s; }
         .term-meta { display: flex; justify-content: space-between; font-size: 11px; color: #6b6480; }
         #terminal-fab {
             position: fixed; bottom: 20px; right: 20px; z-index: 89;
             width: 52px; height: 52px; border-radius: 16px;
-            background: linear-gradient(135deg, #8b5cf6, #06b694);
+            background: linear-gradient(135deg, #f59e0b, #ffffff);
             color: #fff; border: none; cursor: pointer;
             display: none; align-items: center; justify-content: center;
-            font-size: 22px; box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+            font-size: 22px; box-shadow: 0 4px 20px rgba(245,158,11,0.4);
             transition: transform .2s;
         }
         #terminal-fab:hover { transform: scale(1.05); }
@@ -330,7 +330,7 @@
         ::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
 
         /* ═══ Selection ═══ */
-        ::selection { background:rgba(139,92,246,0.3); color:#fff; }
+        ::selection { background:rgba(245,158,11,0.3); color:#fff; }
         .desktop-only { display:block; }
         .mobile-only { display:none; }
         @media(max-width:768px) {
@@ -374,14 +374,14 @@
         }
         .mobile-bottom-nav .nav-item-m.active svg {
             transform:scale(1.1);
-            filter:drop-shadow(0 0 8px rgba(139,92,246,0.5));
+            filter:drop-shadow(0 0 8px rgba(245,158,11,0.5));
         }
         .mobile-bottom-nav .nav-item-m.active::before {
             content:''; position:absolute; top:-7px; left:50%;
             transform:translateX(-50%); width:24px; height:3px;
             border-radius:0 0 3px 3px;
             background:linear-gradient(90deg,var(--grad-start),var(--grad-end));
-            box-shadow:0 0 10px rgba(139,92,246,0.4);
+            box-shadow:0 0 10px rgba(245,158,11,0.4);
         }
         .mobile-bottom-nav .more-panel {
             display:none; position:fixed; bottom:0; left:0; right:0;
@@ -726,7 +726,7 @@
                     speedX: (Math.random() - 0.5) * 0.2,
                     opacity: Math.random() * 0.3 + 0.05,
                     fadeDir: Math.random() > 0.5 ? 1 : -1,
-                    color: Math.random() > 0.5 ? '139,92,246' : '6,182,148'
+                    color: Math.random() > 0.5 ? '245,158,11' : '255,255,255'
                 };
             }
 
@@ -807,7 +807,7 @@
             <div class="dots">
                 <span style="background:#f87171;"></span>
                 <span style="background:#fbbf24;"></span>
-                <span style="background:#34d399;"></span>
+                <span style="background:#ffffff;"></span>
             </div>
             <span class="title" id="term-title">Terminal</span>
             <div class="actions">
@@ -869,7 +869,7 @@
             document.getElementById('term-title').textContent = 'Terminal \u2014 Task #' + taskId;
             document.getElementById('term-fab-badge').classList.remove('show');
             document.getElementById('terminal-fab').style.display = 'none';
-            termAppend('<span style="color:#8b5cf6;">$</span> rorojonggrang scrape --task ' + taskId);
+            termAppend('<span style="color:#f59e0b;">$</span> rorojonggrang scrape --task ' + taskId);
             termAppend('<span style="color:#6b6480;">Initializing scraper...</span>');
             connectTerminalSSE(taskId);
         }
@@ -920,12 +920,12 @@
                 document.getElementById('term-count').textContent = scraped + ' results';
 
                 if (data.status === 'completed') {
-                    termAppend('<span style="color:#34d399;">[DONE]</span> Scraping selesai! <span style="color:#34d399;">' + scraped + '</span> data tersimpan.');
+                    termAppend('<span style="color:#ffffff;">[DONE]</span> Scraping selesai! <span style="color:#ffffff;">' + scraped + '</span> data tersimpan.');
                     document.getElementById('term-progress').style.width = '100%';
-                    document.getElementById('term-progress').style.background = '#34d399';
+                    document.getElementById('term-progress').style.background = '#ffffff';
                     document.getElementById('term-status').textContent = 'Completed \u2014 ' + scraped + ' data';
                     document.getElementById('term-fab-badge').classList.add('show');
-                    termAppendPlain('<span style="color:#8b5cf6; cursor:pointer; text-decoration:underline;" onclick="window.location.href=\'/results/' + termTaskId + '\'">[Lihat Data Hasil Scraping]</span>');
+                    termAppendPlain('<span style="color:#f59e0b; cursor:pointer; text-decoration:underline;" onclick="window.location.href=\'/results/' + termTaskId + '\'">[Lihat Data Hasil Scraping]</span>');
                     if (termEventSource) { termEventSource.close(); termEventSource = null; }
                 } else if (data.status === 'failed') {
                     termAppend('<span style="color:#f87171;">[FAIL]</span> ' + (data.error_message || 'Task failed'));
@@ -938,16 +938,16 @@
                     if (termEventSource) { termEventSource.close(); termEventSource = null; }
                 } else {
                     document.getElementById('term-status').textContent = 'Running... ' + pct + '%';
-                    termAppend('<span style="color:#8b5cf6;">[PROGRESS]</span> ' + scraped + '/' + total + ' (' + pct + '%) \u2014 <span style="color:#34d399;">' + scraped + ' saved</span>');
+                    termAppend('<span style="color:#f59e0b;">[PROGRESS]</span> ' + scraped + '/' + total + ' (' + pct + '%) \u2014 <span style="color:#ffffff;">' + scraped + ' saved</span>');
                 }
                 return;
             }
 
             if (data.type === 'log') {
                 const lvl = data.level || 'info';
-                const colors = { info:'#6b6480', success:'#34d399', error:'#f87171', warning:'#fbbf24', data:'#c0bccf' };
+                const colors = { info:'#6b6480', success:'#ffffff', error:'#f87171', warning:'#fbbf24', data:'#c0bccf' };
                 const color = colors[lvl] || '#c0bccf';
-                const prefix = lvl === 'data' ? '<span style="color:#34d399;">[FOUND]</span>' : ('<span style="color:' + color + ';">[' + lvl.toUpperCase() + ']</span>');
+                const prefix = lvl === 'data' ? '<span style="color:#ffffff;">[FOUND]</span>' : ('<span style="color:' + color + ';">[' + lvl.toUpperCase() + ']</span>');
                 termAppend(prefix + ' ' + (data.message || ''));
                 return;
             }

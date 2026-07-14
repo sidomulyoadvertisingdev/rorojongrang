@@ -5,9 +5,9 @@
     .kpi-card { padding:20px 24px; border-radius:14px; background:var(--bg-card); border:1px solid var(--border); position:relative; overflow:hidden; transition:all .3s; }
     .kpi-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
     .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-    .kpi-card.green::before { background:linear-gradient(90deg,#06b694,#14b8a6); }
-    .kpi-card.blue::before { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
-    .kpi-card.purple::before { background:linear-gradient(90deg,#6366f1,#818cf8); }
+    .kpi-card.green::before { background:linear-gradient(90deg,#ffffff,#14b8a6); }
+    .kpi-card.blue::before { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+    .kpi-card.purple::before { background:linear-gradient(90deg,#fbbf24,#818cf8); }
     .kpi-card.amber::before { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
     .kpi-card.red::before { background:linear-gradient(90deg,#ef4444,#f87171); }
     .kpi-card.cyan::before { background:linear-gradient(90deg,#06b6d4,#22d3ee); }
@@ -15,7 +15,7 @@
     .kpi-label { font-size:12px; font-weight:600; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
     .kpi-value { font-size:28px; font-weight:800; color:var(--text); line-height:1; }
     .kpi-sub { font-size:12px; color:var(--text-sec); margin-top:6px; display:flex; align-items:center; gap:4px; }
-    .kpi-trend-up { color:#06b694; }
+    .kpi-trend-up { color:#ffffff; }
     .kpi-trend-down { color:#ef4444; }
     .chart-panel { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; transition:all .3s; }
     .chart-panel:hover { box-shadow:var(--shadow-hover); }
@@ -28,8 +28,8 @@
     .insight-text { font-size:13px; color:var(--text); line-height:1.5; }
     .insight-type { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
     .insight-type.warning { color:#f59e0b; }
-    .insight-type.success { color:#06b694; }
-    .insight-type.info { color:#8b5cf6; }
+    .insight-type.success { color:#ffffff; }
+    .insight-type.info { color:#f59e0b; }
     .table-container { overflow-x:auto; }
     .data-table { width:100%; border-collapse:collapse; }
     .data-table th { padding:12px 16px; text-align:left; font-size:11px; font-weight:700; color:var(--text-sec); text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid var(--border); background:var(--bg); }
@@ -162,10 +162,10 @@
     var currentPage = 1;
     var filteredRows = [];
 
-    var PALETTE = ['#8b5cf6','#06b694','#f59e0b','#ef4444','#6366f1','#ec4899','#14b8a6','#e879f9','#84cc16','#f97316','#06b6d4','#a78bfa'];
+    var PALETTE = ['#f59e0b','#ffffff','#f59e0b','#ef4444','#fbbf24','#ec4899','#14b8a6','#e879f9','#84cc16','#f97316','#06b6d4','#fbbf24'];
     var GRADIENTS = {
-        green: ['rgba(6,182,148,0.15)','rgba(6,182,148,0.02)'],
-        blue: ['rgba(139,92,246,0.15)','rgba(139,92,246,0.02)'],
+        green: ['rgba(255,255,255,0.15)','rgba(255,255,255,0.02)'],
+        blue: ['rgba(245,158,11,0.15)','rgba(245,158,11,0.02)'],
         purple: ['rgba(99,102,241,0.15)','rgba(99,102,241,0.02)'],
         amber: ['rgba(245,158,11,0.15)','rgba(245,158,11,0.02)'],
     };
@@ -221,25 +221,25 @@
         var h = '';
         if (DATA_TYPE === 'product') {
             h += kpi(ICONS.box, 'Total Produk', fmt(d.total), '', 'green', 'var(--accent-light)');
-            h += kpi(ICONS.currency, 'Harga Rata-rata', fmtRp(d.avg_price), 'Median: ' + fmtRp(d.median_price), 'blue', 'rgba(139,92,246,0.1)');
-            h += kpi(ICONS.layers, 'Total Stok', fmt(d.total_stock), 'Rata-rata: ' + fmt(d.avg_stock) + ' unit', 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.currency, 'Harga Rata-rata', fmtRp(d.avg_price), 'Median: ' + fmtRp(d.median_price), 'blue', 'rgba(245,158,11,0.1)');
+            h += kpi(ICONS.layers, 'Total Stok', fmt(d.total_stock), 'Rata-rata: ' + fmt(d.avg_stock) + ' unit', 'purple', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.alert, 'Stok Rendah', d.low_stock, d.low_stock > 0 ? 'Perlu restock!' : 'Aman', 'red', 'rgba(239,68,68,0.1)');
             h += kpi(ICONS.tag, 'Kategori', d.cat_stats.total_categories, 'Maks: ' + d.cat_stats.max_category + ' produk/kategori', 'amber', 'rgba(245,158,11,0.1)');
             var totalValue = d.total_stock * d.avg_price;
             h += kpi(ICONS.diamond, 'Total Nilai Inventori', fmtRp(totalValue), '', 'cyan', 'rgba(6,182,212,0.1)');
         } else if (DATA_TYPE === 'sales') {
             h += kpi(ICONS.currency, 'Total Omzet', fmtRp(d.total_revenue), fmt(d.total) + ' transaksi', 'green', 'var(--accent-light)');
-            h += kpi(ICONS.chart, 'Rata-rata/Transaksi', fmtRp(d.avg_transaction), 'Median: ' + fmtRp(d.median_transaction), 'blue', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.chart, 'Rata-rata/Transaksi', fmtRp(d.avg_transaction), 'Median: ' + fmtRp(d.median_transaction), 'blue', 'rgba(245,158,11,0.1)');
             var growthIcon = d.growth_rate >= 0 ? ICONS.arrowUp : ICONS.arrowDown;
             var growthColor = d.growth_rate >= 0 ? 'kpi-trend-up' : 'kpi-trend-down';
             h += kpi(ICONS.zap, 'Growth Rate', fmtPct(d.growth_rate), '<span class="' + growthColor + '" style="display:inline-flex;align-items:center;gap:2px;">' + (d.growth_rate >= 0 ? '↑' : '↓') + ' vs periode lalu</span>', d.growth_rate >= 0 ? 'green' : 'red', d.growth_rate >= 0 ? 'var(--accent-light)' : 'rgba(239,68,68,0.1)');
-            h += kpi(ICONS.cart, 'Total Unit Terjual', fmt(d.total_quantity), 'Avg: ' + fmt(d.avg_quantity) + ' unit/trx', 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.cart, 'Total Unit Terjual', fmt(d.total_quantity), 'Avg: ' + fmt(d.avg_quantity) + ' unit/trx', 'purple', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.users, 'Unique Customers', fmt(d.unique_customers), d.unique_products + ' produk terjual', 'amber', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.target, 'Top Customer Share', fmtPct(d.customer_concentration), 'Kontribusi pelanggan #1', 'cyan', 'rgba(6,182,212,0.1)');
         } else if (DATA_TYPE === 'customer') {
             h += kpi(ICONS.users, 'Total Pelanggan', fmt(d.total), '', 'green', 'var(--accent-light)');
-            h += kpi(ICONS.currency, 'Total Pembelian', fmtRp(d.total_purchase), '', 'blue', 'rgba(139,92,246,0.1)');
-            h += kpi(ICONS.chart, 'Avg/Pelanggan', fmtRp(d.avg_purchase), 'Median: ' + fmtRp(d.median_purchase), 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.currency, 'Total Pembelian', fmtRp(d.total_purchase), '', 'blue', 'rgba(245,158,11,0.1)');
+            h += kpi(ICONS.chart, 'Avg/Pelanggan', fmtRp(d.avg_purchase), 'Median: ' + fmtRp(d.median_purchase), 'purple', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.star, 'VIP Customers', fmt(d.segments.values[0]), '>Rp 2M pembelian', 'amber', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.target, 'Pareto (20/80)', fmtPct(d.pareto_ratio), 'Top 20% kontribusi', 'cyan', 'rgba(6,182,212,0.1)');
             var completenessPct = Math.round(((d.completeness.phone + d.completeness.email + d.completeness.address) / (d.total * 3)) * 100);
@@ -248,15 +248,15 @@
             h += kpi(ICONS.arrowUp, 'Total Pemasukan', fmtRp(d.total_income), '', 'green', 'var(--accent-light)');
             h += kpi(ICONS.arrowDown, 'Total Pengeluaran', fmtRp(d.total_expense), '', 'red', 'rgba(239,68,68,0.1)');
             h += kpi(ICONS.layers, 'Saldo', fmtRp(d.balance), d.balance >= 0 ? 'Surplus' : 'Defisit', d.balance >= 0 ? 'green' : 'red', d.balance >= 0 ? 'var(--accent-light)' : 'rgba(239,68,68,0.1)');
-            h += kpi(ICONS.trending, 'Profit Margin', fmtPct(d.profit_margin), '', 'blue', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.trending, 'Profit Margin', fmtPct(d.profit_margin), '', 'blue', 'rgba(245,158,11,0.1)');
             h += kpi(ICONS.fire, 'Burn Rate', fmtRp(d.burn_rate), '/bulan', 'amber', 'rgba(245,158,11,0.1)');
-            h += kpi(ICONS.clock, 'Runway', d.runway_months.toFixed(0) + ' bulan', 'Berdasarkan burn rate', 'purple', 'rgba(139,92,246,0.1)');
+            h += kpi(ICONS.clock, 'Runway', d.runway_months.toFixed(0) + ' bulan', 'Berdasarkan burn rate', 'purple', 'rgba(245,158,11,0.1)');
         }
         el.innerHTML = h;
     }
 
     function kpi(icon, label, value, sub, color, bgColor) {
-        return '<div class="kpi-card ' + color + ' animate-in"><div style="display:flex; align-items:flex-start; justify-content:space-between;"><div><div class="kpi-label">' + label + '</div><div class="kpi-value">' + value + '</div>' + (sub ? '<div class="kpi-sub">' + sub + '</div>' : '') + '</div><div class="kpi-icon" style="background:' + bgColor + '; color:' + (color === 'green' ? '#06b694' : color === 'blue' ? '#8b5cf6' : color === 'purple' ? '#6366f1' : color === 'amber' ? '#f59e0b' : color === 'red' ? '#ef4444' : '#06b6d4') + ';">' + icon + '</div></div></div>';
+        return '<div class="kpi-card ' + color + ' animate-in"><div style="display:flex; align-items:flex-start; justify-content:space-between;"><div><div class="kpi-label">' + label + '</div><div class="kpi-value">' + value + '</div>' + (sub ? '<div class="kpi-sub">' + sub + '</div>' : '') + '</div><div class="kpi-icon" style="background:' + bgColor + '; color:' + (color === 'green' ? '#ffffff' : color === 'blue' ? '#f59e0b' : color === 'purple' ? '#fbbf24' : color === 'amber' ? '#f59e0b' : color === 'red' ? '#ef4444' : '#06b6d4') + ';">' + icon + '</div></div></div>';
     }
 
     function renderMainChart(d) {
@@ -269,7 +269,7 @@
         } else if (DATA_TYPE === 'sales') {
             document.getElementById('main-chart-title').textContent = 'Tren Omzet Bulanan';
             document.getElementById('main-chart-badge').textContent = 'Revenue Trend';
-            charts.main = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Omzet', data:d.monthly.values, borderColor:'#06b694', backgroundColor:makeGradient(ctx,'green'), fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#06b694', pointBorderColor:'#fff', pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, tooltip:{backgroundColor:'rgba(0,0,0,0.8)',titleFont:{family:'Inter'},bodyFont:{family:'Inter'},callbacks:{label:function(c){return 'Omzet: Rp ' + c.parsed.y.toLocaleString('id-ID')}}}} } });
+            charts.main = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Omzet', data:d.monthly.values, borderColor:'#ffffff', backgroundColor:makeGradient(ctx,'green'), fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#ffffff', pointBorderColor:'#fff', pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, tooltip:{backgroundColor:'rgba(0,0,0,0.8)',titleFont:{family:'Inter'},bodyFont:{family:'Inter'},callbacks:{label:function(c){return 'Omzet: Rp ' + c.parsed.y.toLocaleString('id-ID')}}}} } });
         } else if (DATA_TYPE === 'customer') {
             document.getElementById('main-chart-title').textContent = 'Distribusi Pembelian';
             document.getElementById('main-chart-badge').textContent = 'Purchase Distribution';
@@ -277,7 +277,7 @@
         } else if (DATA_TYPE === 'finance') {
             document.getElementById('main-chart-title').textContent = 'Pemasukan vs Pengeluaran';
             document.getElementById('main-chart-badge').textContent = 'Cash Flow';
-            charts.main = new Chart(ctx, { type:'bar', data:{ labels:d.monthly.labels, datasets:[{label:'Pemasukan', data:d.monthly.income, backgroundColor:'rgba(6,182,148,0.8)', borderRadius:4, borderSkipped:false}, {label:'Pengeluaran', data:d.monthly.expense, backgroundColor:'rgba(239,68,68,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:true, position:'top'}}} });
+            charts.main = new Chart(ctx, { type:'bar', data:{ labels:d.monthly.labels, datasets:[{label:'Pemasukan', data:d.monthly.income, backgroundColor:'rgba(255,255,255,0.8)', borderRadius:4, borderSkipped:false}, {label:'Pengeluaran', data:d.monthly.expense, backgroundColor:'rgba(239,68,68,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:true, position:'top'}}} });
         }
     }
 
@@ -292,10 +292,10 @@
             charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.top_products.labels.slice(0,6), datasets:[{data:d.top_products.revenue.slice(0,6), backgroundColor:PALETTE, borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
         } else if (DATA_TYPE === 'customer') {
             document.getElementById('side-chart1-title').textContent = 'Customer Segmentation';
-            charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.segments.labels, datasets:[{data:d.segments.values, backgroundColor:['#f59e0b','#8b5cf6','#06b694','#ef4444'], borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+            charts.side1 = new Chart(ctx, { type:'doughnut', data:{ labels:d.segments.labels, datasets:[{data:d.segments.values, backgroundColor:['#f59e0b','#f59e0b','#ffffff','#ef4444'], borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
         } else if (DATA_TYPE === 'finance') {
             document.getElementById('side-chart1-title').textContent = 'Saldo Kumulatif';
-            charts.side1 = new Chart(ctx, { type:'line', data:{ labels:d.cumulative_balance.map(function(c){return c.date.slice(5)}), datasets:[{label:'Saldo', data:d.cumulative_balance.map(function(c){return c.balance}), borderColor:'#8b5cf6', backgroundColor:makeGradient(ctx,'purple'), fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#8b5cf6'}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            charts.side1 = new Chart(ctx, { type:'line', data:{ labels:d.cumulative_balance.map(function(c){return c.date.slice(5)}), datasets:[{label:'Saldo', data:d.cumulative_balance.map(function(c){return c.balance}), borderColor:'#f59e0b', backgroundColor:makeGradient(ctx,'purple'), fill:true, tension:.4, pointRadius:3, pointBackgroundColor:'#f59e0b'}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         }
     }
 
@@ -304,13 +304,13 @@
         var ctx = document.getElementById('chart3').getContext('2d');
         if (DATA_TYPE === 'product') {
             document.getElementById('chart3-title').textContent = 'Health Stok Produk';
-            charts.chart3 = new Chart(ctx, { type:'doughnut', data:{ labels:d.stock_health.labels, datasets:[{data:d.stock_health.values, backgroundColor:['#ef4444','#f59e0b','#8b5cf6','#06b694'], borderWidth:0}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
+            charts.chart3 = new Chart(ctx, { type:'doughnut', data:{ labels:d.stock_health.labels, datasets:[{data:d.stock_health.values, backgroundColor:['#ef4444','#f59e0b','#f59e0b','#ffffff'], borderWidth:0}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
         } else if (DATA_TYPE === 'sales') {
             document.getElementById('chart3-title').textContent = 'Unit Terjual per Produk';
-            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.labels, datasets:[{label:'Qty', data:d.top_products.quantity, backgroundColor:'rgba(139,92,246,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.labels, datasets:[{label:'Qty', data:d.top_products.quantity, backgroundColor:'rgba(245,158,11,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         } else if (DATA_TYPE === 'customer') {
             document.getElementById('chart3-title').textContent = 'Top 10 Pelanggan';
-            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return c.name||'N/A'}), datasets:[{label:'Pembelian', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(6,182,148,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            charts.chart3 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return c.name||'N/A'}), datasets:[{label:'Pembelian', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(255,255,255,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, indexAxis:'y', plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         } else if (DATA_TYPE === 'finance') {
             document.getElementById('chart3-title').textContent = 'Pengeluaran per Kategori';
             charts.chart3 = new Chart(ctx, { type:'doughnut', data:{ labels:d.expense_categories.labels, datasets:[{data:d.expense_categories.values, backgroundColor:PALETTE, borderWidth:0, hoverOffset:8}] }, options:{responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{legend:{position:'bottom', labels:{font:{family:'Inter',size:11}, padding:10, usePointStyle:true}}}} });
@@ -328,10 +328,10 @@
             charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_products.labels, datasets:[{label:'Revenue', data:d.top_products.revenue, backgroundColor:'rgba(245,158,11,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         } else if (DATA_TYPE === 'customer') {
             document.getElementById('chart4-title').textContent = 'Top 10 Pelanggan (Detail)';
-            charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return (c.name||'').substring(0,12)}), datasets:[{label:'Total Beli', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(139,92,246,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            charts.chart4 = new Chart(ctx, { type:'bar', data:{ labels:d.top_customers.map(function(c){return (c.name||'').substring(0,12)}), datasets:[{label:'Total Beli', data:d.top_customers.map(function(c){return c.total_purchase||0}), backgroundColor:'rgba(245,158,11,0.8)', borderRadius:4, borderSkipped:false}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         } else if (DATA_TYPE === 'finance') {
             document.getElementById('chart4-title').textContent = 'Tren Saldo Bulanan';
-            charts.chart4 = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Saldo', data:d.monthly.balance, borderColor:d.monthly.balance.some(function(v){return v<0}) ? '#ef4444' : '#06b694', backgroundColor:d.monthly.balance.some(function(v){return v<0}) ? 'rgba(239,68,68,0.1)' : 'rgba(6,182,148,0.1)', fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#fff', pointBorderColor:d.monthly.balance.map(function(v){return v>=0?'#06b694':'#ef4444'}), pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
+            charts.chart4 = new Chart(ctx, { type:'line', data:{ labels:d.monthly.labels, datasets:[{label:'Saldo', data:d.monthly.balance, borderColor:d.monthly.balance.some(function(v){return v<0}) ? '#ef4444' : '#ffffff', backgroundColor:d.monthly.balance.some(function(v){return v<0}) ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.1)', fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#fff', pointBorderColor:d.monthly.balance.map(function(v){return v>=0?'#ffffff':'#ef4444'}), pointBorderWidth:2}] }, options:{...chartDefaults, plugins:{...chartDefaults.plugins, legend:{display:false}}} });
         }
     }
 
@@ -369,11 +369,11 @@
         document.getElementById('insight-count').textContent = insights.length + ' insight';
         if (!insights.length) { el.innerHTML = '<p style="color:var(--text-sec); font-size:13px; padding:16px;">Belum ada insight untuk data ini.</p>'; return; }
         var iconMap = {'⚠️': ICONS.alert, '💰': ICONS.currency, '📊': ICONS.chart, '📈': ICONS.trending, '🚀': ICONS.zap, '📉': ICONS.arrowDown, '🏆': ICONS.star, '👥': ICONS.users, '⭐': ICONS.star, '📞': ICONS.info, '✅': ICONS.check};
-        var typeColors = {'warning': '#f59e0b', 'success': '#06b694', 'info': '#8b5cf6'};
+        var typeColors = {'warning': '#f59e0b', 'success': '#ffffff', 'info': '#f59e0b'};
         var h = '';
         insights.forEach(function(i) {
             var svgIcon = iconMap[i.icon] || ICONS.info;
-            var color = typeColors[i.type] || '#8b5cf6';
+            var color = typeColors[i.type] || '#f59e0b';
             h += '<div class="insight-card"><div class="insight-icon" style="color:' + color + ';">' + svgIcon + '</div><div><div class="insight-type ' + i.type + '">' + i.type + '</div><div class="insight-text">' + i.text + '</div></div></div>';
         });
         el.innerHTML = h;
@@ -390,7 +390,7 @@
         if (!items.length) { el.innerHTML = '<p style="color:var(--text-sec); font-size:13px; padding:16px;">Tidak ada data.</p>'; return; }
         var h = '';
         items.forEach(function(item, i) {
-            var colors = ['#06b694','#8b5cf6','#6366f1','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+            var colors = ['#ffffff','#f59e0b','#fbbf24','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
             h += '<div style="display:flex; align-items:center; gap:12px; padding:10px 0; ' + (i < items.length-1 ? 'border-bottom:1px solid var(--border-light);' : '') + '">';
             h += '<div style="width:28px; height:28px; border-radius:8px; background:' + colors[i%colors.length] + '20; color:' + colors[i%colors.length] + '; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">' + (i+1) + '</div>';
             h += '<div style="flex:1; min-width:0;"><div style="font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + item.name + '</div><div style="font-size:11px; color:var(--text-sec);">' + item.sub + '</div></div>';

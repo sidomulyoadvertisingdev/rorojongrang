@@ -370,7 +370,7 @@
     .roadmap-dot.active {
         border-color: var(--accent-secondary);
         background: var(--accent-secondary);
-        box-shadow: 0 0 20px rgba(6,182,148,0.4);
+        box-shadow: 0 0 20px rgba(255,255,255,0.4);
     }
     .roadmap-dot.active::after {
         content: '';
@@ -384,7 +384,7 @@
     .roadmap-dot.next {
         border-color: var(--accent);
         background: var(--accent);
-        box-shadow: 0 0 16px rgba(139,92,246,0.35);
+        box-shadow: 0 0 16px rgba(245,158,11,0.35);
     }
     .roadmap-dot.planned {
         border-color: var(--text-muted);
@@ -408,19 +408,19 @@
         height: 3px;
     }
     .roadmap-item:nth-child(1) .roadmap-card::before {
-        background: linear-gradient(90deg, #06b694, #14b8a6);
+        background: linear-gradient(90deg, #ffffff, #14b8a6);
     }
     .roadmap-item:nth-child(2) .roadmap-card::before {
-        background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
     }
     .roadmap-item:nth-child(3) .roadmap-card::before {
-        background: linear-gradient(90deg, #6366f1, #818cf8);
+        background: linear-gradient(90deg, #fbbf24, #818cf8);
     }
     .roadmap-item:nth-child(4) .roadmap-card::before {
         background: linear-gradient(90deg, #f59e0b, #fbbf24);
     }
     .roadmap-card:hover {
-        border-color: rgba(139,92,246,0.2);
+        border-color: rgba(245,158,11,0.2);
         box-shadow: var(--card-shadow-hover);
         transform: translateY(-2px);
     }
@@ -463,15 +463,15 @@
         border-radius: 50%;
     }
     .status-active {
-        background: rgba(6,182,148,0.1);
-        color: #06b694;
+        background: rgba(255,255,255,0.1);
+        color: #ffffff;
     }
-    .status-active .status-dot { background: #06b694; animation: pulse 2s infinite; }
+    .status-active .status-dot { background: #ffffff; animation: pulse 2s infinite; }
     .status-next {
-        background: rgba(139,92,246,0.1);
-        color: #8b5cf6;
+        background: rgba(245,158,11,0.1);
+        color: #f59e0b;
     }
-    .status-next .status-dot { background: #8b5cf6; }
+    .status-next .status-dot { background: #f59e0b; }
     .status-planned {
         background: rgba(107,100,128,0.1);
         color: var(--text-muted);
@@ -506,9 +506,9 @@
         font-weight: 600;
     }
     .feature-tag.done {
-        background: rgba(6,182,148,0.08);
-        color: #06b694;
-        border: 1px solid rgba(6,182,148,0.15);
+        background: rgba(255,255,255,0.08);
+        color: #ffffff;
+        border: 1px solid rgba(255,255,255,0.15);
     }
     .feature-tag.planned {
         background: rgba(107,100,128,0.06);

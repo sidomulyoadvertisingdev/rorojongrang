@@ -98,18 +98,18 @@
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:13px; color:var(--text-sec);">Selesai</span>
-                    <span style="font-size:15px; font-weight:700; color:#06b694;">{{ tasks|selectattr('status', 'equalto', 'completed')|list|length }}</span>
+                    <span style="font-size:15px; font-weight:700; color:#ffffff;">{{ tasks|selectattr('status', 'equalto', 'completed')|list|length }}</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="font-size:13px; color:var(--text-sec);">Berjalan</span>
-                    <span style="font-size:15px; font-weight:700; color:#8b5cf6;">{{ tasks|selectattr('status', 'equalto', 'running')|list|length }}</span>
+                    <span style="font-size:15px; font-weight:700; color:#f59e0b;">{{ tasks|selectattr('status', 'equalto', 'running')|list|length }}</span>
                 </div>
             </div>
         </div>
 
         <div class="card" style="padding:28px;">
             <h2 style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:20px; display:flex; align-items:center; gap:8px;">
-                <span style="width:28px; height:28px; border-radius:8px; background:rgba(139,92,246,0.1); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">&#128161;</span>
+                <span style="width:28px; height:28px; border-radius:8px; background:rgba(245,158,11,0.1); display:inline-flex; align-items:center; justify-content:center; font-size:14px;">&#128161;</span>
                 Tips
             </h2>
             <ul style="display:flex; flex-direction:column; gap:12px;">
@@ -183,7 +183,7 @@
 
         centerMarker = L.marker([-2.5, 118.0], { draggable: true }).addTo(map);
         radiusCircle = L.circle([-2.5, 118.0], {
-            radius: 5000, color: '#8b5cf6', fillColor: '#8b5cf6',
+            radius: 5000, color: '#f59e0b', fillColor: '#f59e0b',
             fillOpacity: 0.12, weight: 2, dashArray: '6, 4'
         }).addTo(map);
 
@@ -377,7 +377,7 @@
             })
             .then(function(result) {
                 if (result.ok) {
-                    setFeedback('Task #' + result.data.task_id + ' dibuat. Terminal detail dibuka di kanan bawah.', '#06b694');
+                    setFeedback('Task #' + result.data.task_id + ' dibuat. Terminal detail dibuka di kanan bawah.', '#ffffff');
                     if (typeof openPersistentTerminal === 'function') openPersistentTerminal(result.data.task_id);
                     resetButton();
                 } else {
