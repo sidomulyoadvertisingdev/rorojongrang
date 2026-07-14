@@ -281,6 +281,15 @@ function toggleFaq(btn) {
     document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
     if (!wasOpen) item.classList.add('open');
 }
+document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+        document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+        item.classList.add('open');
+    });
+    item.addEventListener('mouseleave', () => {
+        item.classList.remove('open');
+    });
+});
 function openFeedbackModal() {
     const modal = document.getElementById('feedbackModal');
     modal.style.display = 'flex';
