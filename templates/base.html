@@ -331,14 +331,11 @@
 
         /* ═══ Selection ═══ */
         ::selection { background:rgba(139,92,246,0.3); color:#fff; }
-
-        /* ═══ Mobile ═══ */
+        .desktop-only { display:block; }
+        .mobile-only { display:none; }
         @media(max-width:768px) {
-            .sidebar { position:fixed; z-index:50; transform:translateX(-100%); }
-            .sidebar.mobile-open { transform:translateX(0); }
-            .main-content { margin-left:0 !important; }
-            .mobile-hamburger { display:flex !important; }
-            #persistent-terminal { width: 100%; border-radius: 0; }
+            .desktop-only { display:none !important; }
+            .mobile-only { display:block !important; }
         }
         .mobile-hamburger {
             display:none; position:fixed; top:16px; left:16px; z-index:40;
@@ -346,6 +343,199 @@
             background:var(--bg-card); border:1px solid var(--border);
             color:var(--text); align-items:center; justify-content:center;
             cursor:pointer;
+        }
+
+        /* ═══ Mobile Bottom Navigation ═══ */
+        .mobile-bottom-nav {
+            display:none; position:fixed; bottom:0; left:0; right:0;
+            z-index:50; background:rgba(18,16,28,0.95);
+            backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border-top:1px solid var(--border);
+            padding:6px 0 env(safe-area-inset-bottom, 8px);
+        }
+        .mobile-bottom-nav .nav-row {
+            display:flex; align-items:center; justify-content:space-around;
+        }
+        .mobile-bottom-nav .nav-item-m {
+            display:flex; flex-direction:column; align-items:center;
+            gap:3px; padding:6px 0; min-width:56px;
+            text-decoration:none; color:var(--text-muted);
+            transition:color .2s; position:relative;
+            -webkit-tap-highlight-color:transparent;
+        }
+        .mobile-bottom-nav .nav-item-m svg {
+            width:22px; height:22px; transition:transform .2s;
+        }
+        .mobile-bottom-nav .nav-item-m span {
+            font-size:10px; font-weight:600; letter-spacing:0.2px;
+        }
+        .mobile-bottom-nav .nav-item-m.active {
+            color:var(--accent);
+        }
+        .mobile-bottom-nav .nav-item-m.active svg {
+            transform:scale(1.1);
+            filter:drop-shadow(0 0 8px rgba(139,92,246,0.5));
+        }
+        .mobile-bottom-nav .nav-item-m.active::before {
+            content:''; position:absolute; top:-7px; left:50%;
+            transform:translateX(-50%); width:24px; height:3px;
+            border-radius:0 0 3px 3px;
+            background:linear-gradient(90deg,var(--grad-start),var(--grad-end));
+            box-shadow:0 0 10px rgba(139,92,246,0.4);
+        }
+        .mobile-bottom-nav .more-panel {
+            display:none; position:fixed; bottom:0; left:0; right:0;
+            background:rgba(18,16,28,0.97); backdrop-filter:blur(20px);
+            border-top:1px solid var(--border);
+            border-radius:16px 16px 0 0;
+            padding:20px 16px env(safe-area-inset-bottom, 16px);
+            z-index:51; box-shadow:0 -8px 40px rgba(0,0,0,0.6);
+        }
+        .mobile-bottom-nav .more-panel.open { display:block; }
+        .mobile-bottom-nav .more-panel .more-item {
+            display:flex; align-items:center; gap:14px;
+            padding:14px 12px; border-radius:12px;
+            color:var(--text); font-size:14px; font-weight:500;
+            text-decoration:none; transition:background .2s;
+        }
+        .mobile-bottom-nav .more-panel .more-item:hover,
+        .mobile-bottom-nav .more-panel .more-item:active {
+            background:var(--accent-light);
+        }
+        .mobile-bottom-nav .more-panel .more-item svg {
+            width:20px; height:20px; color:var(--text-sec);
+        }
+        .mobile-bottom-nav .more-panel .more-item.active {
+            color:var(--accent);
+        }
+        .mobile-bottom-nav .more-panel .more-item.active svg {
+            color:var(--accent);
+        }
+        .more-overlay {
+            display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+            z-index:50;
+        }
+        .more-overlay.open { display:block; }
+
+        /* ═══ Comprehensive Mobile Override ═══ */
+        @media(max-width:768px) {
+            /* --- Base Layout --- */
+            .mobile-bottom-nav { display:block !important; }
+            .sidebar { display:none !important; }
+            .mobile-hamburger { display:none !important; }
+            .collapse-toggle { display:none !important; }
+            .main-content { padding:16px 12px 90px !important; }
+            .main-wrap { margin-left:0 !important; }
+            #persistent-terminal { bottom:72px !important; width:100% !important; border-radius:0 !important; }
+            #terminal-fab { bottom:80px !important; right:16px !important; width:46px !important; height:46px !important; }
+
+            /* --- Grids stack to single column --- */
+            [style*="grid-template-columns:repeat(3"] { grid-template-columns:1fr !important; }
+            [style*="grid-template-columns:repeat(auto-fill"] { grid-template-columns:1fr !important; }
+            [style*="grid-template-columns:1fr 1fr"] { grid-template-columns:1fr !important; }
+            [style*="grid-template-columns:2fr 1fr"] { grid-template-columns:1fr !important; }
+            [style*="grid-template-columns:1fr 2fr"] { grid-template-columns:1fr !important; }
+
+            /* --- Flex rows: allow wrapping but don't hide anything --- */
+            .results-header-actions { flex-wrap:wrap !important; gap:8px !important; }
+            .results-header-actions .btn-secondary,
+            .results-header-actions .btn-danger { font-size:13px !important; }
+
+            /* --- Tables: horizontal scroll with touch feel --- */
+            .table-container { overflow-x:auto !important; -webkit-overflow-scrolling:touch !important; padding-bottom:8px !important; }
+            table { min-width:500px !important; }
+            table th { font-size:10px !important; padding:10px !important; white-space:nowrap !important; }
+            table td { font-size:12px !important; padding:10px !important; white-space:nowrap !important; }
+
+            /* --- Touch targets minimum 44px --- */
+            .btn-primary, .btn-secondary, .btn-danger {
+                min-height:44px !important; padding:10px 18px !important;
+                font-size:14px !important;
+            }
+            .action-btn { width:38px !important; height:38px !important; min-width:38px !important; }
+            .filter-chip { min-height:38px !important; padding:8px 14px !important; font-size:13px !important; }
+            .tab-btn { min-height:40px !important; padding:10px 16px !important; }
+            .nav-item { min-height:44px !important; padding:12px 16px !important; }
+            .lead-select { width:100% !important; min-height:40px !important; }
+            .modal-close { width:44px !important; height:44px !important; }
+
+            /* --- Inputs larger on mobile --- */
+            .input { padding:12px 14px !important; font-size:16px !important; }
+            select.input { font-size:16px !important; }
+
+            /* --- Cards less padding --- */
+            .card { border-radius:12px !important; }
+            [style*="padding:32px"] { padding:20px !important; }
+            [style*="padding:24px"] { padding:16px !important; }
+            [style*="padding:28px"] { padding:18px !important; }
+            [style*="padding:20px"] { padding:14px !important; }
+
+            /* --- KPI cards --- */
+            .kpi-card { padding:16px !important; }
+            .kpi-value { font-size:22px !important; }
+
+            /* --- Chart panels --- */
+            .chart-panel { padding:16px !important; }
+            .chart-panel [style*="height:320px"] { height:220px !important; }
+            .chart-panel [style*="height:280px"] { height:200px !important; }
+
+            /* --- WA form link rows --- */
+            [style*="grid-template-columns:1fr 2fr auto"] { grid-template-columns:1fr !important; gap:8px !important; }
+
+            /* --- Lead console: stack vertically --- */
+            .lead-console {
+                flex-direction:column !important;
+                align-items:stretch !important;
+                gap:10px !important;
+            }
+            .filter-group {
+                justify-content:center !important;
+            }
+            .lead-console .input {
+                width:100% !important;
+                min-width:0 !important;
+            }
+
+            /* --- Bulk toolbar: stack on mobile --- */
+            #bulk-toolbar {
+                flex-direction:column !important;
+                gap:10px !important;
+                text-align:center !important;
+            }
+
+            /* --- Pagination: stack on mobile --- */
+            #pagination-bar {
+                flex-direction:column !important;
+                gap:8px !important;
+                align-items:center !important;
+            }
+
+            /* --- Remove sticky on mobile --- */
+            [style*="position:sticky"] { position:relative !important; }
+
+            /* --- Flash messages --- */
+            .flash-msg { font-size:13px !important; padding:10px 14px !important; }
+
+            /* --- Scrape form layout --- */
+            .scrape-layout { grid-template-columns:1fr !important; }
+            .scrape-right { position:static !important; }
+
+            /* --- Lead playbook modal: full-screen on mobile --- */
+            .lead-modal { padding:0 !important; }
+            .lead-modal-card {
+                width:100vw !important;
+                max-height:100vh !important;
+                border-radius:0 !important;
+                padding:16px !important;
+            }
+            .playbook-grid { grid-template-columns:1fr !important; }
+            .message-actions { grid-template-columns:repeat(2, minmax(0,1fr)) !important; }
+
+            /* --- Search card --- */
+            .results-search-card {
+                flex-direction:column !important;
+                gap:8px !important;
+            }
         }
     </style>
 </head>
@@ -409,6 +599,49 @@
                 </div>
             </div>
         </aside>
+
+        <!-- Mobile Bottom Navigation -->
+        <div class="mobile-bottom-nav" id="mobileBottomNav">
+            <div class="nav-row">
+                <a href="{{ url_for('dashboard.index') }}" class="nav-item-m {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('scraper.scrape_form') }}" class="nav-item-m {% if request.endpoint == 'scraper.scrape_form' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <span>Scrape</span>
+                </a>
+                <a href="{{ url_for('scraper.history') }}" class="nav-item-m {% if request.endpoint == 'scraper.history' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>History</span>
+                </a>
+                <a href="{{ url_for('wa_templates.list_templates') }}" class="nav-item-m {% if request.endpoint and 'wa_templates' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <span>WA</span>
+                </a>
+                <button class="nav-item-m" onclick="toggleMorePanel()" id="moreBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                    <span>Lainnya</span>
+                </button>
+            </div>
+            <div class="more-panel" id="morePanel">
+                <a href="{{ url_for('analytics.index') }}" class="more-item {% if request.endpoint and 'analytics' in request.endpoint %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Data Analitik
+                </a>
+                <a href="{{ url_for('blog.home') }}" class="more-item" target="_blank">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Blog
+                </a>
+                <div style="height:1px; background:var(--border); margin:8px 0;"></div>
+                <a href="{{ url_for('auth.logout') }}" class="more-item" style="color:#f87171;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Logout
+                </a>
+            </div>
+        </div>
+        <div class="more-overlay" id="moreOverlay" onclick="closeMorePanel()"></div>
+
         <div class="main-wrap" style="flex:1; margin-left:260px; transition:margin-left .3s;" id="mainWrap">
             <div class="main-content" style="margin-left:0; padding:32px;">
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -523,6 +756,18 @@
             const btn = document.getElementById('themeBtn');
             if (btn) btn.textContent = saved === 'dark' ? '\u263D' : '\u2600';
         })();
+
+        /* ═══ Mobile More Panel ═══ */
+        function toggleMorePanel() {
+            var panel = document.getElementById('morePanel');
+            var overlay = document.getElementById('moreOverlay');
+            panel.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+        function closeMorePanel() {
+            document.getElementById('morePanel').classList.remove('open');
+            document.getElementById('moreOverlay').classList.remove('open');
+        }
     </script>
     <button id="terminal-fab" onclick="togglePersistentTerminal()">
         &#9654;

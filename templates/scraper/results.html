@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Data {{ task.keyword }} - RoroJonggrang{% endblock %}
 {% block content %}
-<div style="margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+<div class="results-header">
     <div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
             <a href="{{ url_for('scraper.history') }}" style="color:var(--text-sec); font-size:14px; display:flex; align-items:center; gap:4px;">← Kembali</a>
@@ -9,7 +9,7 @@
         <h1 style="font-size:24px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif;">{{ task.keyword }}</h1>
         <p style="color:var(--text-sec); margin-top:2px;">{{ task.location }} · {{ task.created_at.strftime('%d %b %Y %H:%M') }}</p>
     </div>
-    <div style="display:flex; gap:8px; align-items:center;">
+    <div class="results-header-actions">
         {% if task.status == 'completed' %}
         <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
         {% elif task.status == 'running' %}
@@ -34,7 +34,7 @@
     </button>
 </div>
 
-<div class="card" style="padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+<div class="card results-search-card" style="padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
     <svg style="width:18px; height:18px; color:var(--text-muted); min-width:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
     <input type="text" id="search-box" class="input" placeholder="Cari nama, telepon, alamat, kategori..." style="border:none; padding:0; font-size:14px; background:transparent;" oninput="debounceSearch()">
     <span style="font-size:12px; color:var(--text-muted); white-space:nowrap;" id="search-count"></span>
@@ -65,21 +65,22 @@
 </div>
 
 <div class="card" style="overflow:hidden;">
-    <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
+    {# Desktop table #}
+    <div class="results-table-desktop desktop-only">
+        <table>
             <thead>
                 <tr style="border-bottom:1px solid var(--border);">
                     <th style="padding:12px 12px 12px 16px; width:40px;">
                         <input type="checkbox" id="select-all" style="accent-color:#8b5cf6; width:15px; height:15px; cursor:pointer;" onchange="toggleSelectAll(this)">
                     </th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Nama</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Skor</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Telepon</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Rating</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Alamat</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Kategori</th>
-                    <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Status Lead</th>
-                    <th style="padding:12px 16px; text-align:center; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; width:210px;">Aksi</th>
+                    <th>Nama</th>
+                    <th>Skor</th>
+                    <th>Telepon</th>
+                    <th>Rating</th>
+                    <th>Alamat</th>
+                    <th>Kategori</th>
+                    <th>Status Lead</th>
+                    <th style="text-align:center; width:210px;">Aksi</th>
                 </tr>
             </thead>
             <tbody id="results-body">
@@ -90,6 +91,13 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    {# Mobile cards #}
+    <div class="results-mobile-cards" id="results-mobile-body">
+        <div style="padding:40px; text-align:center; color:var(--text-muted);">
+            <div id="loading-indicator-mobile">Memuat data...</div>
+        </div>
     </div>
     <div style="padding:12px 16px; border-top:1px solid var(--border); display:none; align-items:center; justify-content:space-between;" id="pagination-bar">
         <span style="font-size:12px; color:var(--text-muted);" id="page-info"></span>
@@ -350,6 +358,81 @@
         }
     }
 </style>
+
+<style>
+    .results-header {
+        margin-bottom:24px;
+        display:flex; align-items:center; justify-content:space-between;
+        flex-wrap:wrap; gap:16px;
+    }
+    .results-header-actions {
+        display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+    }
+    .results-search-card { transition:all .2s; }
+
+    /* Desktop table */
+    .results-table-desktop { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .results-table-desktop table { width:100%; border-collapse:collapse; }
+    .results-table-desktop th {
+        padding:12px 16px; text-align:left; font-size:11px; font-weight:600;
+        color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+        white-space:nowrap;
+    }
+    .results-table-desktop td { padding:10px 16px; white-space:nowrap; }
+
+    /* Mobile cards for results */
+    .results-mobile-cards { display:none; }
+    .result-mobile-card {
+        padding:14px 16px; border-bottom:1px solid var(--border-light);
+        transition:background .2s;
+    }
+    .result-mobile-card:active { background:var(--accent-light); }
+    .result-card-top {
+        display:flex; justify-content:space-between; align-items:flex-start;
+        gap:10px; margin-bottom:8px;
+    }
+    .result-card-name {
+        font-size:14px; font-weight:700; color:var(--text);
+        overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0;
+    }
+    .result-card-meta {
+        display:flex; flex-wrap:wrap; gap:6px 12px; font-size:12px; color:var(--text-sec);
+        margin-bottom:8px;
+    }
+    .result-card-meta span { display:inline-flex; align-items:center; gap:3px; }
+    .result-card-actions {
+        display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+    }
+
+    @media(max-width:768px) {
+        .results-header {
+            flex-direction:column !important;
+            align-items:flex-start !important;
+            gap:12px !important;
+        }
+        .results-header-actions {
+            width:100% !important;
+            justify-content:flex-start !important;
+            gap:6px !important;
+        }
+        .results-header-actions .btn-secondary,
+        .results-header-actions .btn-danger {
+            font-size:12px !important;
+            padding:8px 14px !important;
+        }
+        .results-header-actions .status-badge { font-size:11px !important; }
+        .results-header-actions #total-count { font-size:13px !important; }
+
+        .results-table-desktop { display:none !important; }
+        .results-mobile-cards { display:block !important; }
+
+        .result-card-top { gap:8px !important; }
+        .result-card-meta { font-size:11px !important; gap:4px 10px !important; }
+        .result-card-actions { gap:4px !important; }
+        .result-card-actions .action-btn { width:36px !important; height:36px !important; }
+        .result-card-actions .lead-select { width:100% !important; font-size:12px !important; }
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
@@ -391,6 +474,8 @@ function fetchBusinesses(page, search) {
         document.getElementById('total-count').textContent = data.total + ' data';
     }).catch(() => {
         document.getElementById('results-body').innerHTML = '<tr><td colspan="9" style="padding:40px; text-align:center; color:var(--text-muted);">Gagal memuat data</td></tr>';
+        var mobileBody = document.getElementById('results-mobile-body');
+        if (mobileBody) mobileBody.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Gagal memuat data</div>';
     });
 }
 
@@ -688,8 +773,10 @@ function leadStatusLabel(status) {
 
 function renderTable(biz, total, page, pages) {
     const tbody = document.getElementById('results-body');
+    const mobileBody = document.getElementById('results-mobile-body');
     if (!biz || biz.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" style="padding:40px; text-align:center; color:var(--text-muted);">Tidak ada data</td></tr>';
+        if (mobileBody) mobileBody.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);">Tidak ada data</div>';
         document.getElementById('pagination-bar').style.display = 'none';
         return;
     }
@@ -704,6 +791,7 @@ function renderTable(biz, total, page, pages) {
     biz.forEach(function(b) { loadedBusinesses[b.id] = b; });
 
     let html = '';
+    let mobileHtml = '';
     biz.forEach(function(b) {
         var waNum = normalizePhone(b.phone);
         var clicks = waClicks[b.id] || [];
@@ -716,11 +804,14 @@ function renderTable(biz, total, page, pages) {
         var score = calculateLeadScore(b);
 
         var waBtn = '';
+        var waBtnMobile = '';
         if (!waNum) {
             waBtn = '<span class="action-btn action-wa action-disabled" title="Nomor WhatsApp tidak tersedia">' + whatsappIcon() + '</span>';
+            waBtnMobile = waBtn;
         } else if (waTemplates.length === 0) {
             var defaultMsg = buildToposMessage(b, '');
             waBtn = '<a href="https://wa.me/' + waNum + '?text=' + encodeURIComponent(defaultMsg) + '" target="_blank" class="action-btn action-wa" title="WhatsApp ToposDigital" onclick="markLeadContacted(' + b.id + ',' + score + ')">' + whatsappIcon() + '</a>';
+            waBtnMobile = waBtn;
         } else if (waTemplates.length === 1) {
             var t = waTemplates[0];
             var links = t.links || [];
@@ -729,6 +820,7 @@ function renderTable(biz, total, page, pages) {
             var title = hasClicked ? 'WhatsApp (sudah dikirim)' : 'WhatsApp';
             var style = hasClicked ? 'background:rgba(139,92,246,0.15); color:#8b5cf6;' : '';
             waBtn = '<a href="' + waLink + '" target="_blank" class="action-btn action-wa" title="' + title + '" onclick="recordWaClick(' + b.id + ',' + t.id + ',' + (links.length > 0 ? links[0].id : 'null') + ',\'' + escHtml(b.phone || '') + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>';
+            waBtnMobile = waBtn;
         } else {
             var dropdownId = 'wa-drop-' + b.id;
             var clickDetail = '';
@@ -754,15 +846,19 @@ function renderTable(biz, total, page, pages) {
                     }
                 }).join('') +
                 '</div></div>';
+            waBtnMobile = waBtn;
         }
 
         var checkmark = '';
+        var checkmarkMobile = '';
         if (hasClicked) {
             var lastClick = clicks[clicks.length - 1];
             var tip = 'Terkirim via ' + (lastClick.template_name || '-') + (lastClick.link_name ? ' - ' + lastClick.link_name : '') + (lastClick.clicked_at ? ' (' + new Date(lastClick.clicked_at).toLocaleDateString('id-ID') + ')' : '');
             checkmark = '<span style="display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(139,92,246,0.15); color:#8b5cf6; font-size:11px; margin-left:4px; cursor:help;" title="' + escHtml(tip) + '">&#10003;</span>';
+            checkmarkMobile = checkmark;
         }
 
+        // Desktop row
         html += '<tr class="' + rowClass + '" style="border-bottom:1px solid var(--border-light); transition:background .2s;" onmouseover="if(!this.classList.contains(\'row-selected\'))this.style.background=\'var(--accent-light)\'" onmouseout="if(!this.classList.contains(\'row-selected\'))this.style.background=\'transparent\'">';
         html += '<td style="padding:10px 12px 10px 16px;"><input type="checkbox" class="row-check" data-id="' + b.id + '" ' + checked + ' onchange="toggleSelect(' + b.id + ', this)"></td>';
         html += '<td style="padding:10px 16px; font-size:13px; font-weight:600; color:var(--text); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.name) + '">' + escHtml(b.name) + '</td>';
@@ -781,8 +877,34 @@ function renderTable(biz, total, page, pages) {
         html += '<button class="action-btn action-copy" title="Copy follow-up" onclick="copyFollowUp(' + b.id + ')">FU</button>';
         html += '</div></td>';
         html += '</tr>';
+
+        // Mobile card
+        mobileHtml += '<div class="result-mobile-card" data-id="' + b.id + '">';
+        mobileHtml += '<div class="result-card-top">';
+        mobileHtml += '<div style="display:flex; align-items:center; gap:6px; flex:1; min-width:0;">';
+        mobileHtml += '<input type="checkbox" class="row-check" data-id="' + b.id + '" ' + checked + ' onchange="toggleSelect(' + b.id + ', this)" style="flex-shrink:0;">';
+        mobileHtml += '<div class="result-card-name" title="' + escHtml(b.name) + '">' + escHtml(b.name) + '</div>';
+        mobileHtml += '</div>';
+        mobileHtml += scoreBadge(score);
+        mobileHtml += '</div>';
+        mobileHtml += '<div class="result-card-meta">';
+        if (b.phone) mobileHtml += '<span>📞 ' + escHtml(b.phone) + checkmarkMobile + '</span>';
+        if (b.rating) mobileHtml += '<span>★ ' + b.rating + '</span>';
+        if (b.category) mobileHtml += '<span>🏷️ ' + escHtml(b.category) + '</span>';
+        mobileHtml += '</div>';
+        if (b.address) mobileHtml += '<div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + escHtml(b.address) + '">📍 ' + escHtml(b.address) + '</div>';
+        mobileHtml += '<div class="result-card-actions">';
+        mobileHtml += waBtnMobile;
+        mobileHtml += '<a href="' + (mapsLink || '#') + '" target="_blank" class="action-btn action-maps ' + (!mapsLink ? 'action-disabled' : '') + '" title="Maps"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></a>';
+        if (webLink) mobileHtml += '<a href="' + webLink + '" target="_blank" class="action-btn action-web" title="Web"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></a>';
+        mobileHtml += '<button class="action-btn action-play" onclick="openLeadPlaybook(' + b.id + ')">Play</button>';
+        mobileHtml += '<button class="action-btn action-copy" onclick="copyFollowUp(' + b.id + ')">FU</button>';
+        mobileHtml += '<select class="lead-select" onchange="updateLeadStatus(' + b.id + ', this.value, ' + score + ')">' + leadStatusOptions(b.lead_status) + '</select>';
+        mobileHtml += '</div>';
+        mobileHtml += '</div>';
     });
     tbody.innerHTML = html;
+    if (mobileBody) mobileBody.innerHTML = mobileHtml;
     updateToolbar();
 }
 

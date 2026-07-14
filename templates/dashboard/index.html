@@ -43,30 +43,32 @@
 </div>
 
 <div class="card" style="overflow:hidden;">
-    <div style="padding:24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+    <div class="card-header-row">
         <h2 style="font-size:16px; font-weight:700; color:var(--text); font-family:'Playfair Display',serif;">Task Terbaru</h2>
         <a href="{{ url_for('scraper.scrape_form') }}" class="btn-primary" style="font-size:13px; padding:8px 16px;">
             + Scrape Baru
         </a>
     </div>
-    <div style="overflow-x:auto;">
-        <table style="width:100%;">
+
+    {# Desktop table #}
+    <div class="table-container desktop-only">
+        <table class="data-table">
             <thead>
                 <tr style="border-bottom:1px solid var(--border);">
-                    <th style="padding:12px 20px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Keyword</th>
-                    <th style="padding:12px 20px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Lokasi</th>
-                    <th style="padding:12px 20px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Status</th>
-                    <th style="padding:12px 20px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Progress</th>
-                    <th style="padding:12px 20px; text-align:left; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Tanggal</th>
-                    <th style="padding:12px 20px; text-align:right; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">Aksi</th>
+                    <th>Keyword</th>
+                    <th>Lokasi</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Tanggal</th>
+                    <th style="text-align:right;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 {% for task in recent_tasks %}
-                <tr style="border-bottom:1px solid var(--border-light); transition:background .2s;" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding:14px 20px; font-size:14px; font-weight:600; color:var(--text);">{{ task.keyword }}</td>
-                    <td style="padding:14px 20px; font-size:13px; color:var(--text-sec);">{{ task.location }}</td>
-                    <td style="padding:14px 20px;">
+                <tr class="task-row" onmouseover="this.style.background='var(--accent-light)'" onmouseout="if(!this.classList.contains('row-selected'))this.style.background='transparent'">
+                    <td style="font-weight:600; color:var(--text);">{{ task.keyword }}</td>
+                    <td style="color:var(--text-sec);">{{ task.location }}</td>
+                    <td>
                         {% if task.status == 'completed' %}
                         <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
                         {% elif task.status == 'running' %}
@@ -79,7 +81,7 @@
                         <span class="status-badge" style="background:var(--border); color:var(--text-sec);">Dibatalkan</span>
                         {% endif %}
                     </td>
-                    <td style="padding:14px 20px;">
+                    <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div class="progress-bar" style="width:80px;">
                                 <div class="progress-fill" style="width:{{ task.progress_percent }}%;"></div>
@@ -87,8 +89,8 @@
                             <span style="font-size:12px; color:var(--text-muted);">{{ task.scraped_results }}/{{ task.total_results }}</span>
                         </div>
                     </td>
-                    <td style="padding:14px 20px; font-size:13px; color:var(--text-sec);">{{ task.created_at.strftime('%d %b %Y %H:%M') }}</td>
-                    <td style="padding:14px 20px; text-align:right;">
+                    <td style="font-size:13px; color:var(--text-sec);">{{ task.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                    <td style="text-align:right;">
                         {% if task.status == 'completed' %}
                         <a href="{{ url_for('scraper.download', task_id=task.id, fmt='csv') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px;">CSV</a>
                         {% endif %}
@@ -106,5 +108,81 @@
             </tbody>
         </table>
     </div>
+
+    {# Mobile cards #}
+    <div class="mobile-cards mobile-only">
+        {% for task in recent_tasks %}
+        <div class="mobile-task-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                <div style="flex:1; min-width:0;">
+                    <div style="font-size:15px; font-weight:700; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ task.keyword }}</div>
+                    <div style="font-size:12px; color:var(--text-sec); margin-top:2px; display:flex; align-items:center; gap:4px;">
+                        <svg style="width:12px; height:12px; flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ task.location }}
+                    </div>
+                </div>
+                {% if task.status == 'completed' %}
+                <span class="status-badge" style="background:rgba(6,182,148,0.12); color:#06b694;">Selesai</span>
+                {% elif task.status == 'running' %}
+                <span class="status-badge" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">Berjalan</span>
+                {% elif task.status == 'pending' %}
+                <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Menunggu</span>
+                {% elif task.status == 'failed' %}
+                <span class="status-badge" style="background:rgba(248,113,113,0.1); color:#f87171;">Gagal</span>
+                {% else %}
+                <span class="status-badge" style="background:var(--border); color:var(--text-sec);">Dibatalkan</span>
+                {% endif %}
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+                    <div class="progress-bar" style="flex:1;">
+                        <div class="progress-fill" style="width:{{ task.progress_percent }}%;"></div>
+                    </div>
+                    <span style="font-size:11px; color:var(--text-muted); white-space:nowrap;">{{ task.scraped_results }}/{{ task.total_results }}</span>
+                </div>
+                <span style="font-size:11px; color:var(--text-muted); white-space:nowrap;">{{ task.created_at.strftime('%d %b %Y') }}</span>
+                {% if task.status == 'completed' %}
+                <a href="{{ url_for('scraper.download', task_id=task.id, fmt='csv') }}" class="btn-secondary" style="font-size:12px; padding:6px 12px; white-space:nowrap;">CSV</a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div style="padding:48px 20px; text-align:center;">
+            <svg style="width:48px; height:48px; margin:0 auto 16px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <p style="color:var(--text-sec); font-size:14px;">Belum ada task scraping</p>
+            <a href="{{ url_for('scraper.scrape_form') }}" style="color:var(--accent); font-weight:600; font-size:13px; margin-top:8px; display:inline-block;">Mulai scraping sekarang &rarr;</a>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
+<style>
+    .card-header-row {
+        padding:24px; border-bottom:1px solid var(--border);
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    .table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .data-table { width:100%; border-collapse:collapse; }
+    .data-table th {
+        padding:12px 20px; text-align:left; font-size:12px; font-weight:600;
+        color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;
+        white-space:nowrap;
+    }
+    .data-table td {
+        padding:14px 20px; font-size:13px; white-space:nowrap;
+    }
+    .task-row { border-bottom:1px solid var(--border-light); transition:background .2s; }
+    .mobile-cards { display:none; }
+    .mobile-task-card {
+        padding:16px;
+        border-bottom:1px solid var(--border-light);
+        transition:background .2s;
+    }
+    .mobile-task-card:active { background:var(--accent-light); }
+    @media(max-width:768px) {
+        .desktop-only { display:none !important; }
+        .mobile-cards { display:block !important; }
+        .card-header-row { padding:16px !important; }
+    }
+</style>
 {% endblock %}
