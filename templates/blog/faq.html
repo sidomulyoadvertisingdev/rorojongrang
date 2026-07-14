@@ -17,7 +17,7 @@
 
             <!-- FAQ 1 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apakah RoroJonggrang aman digunakan?{% else %}Is RoroJonggrang safe to use?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -32,7 +32,7 @@
 
             <!-- FAQ 2 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Berapa banyak data yang bisa di-scrape?{% else %}How much data can be scraped?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -47,7 +47,7 @@
 
             <!-- FAQ 3 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apa saja data yang diambil dari Google Maps?{% else %}What data is taken from Google Maps?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -62,7 +62,7 @@
 
             <!-- FAQ 4 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apakah saya perlu install software tambahan?{% else %}Do I need to install additional software?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -77,7 +77,7 @@
 
             <!-- FAQ 5 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apakah data yang di-scrape bisa di-export ke Excel?{% else %}Can scraped data be exported to Excel?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -92,7 +92,7 @@
 
             <!-- FAQ 6 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Lokasi mana saja yang didukung?{% else %}Which locations are supported?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -107,7 +107,7 @@
 
             <!-- FAQ 7 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Berapa lama waktu yang dibutuhkan untuk scraping?{% else %}How long does scraping take?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -122,7 +122,7 @@
 
             <!-- FAQ 8 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apakah ada batasan penggunaan?{% else %}Are there usage limits?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -137,7 +137,7 @@
 
             <!-- FAQ 9 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Bagaimana cara mengatasi error saat scraping?{% else %}How to troubleshoot scraping errors?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -152,7 +152,7 @@
 
             <!-- FAQ 10 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apa itu Template WhatsApp?{% else %}What are WhatsApp Templates?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -167,7 +167,7 @@
 
             <!-- FAQ 11 -->
             <div class="faq-item fade-in">
-                <button class="faq-question" onclick="toggleFaq(this)">
+                <button class="faq-question">
                     <span>{% if lang == 'id' %}Apakah RoroJonggrang tersedia dalam bahasa Inggris?{% else %}Is RoroJonggrang available in English?{% endif %}</span>
                     <span class="arrow">▼</span>
                 </button>
@@ -275,30 +275,24 @@
 
 {% block scripts %}
 <script>
-function toggleFaq(btn) {
-    const item = btn.parentElement;
-    const wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
-}
 document.querySelectorAll('.faq-item').forEach(item => {
+    let timer;
     item.addEventListener('mouseenter', () => {
-        document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+        clearTimeout(timer);
         item.classList.add('open');
     });
     item.addEventListener('mouseleave', () => {
-        item.classList.remove('open');
+        timer = setTimeout(() => {
+            item.classList.remove('open');
+        }, 150);
     });
 });
 function openFeedbackModal() {
-    const modal = document.getElementById('feedbackModal');
-    modal.style.display = 'flex';
-    setTimeout(() => { modal.style.opacity = '1'; }, 10);
+    document.getElementById('feedbackModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 function closeFeedbackModal() {
-    const modal = document.getElementById('feedbackModal');
-    modal.style.display = 'none';
+    document.getElementById('feedbackModal').style.display = 'none';
     document.body.style.overflow = '';
 }
 document.getElementById('feedbackModal').addEventListener('click', function(e) {
