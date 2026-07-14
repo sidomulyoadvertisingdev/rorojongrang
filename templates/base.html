@@ -252,9 +252,55 @@
             width:36px; height:36px; min-width:36px; border-radius:10px;
             background:linear-gradient(135deg,var(--grad-start),var(--grad-mid));
             display:flex; align-items:center; justify-content:center;
-            color:#fff; font-weight:700; font-size:14px;
+            color:#111; font-weight:700; font-size:14px;
             box-shadow:0 0 12px rgba(245,158,11,0.2);
         }
+
+        /* ═══ Top Header ═══ */
+        .top-header {
+            display:flex; align-items:center; gap:12px;
+            padding:12px 32px;
+            border-bottom:1px solid var(--border);
+            background:var(--bg-sidebar);
+            position:sticky; top:0; z-index:20;
+        }
+        .top-user-dropdown { position:relative; }
+        .top-user-btn {
+            display:flex; align-items:center; gap:10px;
+            padding:6px 12px 6px 6px;
+            border-radius:12px; border:1px solid var(--border);
+            background:var(--bg-card); cursor:pointer;
+            transition:all .2s; color:var(--text);
+        }
+        .top-user-btn:hover { border-color:var(--accent); }
+        .top-user-info {
+            text-align:right;
+        }
+        .top-user-info p:first-child {
+            font-size:13px; font-weight:600; color:var(--text);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            max-width:160px;
+        }
+        .top-user-info p:last-child {
+            font-size:11px; color:var(--text-muted);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+            max-width:160px;
+        }
+        .top-user-menu {
+            display:none; position:absolute; top:calc(100% + 8px); right:0;
+            min-width:200px; background:var(--bg-card); border:1px solid var(--border);
+            border-radius:12px; padding:6px; z-index:100;
+            box-shadow:0 20px 50px rgba(0,0,0,0.5);
+        }
+        .top-user-dropdown.open .top-user-menu { display:block; }
+        .dropdown-item {
+            display:flex; align-items:center; gap:10px;
+            padding:10px 12px; border-radius:8px;
+            font-size:13px; font-weight:500; color:var(--text);
+            transition:background .15s; cursor:pointer; text-decoration:none;
+        }
+        .dropdown-item:hover { background:var(--accent-light); }
+        .dropdown-divider { height:1px; background:var(--border); margin:4px 0; }
 
         /* ═══ Flash Messages ═══ */
         .flash-msg { padding:12px 16px; border-radius:10px; font-size:14px; font-weight:500; margin-bottom:16px; animation:fadeIn .3s ease; }
@@ -422,6 +468,7 @@
             /* --- Base Layout --- */
             .mobile-bottom-nav { display:block !important; }
             .sidebar { display:none !important; }
+            .top-header { display:none !important; }
             .mobile-hamburger { display:none !important; }
             .collapse-toggle { display:none !important; }
             .main-content { padding:16px 12px 90px !important; }
@@ -597,30 +644,6 @@
                     <span class="menu-label">Blog</span>
                 </a>
             </nav>
-            <div style="padding:8px 16px; display:flex; gap:8px; border-top:1px solid var(--border);">
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">&#9789;</button>
-                <div style="flex:1;"></div>
-            </div>
-            <div class="user-section">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
-                    <div class="user-info" style="flex:1; min-width:0;">
-                        <p style="font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ current_user.full_name or current_user.username }}</p>
-                        <p style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ current_user.email }}</p>
-                    </div>
-                    <div style="display:flex; gap:4px;">
-                        <a href="{{ url_for('auth.edit_profile') }}" style="color:var(--text-muted); transition:color .2s; padding:4px; border-radius:6px; display:flex; align-items:center;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'" title="Edit Profil">
-                            <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </a>
-                        <a href="{{ url_for('auth.change_password') }}" style="color:var(--text-muted); transition:color .2s; padding:4px; border-radius:6px; display:flex; align-items:center;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'" title="Ubah Password">
-                            <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                        </a>
-                        <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted); transition:color .2s; padding:4px; border-radius:6px; display:flex; align-items:center;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-muted)'" title="Logout">
-                            <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
         </aside>
 
         <!-- Mobile Bottom Navigation -->
@@ -688,6 +711,35 @@
         <div class="more-overlay" id="moreOverlay" onclick="closeMorePanel()"></div>
 
         <div class="main-wrap" style="flex:1; margin-left:260px; transition:margin-left .3s;" id="mainWrap">
+            <header class="top-header">
+                <div style="flex:1;"></div>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">&#9789;</button>
+                <div class="top-user-dropdown" id="topUserDropdown">
+                    <button class="top-user-btn" onclick="document.getElementById('topUserDropdown').classList.toggle('open')">
+                        <div class="user-avatar">{{ current_user.username[0]|upper }}</div>
+                        <div class="top-user-info">
+                            <p>{{ current_user.full_name or current_user.username }}</p>
+                            <p>{{ current_user.email }}</p>
+                        </div>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="top-user-menu">
+                        <a href="{{ url_for('auth.edit_profile') }}" class="dropdown-item">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Edit Profil
+                        </a>
+                        <a href="{{ url_for('auth.change_password') }}" class="dropdown-item">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Ubah Password
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('auth.logout') }}" class="dropdown-item" style="color:#f87171;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                            Keluar
+                        </a>
+                    </div>
+                </div>
+            </header>
             <div class="main-content" style="margin-left:0; padding:32px;">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -801,6 +853,10 @@
             const btn = document.getElementById('themeBtn');
             if (btn) btn.textContent = saved === 'dark' ? '\u263D' : '\u2600';
         })();
+        document.addEventListener('click', function(e) {
+            var dd = document.getElementById('topUserDropdown');
+            if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+        });
 
         /* ═══ Mobile More Panel ═══ */
         function toggleMorePanel() {
