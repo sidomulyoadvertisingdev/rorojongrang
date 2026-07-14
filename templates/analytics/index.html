@@ -14,7 +14,7 @@
 
 {% if not uploads %}
 <div class="card" style="padding:60px 28px; text-align:center;">
-    <div style="font-size:48px; margin-bottom:16px;">📊</div>
+    <div style="margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
     <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Belum ada data</h3>
     <p style="color:var(--text-sec); margin-bottom:24px;">Upload file CSV atau Excel untuk mulai menganalisis data bisnis Anda</p>
     <a href="{{ url_for('analytics.upload') }}" class="btn-primary" style="display:inline-flex; align-items:center; gap:6px;">
@@ -28,8 +28,8 @@
     <div class="card" style="padding:24px;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
             <div style="display:flex; align-items:center; gap:10px;">
-                <span style="width:40px; height:40px; border-radius:10px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center; font-size:18px;">
-                    {% if u.data_type == 'product' %}📦{% elif u.data_type == 'sales' %}💰{% elif u.data_type == 'customer' %}👥{% else %}📈{% endif %}
+                <span style="width:40px; height:40px; border-radius:10px; background:var(--accent-light); display:inline-flex; align-items:center; justify-content:center;">
+                    {% if u.data_type == 'product' %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>{% elif u.data_type == 'sales' %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>{% elif u.data_type == 'customer' %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>{% else %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>{% endif %}
                 </span>
                 <div>
                     <div style="font-size:14px; font-weight:700; color:var(--text);">{{ data_types[u.data_type].label }}</div>
