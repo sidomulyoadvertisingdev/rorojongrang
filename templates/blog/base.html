@@ -231,6 +231,12 @@
             pointer-events: none;
             animation: fogDrift1 20s ease-in-out infinite alternate;
         }
+        .hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(14,13,19,0.7);
+            pointer-events: none;
+        }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 6px 16px 6px 8px;
@@ -265,6 +271,7 @@
             margin: 0 auto 36px;
         }
         .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .hero .container { position: relative; z-index: 1; }
         .btn-primary {
             padding: 14px 32px;
             border-radius: 12px;
@@ -411,8 +418,20 @@
         .page-header {
             padding: 140px 0 60px;
             text-align: center;
-            position: relative; z-index: 1;
+            background-image: url('{{ url_for("static", filename="img/hero-bg.png") }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
         }
+        .page-header::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: rgba(14,13,19,0.7);
+            pointer-events: none;
+        }
+        .page-header .container { position: relative; z-index: 1; }
         .page-header h1 {
             font-size: clamp(32px, 5vw, 52px);
             font-weight: 800;
