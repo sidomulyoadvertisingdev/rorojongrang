@@ -1,0 +1,507 @@
+{% extends "blog/base.html" %}
+{% block title %}Roadmap Project - RoroJonggrang{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div class="hero-badge fade-in">
+        <span class="dot"></span>
+        {% if lang == 'id' %}Sedang Dikembangkan{% else %}In Development{% endif %}
+    </div>
+    <h1 class="fade-in fade-in-delay-1">Roadmap Project</h1>
+    <p class="fade-in fade-in-delay-2">
+        {% if lang == 'id' %}
+        Rencana pengembangan fitur RoroJonggrang sepanjang tahun 2026. Setiap kuartal membawa kemampuan baru untuk membantu bisnis Anda berkembang.
+        {% else %}
+        RoroJonggrang development roadmap for 2026. Each quarter brings new capabilities to help your business grow.
+        {% endif %}
+    </p>
+</div>
+
+<section class="section" style="padding-top:0;">
+    <div class="container">
+        {# ═══ Timeline ═══ #}
+        <div class="roadmap-timeline">
+
+            {# ═══ Q1 ═══ #}
+            <div class="roadmap-item fade-in">
+                <div class="roadmap-line">
+                    <div class="roadmap-dot active"></div>
+                </div>
+                <div class="roadmap-card">
+                    <div class="roadmap-card-header">
+                        <div class="roadmap-quarter">
+                            <span class="quarter-label">Q1</span>
+                            <span class="quarter-months">Jan - Mar 2026</span>
+                        </div>
+                        <span class="roadmap-status status-active">
+                            <span class="status-dot"></span>
+                            {% if lang == 'id' %}Aktif{% else %}Active{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="roadmap-title">
+                        {% if lang == 'id' %}Scraping Data Google Maps{% else %}Google Maps Data Scraping{% endif %}
+                    </h3>
+                    <p class="roadmap-desc">
+                        {% if lang == 'id' %}
+                        Mengumpulkan data bisnis lokal dari Google Maps secara otomatis. Termasuk nama bisnis, alamat, nomor telepon, rating, ulasan, kategori, dan koordinat geografis untuk analisis pasar yang lebih dalam.
+                        {% else %}
+                        Automatically collecting local business data from Google Maps. Includes business name, address, phone number, rating, reviews, categories, and geographic coordinates for deeper market analysis.
+                        {% endif %}
+                    </p>
+                    <div class="roadmap-features">
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Keyword & Lokasi{% else %}Keyword & Location{% endif %}
+                        </div>
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Rating & Ulasan{% else %}Rating & Reviews{% endif %}
+                        </div>
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Nomor Telepon & Website{% else %}Phone & Website{% endif %}
+                        </div>
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Export CSV & JSON{% else %}CSV & JSON Export{% endif %}
+                        </div>
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Lead Scoring Otomatis{% else %}Automatic Lead Scoring{% endif %}
+                        </div>
+                        <div class="feature-tag done">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                            {% if lang == 'id' %}Real-time Progress SSE{% else %}Real-time SSE Progress{% endif %}
+                        </div>
+                    </div>
+                    <div class="roadmap-progress">
+                        <div class="progress-text">
+                            <span>{% if lang == 'id' %}Progres{% else %}Progress{% endif %}</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ═══ Q2 ═══ #}
+            <div class="roadmap-item fade-in fade-in-delay-1">
+                <div class="roadmap-line">
+                    <div class="roadmap-dot next"></div>
+                </div>
+                <div class="roadmap-card">
+                    <div class="roadmap-card-header">
+                        <div class="roadmap-quarter">
+                            <span class="quarter-label">Q2</span>
+                            <span class="quarter-months">Apr - Jun 2026</span>
+                        </div>
+                        <span class="roadmap-status status-next">
+                            <span class="status-dot"></span>
+                            {% if lang == 'id' %}Selanjutnya{% else %}Next{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="roadmap-title">
+                        {% if lang == 'id' %}Scraping Data Produk ke Marketplace{% else %}Product Data Scraping to Marketplace{% endif %}
+                    </h3>
+                    <p class="roadmap-desc">
+                        {% if lang == 'id' %}
+                        Mengambil data produk dari berbagai marketplace dan mengintegrasikannya ke dalam sistem. Memudahkan analisis kompetitor, perbandingan harga, dan pemantauan tren produk secara otomatis.
+                        {% else %}
+                        Fetching product data from various marketplaces and integrating it into the system. Enabling competitor analysis, price comparison, and automatic product trend monitoring.
+                        {% endif %}
+                    </p>
+                    <div class="roadmap-features">
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Scrape Shopee & Tokopedia{% else %}Shopee & Tokopedia Scraping{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Perbandingan Harga Otomatis{% else %}Automatic Price Comparison{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Analisis Kompetitor{% else %}Competitor Analysis{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Tren Produk & Kategori{% else %}Product & Category Trends{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Dashboard Perbandingan{% else %}Comparison Dashboard{% endif %}
+                        </div>
+                    </div>
+                    <div class="roadmap-progress">
+                        <div class="progress-text">
+                            <span>{% if lang == 'id' %}Progres{% else %}Progress{% endif %}</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ═══ Q3 ═══ #}
+            <div class="roadmap-item fade-in fade-in-delay-2">
+                <div class="roadmap-line">
+                    <div class="roadmap-dot planned"></div>
+                </div>
+                <div class="roadmap-card">
+                    <div class="roadmap-card-header">
+                        <div class="roadmap-quarter">
+                            <span class="quarter-label">Q3</span>
+                            <span class="quarter-months">Jul - Sep 2026</span>
+                        </div>
+                        <span class="roadmap-status status-planned">
+                            <span class="status-dot"></span>
+                            {% if lang == 'id' %}Direncanakan{% else %}Planned{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="roadmap-title">
+                        {% if lang == 'id' %}Integrasi AI{% else %}AI Integration{% endif %}
+                    </h3>
+                    <p class="roadmap-desc">
+                        {% if lang == 'id' %}
+                        Mengintegrasikan kecerdasan buatan untuk analisis data yang lebih cerdas. AI akan membantu memahami pola pelanggan, memprediksi tren, menghasilkan rekomendasi otomatis, dan mengotomasi pengambilan keputusan bisnis.
+                        {% else %}
+                        Integrating artificial intelligence for smarter data analysis. AI will help understand customer patterns, predict trends, generate automatic recommendations, and automate business decision-making.
+                        {% endif %}
+                    </p>
+                    <div class="roadmap-features">
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Analisis Sentimen Ulasan{% else %}Review Sentiment Analysis{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Prediksi Tren Pasar{% else %}Market Trend Prediction{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Rekomendasi Target Pasar{% else %}Market Target Recommendations{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Smart Lead Scoring AI{% else %}AI Smart Lead Scoring{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Auto-Generated Reports{% else %}Auto-Generated Reports{% endif %}
+                        </div>
+                    </div>
+                    <div class="roadmap-progress">
+                        <div class="progress-text">
+                            <span>{% if lang == 'id' %}Progres{% else %}Progress{% endif %}</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ═══ Q4 ═══ #}
+            <div class="roadmap-item fade-in fade-in-delay-3">
+                <div class="roadmap-line">
+                    <div class="roadmap-dot planned"></div>
+                </div>
+                <div class="roadmap-card">
+                    <div class="roadmap-card-header">
+                        <div class="roadmap-quarter">
+                            <span class="quarter-label">Q4</span>
+                            <span class="quarter-months">Okt - Des 2026</span>
+                        </div>
+                        <span class="roadmap-status status-planned">
+                            <span class="status-dot"></span>
+                            {% if lang == 'id' %}Direncanakan{% else %}Planned{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="roadmap-title">
+                        {% if lang == 'id' %}API WhatsApp{% else %}WhatsApp API{% endif %}
+                    </h3>
+                    <p class="roadmap-desc">
+                        {% if lang == 'id' %}
+                        Menghubungkan langsung dengan WhatsApp Business API untuk pengiriman pesan otomatis, follow-up terjadwal, dan manajemen percakapan pelanggan dalam skala besar. Semua prospek bisa dihubungi tanpa perlu copy-paste manual.
+                        {% else %}
+                        Direct integration with WhatsApp Business API for automatic message sending, scheduled follow-ups, and large-scale customer conversation management. All prospects can be contacted without manual copy-paste.
+                        {% endif %}
+                    </p>
+                    <div class="roadmap-features">
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Kirim Pesan Massal{% else %}Bulk Message Sending{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Follow-up Terjadwal{% else %}Scheduled Follow-ups{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Template Pesan Dinamis{% else %}Dynamic Message Templates{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Tracking Pengiriman{% else %}Delivery Tracking{% endif %}
+                        </div>
+                        <div class="feature-tag planned">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            {% if lang == 'id' %}Dashboard Percakapan{% else %}Conversation Dashboard{% endif %}
+                        </div>
+                    </div>
+                    <div class="roadmap-progress">
+                        <div class="progress-text">
+                            <span>{% if lang == 'id' %}Progres{% else %}Progress{% endif %}</span>
+                            <span>0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {# ═══ CTA ═══ #}
+        <div class="cta-box" style="margin-top:80px;">
+            <h2>
+                {% if lang == 'id' %}Punya Saran Fitur?{% else %}Have Feature Suggestions?{% endif %}
+            </h2>
+            <p>
+                {% if lang == 'id' %}
+                Kami selalu mendengar masukan dari pengguna. Jangan ragu untuk menghubungi kami.
+                {% else %}
+                We always listen to user feedback. Don't hesitate to reach out to us.
+                {% endif %}
+            </p>
+            <a href="{{ url_for('blog.about', lang=lang) }}" class="btn-white">
+                {% if lang == 'id' %}Hubungi Kami{% else %}Contact Us{% endif %}
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    .roadmap-timeline {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .roadmap-item {
+        display: flex;
+        gap: 32px;
+        margin-bottom: 0;
+        position: relative;
+    }
+    .roadmap-line {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+        width: 24px;
+        position: relative;
+    }
+    .roadmap-line::after {
+        content: '';
+        position: absolute;
+        top: 24px;
+        bottom: 0;
+        width: 2px;
+        background: var(--border);
+    }
+    .roadmap-item:last-child .roadmap-line::after { display: none; }
+    .roadmap-dot {
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        border: 3px solid var(--border);
+        background: var(--bg);
+        z-index: 1;
+        flex-shrink: 0;
+        transition: all 0.3s;
+    }
+    .roadmap-dot.active {
+        border-color: var(--accent-secondary);
+        background: var(--accent-secondary);
+        box-shadow: 0 0 20px rgba(6,182,148,0.4);
+    }
+    .roadmap-dot.active::after {
+        content: '';
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #fff;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .roadmap-dot.next {
+        border-color: var(--accent);
+        background: var(--accent);
+        box-shadow: 0 0 16px rgba(139,92,246,0.35);
+    }
+    .roadmap-dot.planned {
+        border-color: var(--text-muted);
+        background: transparent;
+    }
+    .roadmap-card {
+        flex: 1;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 32px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .roadmap-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .roadmap-item:nth-child(1) .roadmap-card::before {
+        background: linear-gradient(90deg, #06b694, #14b8a6);
+    }
+    .roadmap-item:nth-child(2) .roadmap-card::before {
+        background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    }
+    .roadmap-item:nth-child(3) .roadmap-card::before {
+        background: linear-gradient(90deg, #6366f1, #818cf8);
+    }
+    .roadmap-item:nth-child(4) .roadmap-card::before {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    .roadmap-card:hover {
+        border-color: rgba(139,92,246,0.2);
+        box-shadow: var(--card-shadow-hover);
+        transform: translateY(-2px);
+    }
+    .roadmap-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .roadmap-quarter {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .quarter-label {
+        padding: 4px 12px;
+        border-radius: 8px;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+    .quarter-months {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+    .roadmap-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .status-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+    }
+    .status-active {
+        background: rgba(6,182,148,0.1);
+        color: #06b694;
+    }
+    .status-active .status-dot { background: #06b694; animation: pulse 2s infinite; }
+    .status-next {
+        background: rgba(139,92,246,0.1);
+        color: #8b5cf6;
+    }
+    .status-next .status-dot { background: #8b5cf6; }
+    .status-planned {
+        background: rgba(107,100,128,0.1);
+        color: var(--text-muted);
+    }
+    .status-planned .status-dot { background: var(--text-muted); }
+    .roadmap-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 12px;
+        font-family: 'Playfair Display', serif;
+    }
+    .roadmap-desc {
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+    .roadmap-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .feature-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .feature-tag.done {
+        background: rgba(6,182,148,0.08);
+        color: #06b694;
+        border: 1px solid rgba(6,182,148,0.15);
+    }
+    .feature-tag.planned {
+        background: rgba(107,100,128,0.06);
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+    }
+    .roadmap-progress {
+        margin-top: 8px;
+    }
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+    }
+    .progress-track {
+        height: 6px;
+        background: var(--border);
+        border-radius: 100px;
+        overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%;
+        border-radius: 100px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        transition: width 0.8s ease;
+    }
+
+    @media (max-width: 768px) {
+        .roadmap-item { gap: 16px; }
+        .roadmap-card { padding: 20px; }
+        .roadmap-title { font-size: 18px; }
+        .roadmap-card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .feature-tag { font-size: 12px; padding: 5px 10px; }
+    }
+</style>
+{% endblock %}

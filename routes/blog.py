@@ -7,6 +7,7 @@ TRANSLATIONS = {
         'nav_home': 'Beranda',
         'nav_features': 'Fitur',
         'nav_guide': 'Panduan',
+        'nav_roadmap': 'Roadmap',
         'nav_about': 'Tentang',
         'nav_faq': 'FAQ',
         'lang_toggle': 'EN',
@@ -16,6 +17,7 @@ TRANSLATIONS = {
         'nav_home': 'Home',
         'nav_features': 'Features',
         'nav_guide': 'Guide',
+        'nav_roadmap': 'Roadmap',
         'nav_about': 'About',
         'nav_faq': 'FAQ',
         'lang_toggle': 'ID',
@@ -68,3 +70,10 @@ def faq():
     lang = get_lang()
     t = get_t()
     return render_template('blog/faq.html', lang=lang, t=t)
+
+
+@blog_bp.route('/roadmap')
+def roadmap():
+    lang = get_lang()
+    t = get_t()
+    return render_template('blog/roadmap.html', lang=lang, t=t)

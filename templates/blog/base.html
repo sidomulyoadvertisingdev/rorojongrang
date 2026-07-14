@@ -535,6 +535,7 @@
                 <a href="{{ url_for('blog.home', lang=lang) }}" class="{% if request.endpoint == 'blog.home' %}active{% endif %}">{{ t.nav_home }}</a>
                 <a href="{{ url_for('blog.features', lang=lang) }}" class="{% if request.endpoint == 'blog.features' %}active{% endif %}">{{ t.nav_features }}</a>
                 <a href="{{ url_for('blog.guide', lang=lang) }}" class="{% if request.endpoint == 'blog.guide' %}active{% endif %}">{{ t.nav_guide }}</a>
+                <a href="{{ url_for('blog.roadmap', lang=lang) }}" class="{% if request.endpoint == 'blog.roadmap' %}active{% endif %}">{{ t.nav_roadmap }}</a>
                 <a href="{{ url_for('blog.about', lang=lang) }}" class="{% if request.endpoint == 'blog.about' %}active{% endif %}">{{ t.nav_about }}</a>
                 <a href="{{ url_for('blog.faq', lang=lang) }}" class="{% if request.endpoint == 'blog.faq' %}active{% endif %}">{{ t.nav_faq }}</a>
             </div>
@@ -555,6 +556,7 @@
             <div class="footer-links">
                 <a href="{{ url_for('blog.features', lang=lang) }}">{{ t.nav_features }}</a>
                 <a href="{{ url_for('blog.guide', lang=lang) }}">{{ t.nav_guide }}</a>
+                <a href="{{ url_for('blog.roadmap', lang=lang) }}">{{ t.nav_roadmap }}</a>
                 <a href="{{ url_for('blog.about', lang=lang) }}">{{ t.nav_about }}</a>
                 <a href="{{ url_for('blog.faq', lang=lang) }}">{{ t.nav_faq }}</a>
             </div>
