@@ -1,5 +1,6 @@
 from datetime import datetime
 from models import db
+from models.board_column import BoardColumn
 
 
 class TeamBoard(db.Model):

@@ -64,9 +64,7 @@
                     <select name="assigned_to" class="input" style="padding:10px 12px;">
                         <option value="">-- Pilih User --</option>
                         {% for u in users %}
-                        {% if not u.is_admin or u.id == current_user.id %}
                         <option value="{{ u.id }}">{{ u.full_name or u.username }}</option>
-                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>

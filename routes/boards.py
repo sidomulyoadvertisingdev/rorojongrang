@@ -192,7 +192,7 @@ def task_detail(board_id, task_id):
     columns = BoardColumn.query.filter_by(board_id=board.id).order_by(BoardColumn.position).all()
     activities = TaskActivity.query.filter_by(task_id=task.id).order_by(TaskActivity.created_at.desc()).all()
     users = User.query.filter_by(is_active=True).all()
-    return render_template("boards/task_detail.html", board=board, task=task, columns=columns, activities=activities, users=users)
+    return render_template("boards/task_detail.html", board=board, task=task, columns=columns, activities=activities, users=users, now=datetime.utcnow())
 
 
 @boards_bp.route("/api/boards/<int:board_id>/task/move", methods=["POST"])
