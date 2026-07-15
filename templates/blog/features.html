@@ -590,6 +590,146 @@
                 </div>
             </div>
         </div>
+
+        <!-- Google Drive Integration -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Integrasi Google Drive{% else %}Google Drive Integration{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Hubungkan Google Drive Anda dan upload file langsung dari aplikasi. File tersimpan aman di Drive pribadi Anda dan otomatis di-share ke tim dengan link "anyone can view".
+                    {% else %}Connect your Google Drive and upload files directly from the app. Files are securely stored in your personal Drive and automatically shared with the team via "anyone can view" links.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Upload file ke Google Drive dari task atau campaign{% else %}Upload files to Google Drive from tasks or campaigns{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Auto-share "anyone with link can view"{% else %}Auto-share "anyone with link can view"{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Maks 25MB per file, support semua format{% else %}Max 25MB per file, all formats supported{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Folder otomatis per board / campaign{% else %}Auto folder per board / campaign{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Google Drive Integration</div>
+                <div style="padding: 12px; border-radius: 6px; background: rgba(66,133,244,0.1); border: 1px solid rgba(66,133,244,0.2); margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(66,133,244,0.2); display: flex; align-items: center; justify-content: center;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size: 10px; font-weight: 700; color: #22c55e;">Terhubung</div>
+                            <div style="font-size: 8px; color: #8b949e;">user@gmail.com</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                    <div style="font-size: 9px; color: #8b949e; margin-bottom: 6px;">File & Lampiran</div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.03);">
+                        <div style="width: 20px; height: 20px; border-radius: 4px; background: rgba(245,158,11,0.15); display: flex; align-items: center; justify-content: center; color: #f59e0b; font-size: 8px;">PDF</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 9px; font-weight: 600; color: #c9d1d9;">desain-promo.pdf</div>
+                            <div style="font-size: 7px; color: #8b949e;">2.4 MB</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.03); margin-top: 4px;">
+                        <div style="width: 20px; height: 20px; border-radius: 4px; background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; color: #22c55e; font-size: 8px;">IMG</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 9px; font-weight: 600; color: #c9d1d9;">banner-ig.jpg</div>
+                            <div style="font-size: 7px; color: #8b949e;">1.1 MB</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; padding: 6px 10px; border-radius: 6px; background: rgba(66,133,244,0.08); border: 1px solid rgba(66,133,244,0.2); font-size: 9px; color: #4285f4;">
+                    Anyone with link can view ✓
+                </div>
+            </div>
+        </div>
+
+        <!-- Collaborative File Sharing -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}File Sharing Kolaboratif{% else %}Collaborative File Sharing{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Lampirkan file saat kirim comment, upload di task detail, atau attach desain di campaign. Semua file terpusat dan bisa diakses seluruh tim tanpa perlu request akses.
+                    {% else %}Attach files when sending comments, upload in task detail, or attach designs to campaigns. All files are centralized and accessible to the entire team without needing to request access.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Upload file di task Kanban{% else %}Upload files in Kanban tasks{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Attach file saat kirim comment{% else %}Attach files when sending comments{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Board-level Files view (semua file di satu board){% else %}Board-level Files view (all files in one board){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Upload file desain di campaign{% else %}Upload design files in campaigns{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Filter by tipe: Gambar, PDF, Spreadsheet{% else %}Filter by type: Images, PDFs, Spreadsheets{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Board Files View</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                    <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                        <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(245,158,11,0.15); display: flex; align-items: center; justify-content: center; color: #f59e0b; margin-bottom: 6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                        </div>
+                        <div style="font-size: 9px; font-weight: 600; color: #c9d1d9;">banner-promo.jpg</div>
+                        <div style="font-size: 7px; color: #8b949e;">1.2 MB</div>
+                    </div>
+                    <div style="padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid #30363d;">
+                        <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(239,68,68,0.15); display: flex; align-items: center; justify-content: center; color: #ef4444; margin-bottom: 6px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div style="font-size: 9px; font-weight: 600; color: #c9d1d9;">proposal.pdf</div>
+                        <div style="font-size: 7px; color: #8b949e;">3.8 MB</div>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid #30363d;">
+                    <div style="font-size: 9px; color: #8b949e; margin-bottom: 4px;">Filter:</div>
+                    <div style="display: flex; gap: 4px;">
+                        <span style="padding: 2px 8px; border-radius: 4px; background: rgba(245,158,11,0.15); color: #f59e0b; font-size: 8px; font-weight: 600;">Semua (5)</span>
+                        <span style="padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: #8b949e; font-size: 8px;">Gambar</span>
+                        <span style="padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: #8b949e; font-size: 8px;">PDF</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Light & Dark Mode -->
+        <div class="feature-row fade-in">
+            <div>
+                <div class="card-icon" style="margin-bottom: 16px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></div>
+                <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 16px;">
+                    {% if lang == 'id' %}Mode Terang & Gelap{% else %}Light & Dark Mode{% endif %}
+                </h2>
+                <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8;">
+                    {% if lang == 'id' %}
+                    Default tampilan terang untuk kenyamanan mata di siang hari. Beralih ke mode gelap dengan satu klik untuk kenyamanan di malam hari. Preference tersimpan di browser Anda.
+                    {% else %}Default light display for eye comfort during daytime. Switch to dark mode with one click for nighttime comfort. Preference is saved in your browser.{% endif %}
+                </p>
+                <ul style="margin-top: 16px; color: var(--text-secondary); font-size: 15px; line-height: 2;">
+                    <li>✓ {% if lang == 'id' %}Default mode terang (putih){% else %}Default light mode (white){% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Toggle satu klik untuk mode gelap{% else %}One-click toggle for dark mode{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Preference tersimpan di localStorage{% else %}Preference saved in localStorage{% endif %}</li>
+                    <li>✓ {% if lang == 'id' %}Transisi warna yang smooth{% else %}Smooth color transitions{% endif %}</li>
+                </ul>
+            </div>
+            <div class="feature-visual">
+                <div style="color: #8b949e; margin-bottom: 8px;">// Theme Toggle</div>
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1; padding: 12px; border-radius: 8px; background: #f8f7f4; border: 2px solid rgba(245,158,11,0.3);">
+                        <div style="font-size: 9px; color: #5a5470; margin-bottom: 4px;">Mode Terang ☀</div>
+                        <div style="height: 4px; background: #e8e6e0; border-radius: 2px; margin-bottom: 4px;"><div style="width: 60%; height: 100%; background: #f59e0b; border-radius: 2px;"></div></div>
+                        <div style="font-size: 7px; color: #8a8498;">Background: #f8f7f4</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; border-radius: 8px; background: #16141f; border: 1px solid #1e1b2e;">
+                        <div style="font-size: 9px; color: #6b6480; margin-bottom: 4px;">Mode Gelap ☽</div>
+                        <div style="height: 4px; background: #1e1b2e; border-radius: 2px; margin-bottom: 4px;"><div style="width: 60%; height: 100%; background: #f59e0b; border-radius: 2px;"></div></div>
+                        <div style="font-size: 7px; color: #4a4560;">Background: #16141f</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

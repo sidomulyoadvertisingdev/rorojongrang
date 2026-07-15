@@ -59,6 +59,61 @@
     </div>
 </div>
 
+<div class="card" style="padding:24px; margin-bottom:24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; color:var(--accent);">
+                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+            </div>
+            <div>
+                <h3 style="font-size:15px; font-weight:700; color:var(--text);">File & Desain</h3>
+                <p style="font-size:11px; color:var(--text-muted);">Upload file desain, brosur, atau materi promosi</p>
+            </div>
+        </div>
+        {% if drive_token %}
+        <label style="background:var(--accent); color:#111; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:transform .15s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+            <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Upload File
+            <input type="file" id="campaignFileInput" style="display:none;" onchange="uploadCampaignFile(this)" max="25MB">
+        </label>
+        {% else %}
+        <a href="{{ url_for('auth.edit_profile') }}" style="font-size:12px; color:var(--text-muted); text-decoration:none; display:flex; align-items:center; gap:4px;">
+            <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg>
+            Hubungkan Drive
+        </a>
+        {% endif %}
+    </div>
+    <div id="campaignAttachmentList" style="display:flex; flex-direction:column; gap:6px;">
+        {% for att in attachments %}
+        <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); transition:border-color .15s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.2)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="width:32px; height:32px; border-radius:8px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--accent);">
+                {{ att.icon_svg()|safe }}
+            </div>
+            <div style="flex:1; min-width:0;">
+                <a href="{{ att.drive_url }}" target="_blank" style="font-size:12px; font-weight:600; color:var(--text); text-decoration:none; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ att.filename }}</a>
+                <div style="font-size:10px; color:var(--text-muted);">{{ att.size_display() }} &middot; {{ att.uploader.full_name or att.uploader.username if att.uploader else '?' }} &middot; {{ att.created_at.strftime('%d %b') }}</div>
+            </div>
+            {% if current_user.is_admin %}
+            <button onclick="deleteCampaignAttachment({{ att.id }})" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:4px; border-radius:4px; flex-shrink:0;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-muted)'" title="Hapus">
+                <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% if not attachments %}
+        <div style="text-align:center; padding:20px; font-size:12px; color:var(--text-muted);">
+            {% if drive_token %}Belum ada file. Klik Upload untuk menambahkan.{% else %}Hubungkan Google Drive di profil untuk mulai melampirkan file.{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div id="campaignUploadProgress" style="display:none; margin-top:12px;">
+        <div style="height:4px; background:var(--border); border-radius:100px; overflow:hidden;">
+            <div id="campaignUploadBar" style="height:100%; width:0%; background:linear-gradient(90deg, var(--grad-start), var(--grad-end)); border-radius:100px; transition:width .3s;"></div>
+        </div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:4px;">Mengupload ke Google Drive...</div>
+    </div>
+</div>
+
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
     <div class="card" style="padding:24px;">
         <h3 style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px;">Leads per Status</h3>
@@ -156,6 +211,30 @@ function updateCampaign(id, status) {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({status: status})
+    }).then(function(r) { if (r.ok) location.reload(); });
+}
+function uploadCampaignFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) { alert('File terlalu besar (maks 25MB)'); input.value = ''; return; }
+    var prog = document.getElementById('campaignUploadProgress');
+    var bar = document.getElementById('campaignUploadBar');
+    prog.style.display = 'block';
+    bar.style.width = '30%';
+    var fd = new FormData();
+    fd.append('file', file);
+    fetch('/campaigns/{{ campaign.id }}/upload', {
+        method: 'POST', body: fd
+    }).then(function(r) { bar.style.width = '80%'; return r.json(); }).then(function(d) {
+        bar.style.width = '100%';
+        if (d.ok) { location.reload(); } else { alert(d.error || 'Gagal upload'); prog.style.display = 'none'; }
+    }).catch(function() { alert('Terjadi kesalahan'); prog.style.display = 'none'; });
+    input.value = '';
+}
+function deleteCampaignAttachment(attId) {
+    if (!confirm('Hapus file ini?')) return;
+    fetch('/campaigns/{{ campaign.id }}/attachment/' + attId + '/delete', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}
     }).then(function(r) { if (r.ok) location.reload(); });
 }
 </script>

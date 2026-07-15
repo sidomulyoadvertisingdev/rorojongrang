@@ -27,6 +27,7 @@ class Campaign(db.Model):
         return self.metrics
 
     def recalculate_metrics(self):
+        from models.lead_pipeline import LeadPipeline
         m = self.get_or_create_metrics()
         all_leads = LeadPipeline.query.filter_by(campaign_id=self.id).all()
         m.total_leads = len(all_leads)

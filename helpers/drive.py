@@ -99,6 +99,16 @@ def upload_file_to_drive(token_record, file_data, filename, mime_type, board_nam
     return resp.json()
 
 
+def share_file_anyone(token_record, drive_file_id):
+    token_record = ensure_valid_token(token_record)
+    resp = requests.post(
+        f"{DRIVE_API_BASE}/files/{drive_file_id}/permissions",
+        headers={**_get_headers(token_record), "Content-Type": "application/json"},
+        json={"role": "reader", "type": "anyone"},
+    )
+    return resp.status_code in (200, 201)
+
+
 def delete_file_from_drive(token_record, drive_file_id):
     token_record = ensure_valid_token(token_record)
     resp = requests.delete(f"{DRIVE_API_BASE}/files/{drive_file_id}", headers=_get_headers(token_record))

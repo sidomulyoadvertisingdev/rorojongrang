@@ -197,10 +197,14 @@
             <div id="activityLog" style="display:flex; flex-direction:column; gap:8px; max-height:300px; overflow-y:auto; margin-bottom:12px;">
                 {% for act in activities %}
                 <div style="display:flex; gap:8px; font-size:12px;">
-                    <div style="width:20px; height:20px; border-radius:6px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
+                    <div style="width:20px; height:20px; border-radius:6px; background:{{ 'rgba(34,197,94,0.1)' if act.action == 'comment' else 'var(--accent-light)' }}; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">
+                        {% if act.action == 'comment' %}
+                        <svg style="width:10px; height:10px; color:#22c55e;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        {% else %}
                         <svg style="width:10px; height:10px; color:var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {% endif %}
                     </div>
-                    <div>
+                    <div style="flex:1;">
                         <span style="font-weight:600; color:var(--text);">{{ act.user.full_name or act.user.username }}</span>
                         <span style="color:var(--text-sec);"> {{ act.detail }}</span>
                         <div style="font-size:10px; color:var(--text-muted); margin-top:1px;">{{ act.created_at.strftime('%d %b %H:%M') }}</div>
@@ -209,9 +213,22 @@
                 {% endfor %}
             </div>
             {% if task.assigned_to == current_user.id or current_user.is_admin %}
-            <div style="display:flex; gap:8px;">
-                <input type="text" id="commentInput" placeholder="Tambah catatan..." class="input" style="flex:1; padding:8px 12px; font-size:12px;" onkeydown="if(event.key==='Enter')addComment()">
-                <button onclick="addComment()" style="background:var(--accent); color:#111; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;">Kirim</button>
+            <div style="display:flex; gap:8px; align-items:flex-end;">
+                <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                    <input type="text" id="commentInput" placeholder="Tambah catatan..." class="input" style="padding:8px 12px; font-size:12px;" onkeydown="if(event.key==='Enter')addComment()">
+                    <div id="commentFileName" style="display:none; font-size:11px; color:var(--accent); display:flex; align-items:center; gap:4px;">
+                        <svg style="width:10px; height:10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        <span id="commentFileNameText"></span>
+                        <button onclick="clearCommentFile()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; padding:0; font-size:10px;">x</button>
+                    </div>
+                </div>
+                {% if drive_token %}
+                <label style="background:var(--bg); border:1px solid var(--border); color:var(--text-sec); padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; transition:all .15s; flex-shrink:0;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-sec)'" title="Lampirkan file">
+                    <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    <input type="file" id="commentFileInput" style="display:none;" onchange="selectCommentFile(this)">
+                </label>
+                {% endif %}
+                <button onclick="addComment()" style="background:var(--accent); color:#111; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; flex-shrink:0;">Kirim</button>
             </div>
             {% endif %}
         </div>
@@ -242,14 +259,41 @@ function addChecklistItem() {
         body: JSON.stringify({title: title})
     }).then(function(r) { if (r.ok) location.reload(); });
 }
+var selectedCommentFile = null;
+function selectCommentFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) { alert('File terlalu besar (maks 25MB)'); input.value = ''; return; }
+    selectedCommentFile = file;
+    var nameEl = document.getElementById('commentFileName');
+    var nameText = document.getElementById('commentFileNameText');
+    nameText.textContent = file.name;
+    nameEl.style.display = 'flex';
+}
+function clearCommentFile() {
+    selectedCommentFile = null;
+    document.getElementById('commentFileInput').value = '';
+    document.getElementById('commentFileName').style.display = 'none';
+}
 function addComment() {
     var input = document.getElementById('commentInput');
     var msg = input.value.trim();
-    if (!msg) return;
-    fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/comment', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({message: msg})
-    }).then(function(r) { if (r.ok) { input.value = ''; location.reload(); } });
+    if (!msg && !selectedCommentFile) return;
+    if (selectedCommentFile) {
+        var fd = new FormData();
+        fd.append('message', msg);
+        fd.append('file', selectedCommentFile);
+        fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/comment', {
+            method: 'POST', body: fd
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.ok) { location.reload(); } else { alert(d.error || 'Gagal'); }
+        });
+    } else {
+        fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/comment', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: msg})
+        }).then(function(r) { if (r.ok) location.reload(); });
+    }
 }
 function reassign(userId) {
     fetch('/api/boards/{{ board.id }}/task/{{ task.id }}/reassign', {

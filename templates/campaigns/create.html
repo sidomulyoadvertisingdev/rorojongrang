@@ -12,7 +12,7 @@
     <h1 style="font-size:22px; font-weight:800; color:var(--text); font-family:'Playfair Display',serif; margin-bottom:20px;">Buat Campaign Baru</h1>
 
     <div class="card" style="padding:28px;">
-        <form method="POST" style="display:flex; flex-direction:column; gap:20px;">
+        <form method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:20px;">
             <div>
                 <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">Nama Campaign</label>
                 <input type="text" name="name" class="input" required placeholder="Contoh: Promosi Ramadhan 2026" style="padding:10px 12px;">
@@ -39,6 +39,18 @@
                 <input type="number" name="target_leads" class="input" placeholder="0" style="padding:10px 12px;">
             </div>
 
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; color:var(--text-sec); margin-bottom:6px;">File & Desain (opsional)</label>
+                <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Upload file desain, brosur, atau materi promosi (maks 25MB)</p>
+                <label style="display:flex; align-items:center; gap:10px; padding:16px; border:2px dashed var(--border); border-radius:10px; cursor:pointer; transition:all .15s; text-align:center; justify-content:center; flex-direction:column;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" id="fileDropZone">
+                    <svg style="width:24px; height:24px; color:var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <span style="font-size:13px; color:var(--text-sec); font-weight:500;">Klik atau seret file ke sini</span>
+                    <span style="font-size:11px; color:var(--text-muted);">Gambar, PDF, Spreadsheet (maks 25MB)</span>
+                    <input type="file" name="files" id="campaignFiles" style="display:none;" multiple accept="image/*,.pdf,.csv,.xlsx,.xls,.doc,.docx,.ppt,.pptx">
+                </label>
+                <div id="selectedFiles" style="margin-top:8px; display:flex; flex-direction:column; gap:4px;"></div>
+            </div>
+
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:15px;">
                 <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Buat Campaign
@@ -46,4 +58,24 @@
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('campaignFiles').addEventListener('change', function(e) {
+    var container = document.getElementById('selectedFiles');
+    container.innerHTML = '';
+    var files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    files.forEach(function(file) {
+        if (file.size > 25 * 1024 * 1024) {
+            alert('File "' + file.name + '" terlalu besar (maks 25MB)');
+            return;
+        }
+        var div = document.createElement('div');
+        div.style.cssText = 'display:flex; align-items:center; gap:8px; padding:8px 12px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:12px;';
+        var size = file.size < 1024 ? file.size + ' B' : file.size < 1048576 ? (file.size/1024).toFixed(1) + ' KB' : (file.size/1048576).toFixed(1) + ' MB';
+        div.innerHTML = '<svg style="width:14px; height:14px; color:var(--accent); flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg><span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text);">' + file.name + '</span><span style="color:var(--text-muted); flex-shrink:0;">' + size + '</span>';
+        container.appendChild(div);
+    });
+});
+</script>
 {% endblock %}

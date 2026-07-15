@@ -201,7 +201,8 @@ def edit_profile():
         if errors:
             for err in errors:
                 flash(err, "danger")
-            return render_template("auth/edit_profile.html")
+            drive_token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+            return render_template("auth/edit_profile.html", drive_token=drive_token)
 
         current_user.full_name = full_name
         current_user.email = email
@@ -209,7 +210,8 @@ def edit_profile():
         flash("Profil berhasil diperbarui!", "success")
         return redirect(url_for("auth.edit_profile"))
 
-    return render_template("auth/edit_profile.html")
+    drive_token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    return render_template("auth/edit_profile.html", drive_token=drive_token)
 
 
 @auth_bp.route("/profile/password", methods=["GET", "POST"])

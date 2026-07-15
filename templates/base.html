@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full" data-theme="dark">
+<html lang="id" class="h-full" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,14 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10/dist/ext/sse.js"></script>
     <style>
         :root {
-            --bg: #0e0d13; --bg-card: #16141f; --bg-sidebar: #12101c;
-            --text: #d4d0e0; --text-sec: #6b6480; --text-muted: #4a4560;
-            --border: #1e1b2e; --border-light: #16141f;
-            --accent: #f59e0b; --accent-dark: #d97706; --accent-light: rgba(245,158,11,0.12);
-            --accent-secondary: #ffffff; --glow: #f59e0b;
+            --bg: #f8f7f4; --bg-card: #ffffff; --bg-sidebar: #f3f2ee;
+            --text: #1a1825; --text-sec: #5a5470; --text-muted: #8a8498;
+            --border: #e8e6e0; --border-light: #f0eeea;
+            --accent: #f59e0b; --accent-dark: #d97706; --accent-light: rgba(245,158,11,0.10);
+            --accent-secondary: #1a1825; --glow: #f59e0b;
             --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
-            --shadow: 0 1px 3px rgba(0,0,0,0.4); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
-            --terminal-bg: #0a0914; --terminal-text: #c0bccf;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-hover: 0 8px 30px rgba(0,0,0,0.10);
+            --terminal-bg: #f0eeea; --terminal-text: #5a5470;
         }
         [data-theme="dark"] {
             --bg: #0e0d13; --bg-card: #16141f; --bg-sidebar: #12101c;
@@ -27,16 +27,6 @@
             --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.4); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
             --terminal-bg: #0a0914; --terminal-text: #c0bccf;
-        }
-        [data-theme="light"] {
-            --bg: #1a1726; --bg-card: #221f30; --bg-sidebar: #1e1b2c;
-            --text: #d4d0e0; --text-sec: #8a84a0; --text-muted: #5e5878;
-            --border: #2a2740; --border-light: #221f30;
-            --accent: #fbbf24; --accent-dark: #f59e0b; --accent-light: rgba(251,191,36,0.15);
-            --accent-secondary: #ffffff; --glow: #fbbf24;
-            --grad-start: #fbbf24; --grad-mid: #fde68a; --grad-end: #ffffff;
-            --shadow: 0 1px 3px rgba(0,0,0,0.3); --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
-            --terminal-bg: #0f0e18; --terminal-text: #c0bccf;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -881,7 +871,7 @@
             }
         }
         (function() {
-            const saved = localStorage.getItem('theme') || 'dark';
+            const saved = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', saved);
             const btn = document.getElementById('themeBtn');
             if (btn) btn.textContent = saved === 'dark' ? '\u263D' : '\u2600';

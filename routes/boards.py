@@ -112,6 +112,21 @@ def view_board(board_id):
     return render_template("boards/board.html", board=board, columns=columns, tasks_by_col=tasks_by_col, users=users)
 
 
+@boards_bp.route("/boards/<int:board_id>/files")
+@login_required
+def view_board_files(board_id):
+    board = TeamBoard.query.get_or_404(board_id)
+    if not _can_access_board(board):
+        flash("Akses ditolak.", "danger")
+        return redirect(url_for("boards.board_list"))
+    task_ids = db.session.query(BoardTask.id).filter_by(board_id=board.id).subquery()
+    attachments = TaskAttachment.query.filter(TaskAttachment.task_id.in_(db.session.query(task_ids))).order_by(TaskAttachment.created_at.desc()).all()
+    task_map = {t.id: t for t in BoardTask.query.filter_by(board_id=board.id).all()}
+    users = User.query.filter_by(is_active=True).all()
+    drive_token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    return render_template("boards/board_files.html", board=board, attachments=attachments, task_map=task_map, users=users, drive_token=drive_token)
+
+
 @boards_bp.route("/boards/<int:board_id>/task/create", methods=["GET", "POST"])
 @admin_required
 def create_task(board_id):
@@ -259,11 +274,53 @@ def add_checklist(board_id, task_id):
 @boards_bp.route("/api/boards/<int:board_id>/task/<int:task_id>/comment", methods=["POST"])
 @login_required
 def add_comment(board_id, task_id):
-    data = request.get_json()
-    message = data.get("message", "").strip()
-    if not message:
+    task = BoardTask.query.get_or_404(task_id)
+    message = ""
+    file = request.files.get("file")
+
+    if request.content_type and "multipart/form-data" in request.content_type:
+        message = request.form.get("message", "").strip()
+    else:
+        data = request.get_json(silent=True) or {}
+        message = data.get("message", "").strip()
+
+    if not message and not file:
         return jsonify({"error": "Pesan kosong"}), 400
-    _log_activity(task_id, "comment", message)
+
+    detail = message if message else "Melampirkan file"
+
+    if file and file.filename:
+        token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+        if not token:
+            return jsonify({"error": "Google Drive belum terhubung"}), 400
+        file_data = file.read()
+        if len(file_data) > MAX_FILE_SIZE:
+            return jsonify({"error": "File terlalu besar (maks 25MB)"}), 400
+        try:
+            from helpers.drive import upload_file_to_drive, share_file_anyone
+            board = TeamBoard.query.get(board_id)
+            result = upload_file_to_drive(token, file_data, file.filename, file.content_type, board_name=board.name if board else None)
+            drive_file_id = result.get("id", "")
+            share_file_anyone(token, drive_file_id)
+            att = TaskAttachment(
+                task_id=task.id,
+                uploaded_by=current_user.id,
+                drive_file_id=drive_file_id,
+                filename=file.filename,
+                mime_type=file.content_type,
+                file_size=len(file_data),
+                drive_url=f"https://drive.google.com/file/d/{drive_file_id}/view",
+            )
+            db.session.add(att)
+            if message:
+                detail = f"{message} [file: {file.filename}]"
+            else:
+                detail = f"Lampirkan file '{file.filename}'"
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"Gagal upload: {str(e)}"}), 500
+
+    _log_activity(task_id, "comment", detail)
     db.session.commit()
     return jsonify({"ok": True, "user": current_user.full_name or current_user.username})
 
@@ -315,6 +372,18 @@ def delete_task(board_id, task_id):
     if not current_user.is_admin:
         return jsonify({"error": "Akses ditolak"}), 403
     task = BoardTask.query.get_or_404(task_id)
+
+    attachments = TaskAttachment.query.filter_by(task_id=task.id).all()
+    for att in attachments:
+        try:
+            token = UserDriveToken.query.filter_by(user_id=att.uploaded_by).first()
+            if token and att.drive_file_id:
+                from helpers.drive import delete_file_from_drive
+                delete_file_from_drive(token, att.drive_file_id)
+        except Exception:
+            pass
+    TaskAttachment.query.filter_by(task_id=task.id).delete()
+
     TaskChecklist.query.filter_by(task_id=task.id).delete()
     TaskActivity.query.filter_by(task_id=task.id).delete()
     db.session.delete(task)
@@ -362,21 +431,24 @@ def upload_attachment(board_id, task_id):
         return jsonify({"error": "File terlalu besar (maks 25MB)"}), 400
 
     try:
-        from helpers.drive import upload_file_to_drive
+        from helpers.drive import upload_file_to_drive, share_file_anyone
         board = TeamBoard.query.get(board_id)
         result = upload_file_to_drive(
             token, file_data, file.filename, file.content_type,
             board_name=board.name if board else None
         )
 
+        drive_file_id = result.get("id", "")
+        share_file_anyone(token, drive_file_id)
+
         att = TaskAttachment(
             task_id=task.id,
             uploaded_by=current_user.id,
-            drive_file_id=result.get("id", ""),
+            drive_file_id=drive_file_id,
             filename=file.filename,
             mime_type=file.content_type,
             file_size=len(file_data),
-            drive_url=f"https://drive.google.com/file/d/{result.get('id', '')}/view",
+            drive_url=f"https://drive.google.com/file/d/{drive_file_id}/view",
         )
         db.session.add(att)
         _log_activity(task.id, "upload", f"Lampirkan file '{file.filename}'")
@@ -435,6 +507,8 @@ def delete_attachment(board_id, task_id, att_id):
 
     try:
         token = UserDriveToken.query.filter_by(user_id=att.uploaded_by).first()
+        if not token and current_user.is_admin:
+            token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
         if token and att.drive_file_id:
             from helpers.drive import delete_file_from_drive
             delete_file_from_drive(token, att.drive_file_id)
