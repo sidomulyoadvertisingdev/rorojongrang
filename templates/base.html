@@ -162,6 +162,19 @@
         .sidebar.collapsed .menu-group-label svg { margin:0; }
         .sidebar.collapsed .menu-group-label .group-text,
         .sidebar.collapsed .menu-group-label .chevron { display:none; }
+        .sidebar.collapsed.hover-expanded { width:260px; }
+        .sidebar.collapsed.hover-expanded .menu-label,
+        .sidebar.collapsed.hover-expanded .brand-text,
+        .sidebar.collapsed.hover-expanded .user-info { opacity:1; width:auto; overflow:visible; }
+        .sidebar.collapsed.hover-expanded .nav-item { justify-content:flex-start; padding-left:16px; padding-right:16px; }
+        .sidebar.collapsed.hover-expanded .nav-item svg { margin:0; }
+        .sidebar.collapsed.hover-expanded .menu-group-label {
+            justify-content:flex-start; padding-left:16px; padding-right:16px;
+            margin:2px 8px;
+        }
+        .sidebar.collapsed.hover-expanded .menu-group-label .group-text,
+        .sidebar.collapsed.hover-expanded .menu-group-label .chevron { display:inline; }
+        .sidebar.collapsed.hover-expanded .menu-group-items.open { opacity:1; width:auto; overflow:visible; }
 
         /* ═══ Main ═══ */
         .main-content {
@@ -170,6 +183,7 @@
             position:relative; z-index:2;
         }
         .sidebar.collapsed ~ .main-wrap .main-content { margin-left:72px; }
+        .sidebar.collapsed.hover-expanded ~ .main-wrap .main-content { margin-left:260px; }
 
         /* ═══ Cards ═══ */
         .card {
