@@ -924,6 +924,7 @@
             const wrap = document.getElementById('mainWrap');
             const btn = document.getElementById('collapseBtn');
             sidebar.classList.toggle('collapsed');
+            sidebar.dataset.manualExpand = sidebar.classList.contains('collapsed') ? 'false' : 'true';
             if (sidebar.classList.contains('collapsed')) {
                 wrap.style.marginLeft = '72px';
                 btn.textContent = '\u00BB';
@@ -935,6 +936,21 @@
 
         /* ═══ Menu Group Toggle ═══ */
         var groupTimers = {};
+        var sidebarHoverTimer = null;
+        function expandSidebarTemp() {
+            var sidebar = document.getElementById('sidebar');
+            var wrap = document.getElementById('mainWrap');
+            if (!sidebar.classList.contains('collapsed')) return;
+            sidebar.classList.add('hover-expanded');
+            wrap.style.marginLeft = '260px';
+        }
+        function collapseSidebarTemp() {
+            var sidebar = document.getElementById('sidebar');
+            var wrap = document.getElementById('mainWrap');
+            if (!sidebar.classList.contains('collapsed') || sidebar.dataset.manualExpand === 'true') return;
+            sidebar.classList.remove('hover-expanded');
+            wrap.style.marginLeft = '72px';
+        }
         function openMenuGroup(label) {
             clearTimeout(groupTimers[label.dataset.group]);
             if (label.classList.contains('open')) return;
@@ -962,6 +978,7 @@
             }
         }
         (function() {
+            var sidebar = document.getElementById('sidebar');
             var groups = document.querySelectorAll('.menu-group-label');
             groups.forEach(function(label, idx) {
                 label.dataset.group = 'g' + idx;
@@ -971,12 +988,24 @@
                     label.classList.add('open');
                     items.classList.add('open');
                 }
-                label.addEventListener('mouseenter', function() { openMenuGroup(label); });
+                label.addEventListener('mouseenter', function() {
+                    if (sidebar.classList.contains('collapsed')) expandSidebarTemp();
+                    openMenuGroup(label);
+                });
                 label.addEventListener('mouseleave', function() { closeMenuGroup(label); });
                 if (items) {
                     items.addEventListener('mouseenter', function() { clearTimeout(groupTimers[label.dataset.group]); });
                     items.addEventListener('mouseleave', function() { closeMenuGroup(label); });
                 }
+            });
+            sidebar.addEventListener('mouseleave', function() {
+                collapseSidebarTemp();
+                groups.forEach(function(label) {
+                    if (label.dataset.pinned !== 'true') closeMenuGroup(label);
+                });
+            });
+            sidebar.addEventListener('mouseenter', function() {
+                clearTimeout(sidebarHoverTimer);
             });
             if (!document.querySelector('.menu-group-label[data-pinned="true"]')) {
                 var first = document.querySelector('.menu-group-label');
