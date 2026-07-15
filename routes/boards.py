@@ -1,6 +1,6 @@
 from datetime import datetime
 from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
 from models import db
 from models.team_board import TeamBoard
@@ -8,6 +8,8 @@ from models.board_column import BoardColumn
 from models.board_task import BoardTask
 from models.task_checklist import TaskChecklist
 from models.task_activity import TaskActivity
+from models.task_attachment import TaskAttachment
+from models.user_drive_token import UserDriveToken
 from models.business import Business
 from models.user import User
 
@@ -191,8 +193,10 @@ def task_detail(board_id, task_id):
         return redirect(url_for("boards.view_board", board_id=board.id))
     columns = BoardColumn.query.filter_by(board_id=board.id).order_by(BoardColumn.position).all()
     activities = TaskActivity.query.filter_by(task_id=task.id).order_by(TaskActivity.created_at.desc()).all()
+    attachments = TaskAttachment.query.filter_by(task_id=task.id).order_by(TaskAttachment.created_at.desc()).all()
     users = User.query.filter_by(is_active=True).all()
-    return render_template("boards/task_detail.html", board=board, task=task, columns=columns, activities=activities, users=users, now=datetime.utcnow())
+    drive_token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    return render_template("boards/task_detail.html", board=board, task=task, columns=columns, activities=activities, attachments=attachments, drive_token=drive_token, users=users, now=datetime.utcnow())
 
 
 @boards_bp.route("/api/boards/<int:board_id>/task/move", methods=["POST"])
@@ -330,3 +334,114 @@ def search_business():
     ).limit(10).all()
     results = [{"id": b.id, "name": b.name, "address": b.address or "", "phone": b.phone or "", "rating": b.rating or 0} for b in businesses]
     return jsonify(results)
+
+
+MAX_FILE_SIZE = 25 * 1024 * 1024
+
+
+@boards_bp.route("/api/boards/<int:board_id>/task/<int:task_id>/upload", methods=["POST"])
+@login_required
+def upload_attachment(board_id, task_id):
+    task = BoardTask.query.get_or_404(task_id)
+    if not _can_access_task(task):
+        return jsonify({"error": "Akses ditolak"}), 403
+
+    token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    if not token:
+        return jsonify({"error": "Google Drive belum terhubung. Hubungkan di profil Anda."}), 400
+
+    if "file" not in request.files:
+        return jsonify({"error": "Tidak ada file"}), 400
+
+    file = request.files["file"]
+    if not file.filename:
+        return jsonify({"error": "Filename kosong"}), 400
+
+    file_data = file.read()
+    if len(file_data) > MAX_FILE_SIZE:
+        return jsonify({"error": "File terlalu besar (maks 25MB)"}), 400
+
+    try:
+        from helpers.drive import upload_file_to_drive
+        board = TeamBoard.query.get(board_id)
+        result = upload_file_to_drive(
+            token, file_data, file.filename, file.content_type,
+            board_name=board.name if board else None
+        )
+
+        att = TaskAttachment(
+            task_id=task.id,
+            uploaded_by=current_user.id,
+            drive_file_id=result.get("id", ""),
+            filename=file.filename,
+            mime_type=file.content_type,
+            file_size=len(file_data),
+            drive_url=f"https://drive.google.com/file/d/{result.get('id', '')}/view",
+        )
+        db.session.add(att)
+        _log_activity(task.id, "upload", f"Lampirkan file '{file.filename}'")
+        db.session.commit()
+
+        return jsonify({
+            "ok": True,
+            "id": att.id,
+            "filename": att.filename,
+            "size": att.size_display(),
+            "mime_type": att.mime_type,
+            "url": att.drive_url,
+            "uploaded_by": current_user.full_name or current_user.username,
+            "created_at": att.created_at.strftime("%d %b %Y %H:%M"),
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Gagal upload: {str(e)}"}), 500
+
+
+@boards_bp.route("/api/boards/<int:board_id>/task/<int:task_id>/attachments")
+@login_required
+def list_attachments(board_id, task_id):
+    task = BoardTask.query.get_or_404(task_id)
+    if not _can_access_task(task):
+        return jsonify({"error": "Akses ditolak"}), 403
+
+    attachments = TaskAttachment.query.filter_by(task_id=task.id).order_by(TaskAttachment.created_at.desc()).all()
+    result = []
+    for att in attachments:
+        result.append({
+            "id": att.id,
+            "filename": att.filename,
+            "size": att.size_display(),
+            "mime_type": att.mime_type,
+            "url": att.drive_url,
+            "uploaded_by": att.uploader.full_name or att.uploader.username if att.uploader else "Unknown",
+            "created_at": att.created_at.strftime("%d %b %Y %H:%M"),
+        })
+    return jsonify(result)
+
+
+@boards_bp.route("/api/boards/<int:board_id>/task/<int:task_id>/attachment/<int:att_id>/delete", methods=["POST"])
+@login_required
+def delete_attachment(board_id, task_id, att_id):
+    task = BoardTask.query.get_or_404(task_id)
+    if not _can_access_task(task):
+        return jsonify({"error": "Akses ditolak"}), 403
+
+    att = TaskAttachment.query.get_or_404(att_id)
+    if att.task_id != task.id:
+        return jsonify({"error": "Invalid"}), 400
+
+    if att.uploaded_by != current_user.id and not current_user.is_admin:
+        return jsonify({"error": "Hanya uploader atau admin yang bisa menghapus"}), 403
+
+    try:
+        token = UserDriveToken.query.filter_by(user_id=att.uploaded_by).first()
+        if token and att.drive_file_id:
+            from helpers.drive import delete_file_from_drive
+            delete_file_from_drive(token, att.drive_file_id)
+    except Exception:
+        pass
+
+    _log_activity(task.id, "attachment_delete", f"Hapus file '{att.filename}'")
+    db.session.delete(att)
+    db.session.commit()
+    return jsonify({"ok": True})

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, session
 from flask_login import login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 from models import db
 from models.user import User
+from models.user_drive_token import UserDriveToken
 
 auth_bp = Blueprint("auth", __name__)
 oauth = OAuth()
@@ -238,3 +239,79 @@ def change_password():
         return redirect(url_for("auth.change_password"))
 
     return render_template("auth/change_password.html")
+
+
+@auth_bp.route("/profile/drive/connect")
+@login_required
+def drive_connect():
+    google = oauth.create_client("google")
+    redirect_uri = url_for("auth.drive_callback", _external=True)
+    return google.authorize_redirect(
+        redirect_uri,
+        scope="openid email profile https://www.googleapis.com/auth/drive.file",
+        prompt="consent",
+        access_type="offline",
+    )
+
+
+@auth_bp.route("/profile/drive/callback")
+@login_required
+def drive_callback():
+    google = oauth.create_client("google")
+    try:
+        token = google.authorize_access_token()
+    except Exception:
+        flash("Gagal menghubungkan Google Drive. Silakan coba lagi.", "danger")
+        return redirect(url_for("auth.edit_profile"))
+
+    access_token = token.get("access_token")
+    refresh_token = token.get("refresh_token")
+    expires_in = token.get("expires_in", 3600)
+
+    if not refresh_token:
+        existing = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+        if existing:
+            refresh_token = existing.refresh_token
+
+    if not refresh_token:
+        flash("Gagal mendapatkan refresh token. Silakan coba lagi.", "danger")
+        return redirect(url_for("auth.edit_profile"))
+
+    import requests as req
+    user_info_resp = req.get("https://www.googleapis.com/oauth2/v3/userinfo", headers={
+        "Authorization": f"Bearer {access_token}"
+    })
+    drive_email = ""
+    if user_info_resp.status_code == 200:
+        drive_email = user_info_resp.json().get("email", current_user.email)
+
+    existing = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    if existing:
+        existing.access_token = access_token
+        existing.refresh_token = refresh_token
+        existing.token_expiry = datetime.utcnow() + timedelta(seconds=expires_in)
+        existing.drive_email = drive_email
+    else:
+        dt = UserDriveToken(
+            user_id=current_user.id,
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_expiry=datetime.utcnow() + timedelta(seconds=expires_in),
+            drive_email=drive_email,
+        )
+        db.session.add(dt)
+
+    db.session.commit()
+    flash("Google Drive berhasil dihubungkan!", "success")
+    return redirect(url_for("auth.edit_profile"))
+
+
+@auth_bp.route("/profile/drive/disconnect", methods=["POST"])
+@login_required
+def drive_disconnect():
+    token = UserDriveToken.query.filter_by(user_id=current_user.id).first()
+    if token:
+        db.session.delete(token)
+        db.session.commit()
+    flash("Google Drive telah diputuskan.", "info")
+    return redirect(url_for("auth.edit_profile"))

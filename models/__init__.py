@@ -25,3 +25,5 @@ from models.lead_pipeline import LeadPipeline
 from models.lead_activity import LeadActivity
 from models.followup import FollowUp
 from models.campaign import Campaign, CampaignMetric
+from models.user_drive_token import UserDriveToken
+from models.task_attachment import TaskAttachment
