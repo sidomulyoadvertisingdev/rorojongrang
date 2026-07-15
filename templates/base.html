@@ -934,25 +934,54 @@
         }
 
         /* ═══ Menu Group Toggle ═══ */
-        function toggleMenuGroup(label) {
-            label.classList.toggle('open');
+        var groupTimers = {};
+        function openMenuGroup(label) {
+            clearTimeout(groupTimers[label.dataset.group]);
+            if (label.classList.contains('open')) return;
+            label.classList.add('open');
             var items = label.nextElementSibling;
-            if (items && items.classList.contains('menu-group-items')) {
-                items.classList.toggle('open');
+            if (items && items.classList.contains('menu-group-items')) items.classList.add('open');
+        }
+        function closeMenuGroup(label) {
+            if (label.dataset.pinned === 'true') return;
+            var key = label.dataset.group;
+            clearTimeout(groupTimers[key]);
+            groupTimers[key] = setTimeout(function() {
+                label.classList.remove('open');
+                var items = label.nextElementSibling;
+                if (items && items.classList.contains('menu-group-items')) items.classList.remove('open');
+            }, 200);
+        }
+        function toggleMenuGroup(label) {
+            if (label.dataset.pinned === 'true') {
+                label.dataset.pinned = 'false';
+                closeMenuGroup(label);
+            } else {
+                label.dataset.pinned = 'true';
+                openMenuGroup(label);
             }
         }
         (function() {
             var groups = document.querySelectorAll('.menu-group-label');
-            groups.forEach(function(label) {
+            groups.forEach(function(label, idx) {
+                label.dataset.group = 'g' + idx;
                 var items = label.nextElementSibling;
                 if (items && items.classList.contains('menu-group-items') && items.querySelector('.nav-item.active')) {
+                    label.dataset.pinned = 'true';
                     label.classList.add('open');
                     items.classList.add('open');
                 }
+                label.addEventListener('mouseenter', function() { openMenuGroup(label); });
+                label.addEventListener('mouseleave', function() { closeMenuGroup(label); });
+                if (items) {
+                    items.addEventListener('mouseenter', function() { clearTimeout(groupTimers[label.dataset.group]); });
+                    items.addEventListener('mouseleave', function() { closeMenuGroup(label); });
+                }
             });
-            if (!document.querySelector('.menu-group-items.open')) {
+            if (!document.querySelector('.menu-group-label[data-pinned="true"]')) {
                 var first = document.querySelector('.menu-group-label');
                 if (first) {
+                    first.dataset.pinned = 'true';
                     first.classList.add('open');
                     var firstItems = first.nextElementSibling;
                     if (firstItems) firstItems.classList.add('open');
