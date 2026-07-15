@@ -253,6 +253,6 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**Built with ❤ for Ragama Mnafaat Sinergi**
+**Built with ❤ for Ragam Mnafaat Sinergi**
 
 </div>
