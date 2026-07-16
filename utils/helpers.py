@@ -66,7 +66,7 @@ def build_search_url(keyword: str, location: str, radius_km: int = 0, lat: float
     zoom = RADIUS_ZOOM.get(radius_km, 14)
     if lat and lng:
         return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@{lat},{lng},{zoom}z"
-    return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@0,0,{zoom}z"
+    return f"{GOOGLE_MAPS_BASE_URL}/{encoded}"
 
 
 def admin_required(f):
