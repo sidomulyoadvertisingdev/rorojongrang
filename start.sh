@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Starting RoroJonggrang Data Scrape..."
+echo "Starting Roro Jonggrang Data Scrape..."
 
 if [ -f ".env" ]; then
   set -a
@@ -45,7 +45,7 @@ fi
 
 echo ""
 echo "============================================"
-echo "  RoroJonggrang Data Scrape is running!    "
+echo "  Roro Jonggrang Data Scrape is running!    "
 echo "============================================"
 echo ""
 echo "  Web App:  http://localhost:5001"

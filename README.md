@@ -1,6 +1,6 @@
 <div align="center">
 
-# RoroJonggrang
+# Roro Jonggrang
 
 **Platform Digital Marketing untuk UMKM Indonesia**
 
@@ -14,7 +14,7 @@
 
 ## Overview
 
-RoroJonggrang adalah platform digital marketing all-in-one untuk UMKM Indonesia. Scraping data Google Maps, kelola leads CRM, jadwalkan follow-up, jalankan kampanye, kolaborasi tim dengan Kanban boards, dan upload file ke Google Drive — semuanya dalam satu platform.
+Roro Jonggrang adalah platform digital marketing all-in-one untuk UMKM Indonesia. Scraping data Google Maps, kelola leads CRM, jadwalkan follow-up, jalankan kampanye, kolaborasi tim dengan Kanban boards, dan upload file ke Google Drive — semuanya dalam satu platform.
 
 **Live:** [rorojonggrang.web.id](https://rorojonggrang.web.id)
 

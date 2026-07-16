@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}RoroJonggrang{% endblock %}</title>
+    <title>{% block title %}Roro Jonggrang{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -586,7 +586,7 @@
             <a href="{{ url_for('blog.home', lang=lang) }}" class="nav-logo">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                 <div class="logo-icon" style="display:none;">R</div>
-                <span style="font-weight:800; font-size:16px; letter-spacing:-0.3px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span><span style="color:var(--brand-jonggrang);">Jonggrang</span></span>
+                <span style="font-weight:800; font-size:16px; letter-spacing:-0.3px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span> <span style="color:var(--brand-jonggrang);">Jonggrang</span></span>
             </a>
             <div class="nav-links" id="navLinks">
                 <a href="{{ url_for('blog.home', lang=lang) }}" class="{% if request.endpoint == 'blog.home' %}active{% endif %}">{{ t.nav_home }}</a>
@@ -646,7 +646,7 @@
 
     <footer class="blog-footer">
         <div class="container">
-            <p>&copy; 2026 RoroJonggrang by RamsDev. All rights reserved.</p>
+            <p>&copy; 2026 Roro Jonggrang by RamsDev. All rights reserved.</p>
             <div class="footer-links">
                 <a href="{{ url_for('blog.features', lang=lang) }}">{{ t.nav_features }}</a>
                 <a href="{{ url_for('blog.guide', lang=lang) }}">{{ t.nav_guide }}</a>

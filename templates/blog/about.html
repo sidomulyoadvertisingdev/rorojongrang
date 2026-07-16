@@ -1,11 +1,11 @@
 {% extends "blog/base.html" %}
-{% block title %}Tentang - RoroJonggrang{% endblock %}
+{% block title %}Tentang - Roro Jonggrang{% endblock %}
 {% block content %}
 
 <!-- Page Header -->
 <section class="page-header">
     <div class="container">
-        <h1>{% if lang == 'id' %}Tentang RoroJonggrang{% else %}About RoroJonggrang{% endif %}</h1>
+        <h1 style="color: var(--accent);">{% if lang == 'id' %}Tentang Roro Jonggrang{% else %}About Roro Jonggrang{% endif %}</h1>
         <p>{% if lang == 'id' %}Platform digital marketing lengkap untuk UMKM Indonesia — scraping, analytics, WhatsApp, dan kolaborasi tim dalam satu dashboard.{% else %}Complete digital marketing platform for Indonesian SMEs — scraping, analytics, WhatsApp, and team collaboration in one dashboard.{% endif %}</p>
     </div>
 </section>
@@ -21,9 +21,9 @@
                 </h2>
                 <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">
                     {% if lang == 'id' %}
-                    RoroJonggrang hadir sebagai solusi all-in-one untuk digital marketing Indonesia. Mulai dari scraping data bisnis dari Google Maps, visualisasi data dengan grafik interaktif, kelola pesan WhatsApp otomatis, hingga kolaborasi tim dengan papan Kanban — semua dalam satu platform. Nama "Roro Jonggrang" terinspirasi dari legenda Jawa yang menggambarkan kekuatan dan ketekunan.
+                    Roro Jonggrang hadir sebagai solusi all-in-one untuk digital marketing Indonesia. Mulai dari scraping data bisnis dari Google Maps, visualisasi data dengan grafik interaktif, kelola pesan WhatsApp otomatis, hingga kolaborasi tim dengan papan Kanban — semua dalam satu platform. Nama "Roro Jonggrang" terinspirasi dari legenda Jawa yang menggambarkan kekuatan dan ketekunan.
                     {% else %}
-                    RoroJonggrang is a solution for Indonesian digital marketers who need local business data quickly and accurately. The name "Roro Jonggrang" is inspired by Javanese legend that depicts strength and perseverance.
+                    Roro Jonggrang is a solution for Indonesian digital marketers who need local business data quickly and accurately. The name "Roro Jonggrang" is inspired by Javanese legend that depicts strength and perseverance.
                     {% endif %}
                 </p>
                 <div style="padding: 20px 24px; border-radius: 12px; background: var(--accent-light); border-left: 4px solid var(--accent);">
@@ -139,7 +139,7 @@
     <div class="container">
         <div class="cta-box fade-in">
             <h2>{% if lang == 'id' %}Bergabung dengan Kami{% else %}Join Us{% endif %}</h2>
-            <p>{% if lang == 'id' %}Mulai gunakan RoroJonggrang dan rasakan kemudahan digital marketing dalam satu platform.{% else %}Start using RoroJonggrang and experience the ease of digital marketing in one platform.{% endif %}</p>
+            <p>{% if lang == 'id' %}Mulai gunakan Roro Jonggrang dan rasakan kemudahan digital marketing dalam satu platform.{% else %}Start using Roro Jonggrang and experience the ease of digital marketing in one platform.{% endif %}</p>
             <a href="{{ url_for('auth.register') }}" class="btn-white">
                 {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
             </a>

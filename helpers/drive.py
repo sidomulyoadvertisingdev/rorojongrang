@@ -5,7 +5,7 @@ from flask import current_app
 
 DRIVE_API_BASE = "https://www.googleapis.com/drive/v3"
 DRIVE_UPLOAD_BASE = "https://www.googleapis.com/upload/drive/v3"
-APP_FOLDER_NAME = "RoroJonggrang"
+APP_FOLDER_NAME = "Roro Jonggrang"
 
 
 def _get_headers(token_record):

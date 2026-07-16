@@ -94,7 +94,7 @@ def api_geocode():
         resp = http_requests.get(
             "https://nominatim.openstreetmap.org/search",
             params={"q": q + ", Indonesia", "format": "json", "limit": 1},
-            headers={"User-Agent": "RoroJonggrangScraper/1.0"},
+            headers={"User-Agent": "Roro JonggrangScraper/1.0"},
             timeout=10,
         )
         data = resp.json()

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Login - RoroJonggrang{% endblock %}
+{% block title %}Login - Roro Jonggrang{% endblock %}
 {% block auth_content %}
 <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; background:var(--bg); position:relative; overflow:hidden;">
     <div style="position:absolute; top:-50%; left:-50%; right:-50%; bottom:-50%; background:radial-gradient(ellipse at 30% 50%, rgba(245,158,11,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.05) 0%, transparent 50%); pointer-events:none; animation:fogDrift1 20s ease-in-out infinite alternate;"></div>
@@ -8,7 +8,7 @@
         <div style="text-align:center; margin-bottom:32px;">
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width:64px; height:64px; border-radius:18px; object-fit:contain; margin:0 auto 16px; display:block; box-shadow:0 0 30px rgba(245,158,11,0.3);" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
             <div style="width:64px; height:64px; border-radius:18px; background:linear-gradient(135deg,var(--grad-start),var(--grad-end)); display:none; align-items:center; justify-content:center; margin:0 auto 16px; color:#fff; font-size:28px; font-weight:800; box-shadow:0 0 30px rgba(245,158,11,0.3);">R</div>
-            <h1 style="font-size:28px; font-weight:900; letter-spacing:-0.5px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span><span style="color:var(--brand-jonggrang);">Jonggrang</span></h1>
+            <h1 style="font-size:28px; font-weight:900; letter-spacing:-0.5px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span> <span style="color:var(--brand-jonggrang);">Jonggrang</span></h1>
             <p style="color:var(--text-sec); margin-top:4px; font-size:14px; font-weight:500;">Data Scrape Platform</p>
         </div>
         <div class="card" style="padding:32px;">

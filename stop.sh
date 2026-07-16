@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Stopping RoroJonggrang Data Scrape..."
+echo "Stopping Roro Jonggrang Data Scrape..."
 
 # Stop Celery
 pkill -f "celery -A celery_worker" 2>/dev/null && echo "Celery stopped" || echo "Celery not running"
