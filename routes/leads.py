@@ -1,5 +1,4 @@
 from datetime import datetime
-from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from models import db
@@ -8,19 +7,9 @@ from models.lead_activity import LeadActivity
 from models.followup import FollowUp
 from models.business import Business
 from models.user import User
+from utils.helpers import admin_required
 
 leads_bp = Blueprint("leads", __name__)
-
-
-def admin_required(f):
-    @wraps(f)
-    @login_required
-    def decorated(*args, **kwargs):
-        if not current_user.is_admin:
-            flash("Akses ditolak.", "danger")
-            return redirect(url_for("leads.lead_pipeline"))
-        return f(*args, **kwargs)
-    return decorated
 
 
 def _log_lead_activity(lead_id, action, detail=""):

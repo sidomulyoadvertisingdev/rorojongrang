@@ -1,23 +1,12 @@
 from datetime import datetime
-from functools import wraps
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from models import db
 from models.user import User
 from models.activity_log import ActivityLog
+from utils.helpers import admin_required, platform_admin_required
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
-
-
-def admin_required(f):
-    @wraps(f)
-    @login_required
-    def decorated(*args, **kwargs):
-        if not current_user.is_admin:
-            flash("Akses ditolak. Hanya admin yang bisa mengakses halaman ini.", "danger")
-            return redirect(url_for("dashboard.index"))
-        return f(*args, **kwargs)
-    return decorated
 
 
 def log_activity(user_id, action, target, detail=""):
@@ -63,6 +52,33 @@ def user_list():
     )
 
 
+@admin_bp.route("/users/<int:user_id>/role", methods=["POST"])
+@platform_admin_required
+def change_role(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.id == current_user.id:
+        flash("Tidak bisa mengubah role akun sendiri.", "danger")
+        return redirect(url_for("admin.user_list"))
+
+    new_role = request.form.get("role", "").strip()
+    allowed_roles = [User.ROLE_USER, User.ROLE_ADMIN, User.ROLE_PLATFORM_ADMIN]
+    if new_role not in allowed_roles:
+        flash("Role tidak valid.", "danger")
+        return redirect(url_for("admin.user_list"))
+
+    if user.role == User.ROLE_PLATFORM_ADMIN and new_role != User.ROLE_PLATFORM_ADMIN:
+        flash("Tidak bisa menurunkan role Admin Platform lain.", "danger")
+        return redirect(url_for("admin.user_list"))
+
+    user.role = new_role
+    db.session.commit()
+
+    log_activity(user_id, "change_role", user.username, f"role -> {new_role}")
+    flash(f"Role {user.username} diubah menjadi '{new_role}'.", "success")
+    return redirect(url_for("admin.user_list"))
+
+
 @admin_bp.route("/users/<int:user_id>/ban", methods=["POST"])
 @admin_required
 def ban_user(user_id):
@@ -72,7 +88,7 @@ def ban_user(user_id):
         flash("Tidak bisa ban akun sendiri.", "danger")
         return redirect(url_for("admin.user_list"))
 
-    if user.is_admin:
+    if not current_user.can_manage(user):
         flash("Tidak bisa ban akun admin lain.", "danger")
         return redirect(url_for("admin.user_list"))
 
@@ -118,7 +134,7 @@ def delete_user(user_id):
         flash("Tidak bisa hapus akun sendiri.", "danger")
         return redirect(url_for("admin.user_list"))
 
-    if user.is_admin:
+    if not current_user.can_manage(user):
         flash("Tidak bisa hapus akun admin lain.", "danger")
         return redirect(url_for("admin.user_list"))
 

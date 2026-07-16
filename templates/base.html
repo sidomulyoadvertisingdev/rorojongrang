@@ -17,6 +17,7 @@
             --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.06); --shadow-hover: 0 8px 30px rgba(0,0,0,0.10);
             --terminal-bg: #f0eeea; --terminal-text: #5a5470;
+            --brand-roro: #000000; --brand-jonggrang: #f59e0b;
         }
         [data-theme="dark"] {
             --bg: #0e0d13; --bg-card: #16141f; --bg-sidebar: #12101c;
@@ -27,6 +28,7 @@
             --grad-start: #f59e0b; --grad-mid: #fbbf24; --grad-end: #ffffff;
             --shadow: 0 1px 3px rgba(0,0,0,0.4); --shadow-hover: 0 8px 30px rgba(0,0,0,0.5);
             --terminal-bg: #0a0914; --terminal-text: #c0bccf;
+            --brand-roro: #f59e0b; --brand-jonggrang: #f59e0b;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -628,7 +630,7 @@
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo-icon" style="object-fit:contain; background:transparent;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                 <div class="logo-icon" style="display:none;">R</div>
                 <div class="brand-text">
-                    <h1 style="font-size:17px; font-weight:900; color:var(--text); line-height:1.2; letter-spacing:-0.3px; font-family:'Playfair Display',serif;">RoroJonggrang</h1>
+                    <h1 style="font-size:17px; font-weight:900; line-height:1.2; letter-spacing:-0.3px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span><span style="color:var(--brand-jonggrang);">Jonggrang</span></h1>
                     <p style="font-size:10px; color:var(--text-muted); font-weight:600; letter-spacing:0.5px; text-transform:uppercase;">Data Scrape Platform</p>
                 </div>
             </div>

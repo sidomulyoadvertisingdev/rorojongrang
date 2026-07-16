@@ -1,6 +1,11 @@
 import re
 import unicodedata
 
+from functools import wraps
+
+from flask import redirect, url_for, flash, jsonify
+from flask_login import login_required, current_user
+
 
 def clean_text(text: str) -> str:
     if not text:
@@ -62,3 +67,39 @@ def build_search_url(keyword: str, location: str, radius_km: int = 0, lat: float
     if lat and lng:
         return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@{lat},{lng},{zoom}z"
     return f"{GOOGLE_MAPS_BASE_URL}/{encoded}/@0,0,{zoom}z"
+
+
+def admin_required(f):
+    @wraps(f)
+    @login_required
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_admin:
+            if _wants_json():
+                return jsonify({"error": "Akses ditolak."}), 403
+            flash("Akses ditolak. Hanya admin yang bisa mengakses halaman ini.", "danger")
+            return redirect(url_for("dashboard.index"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+def platform_admin_required(f):
+    @wraps(f)
+    @login_required
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_platform_admin:
+            if _wants_json():
+                return jsonify({"error": "Akses ditolak."}), 403
+            flash("Akses ditolak. Hanya Admin Platform yang bisa mengakses halaman ini.", "danger")
+            return redirect(url_for("dashboard.index"))
+        return f(*args, **kwargs)
+    return decorated
+
+
+def _wants_json():
+    from flask import request
+    return (
+        request.path.startswith("/api/")
+        or request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or "application/json" in (request.headers.get("Accept", "") or "")
+    )
+

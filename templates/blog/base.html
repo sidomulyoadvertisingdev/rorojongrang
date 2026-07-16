@@ -18,6 +18,7 @@
             --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
             --card-shadow-hover: 0 10px 30px rgba(0,0,0,0.10);
             --terminal-bg: #f0eeea; --terminal-text: #5a5470;
+            --brand-roro: #000000; --brand-jonggrang: #f59e0b;
         }
         [data-theme="dark"] {
             --bg: #0e0d13; --bg-secondary: #16141f;
@@ -31,6 +32,7 @@
             --card-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
             --card-shadow-hover: 0 10px 30px rgba(0,0,0,0.5);
             --terminal-bg: #0a0914; --terminal-text: #c0bccf;
+            --brand-roro: #f59e0b; --brand-jonggrang: #f59e0b;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -584,7 +586,7 @@
             <a href="{{ url_for('blog.home', lang=lang) }}" class="nav-logo">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width:36px;height:36px;border-radius:10px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                 <div class="logo-icon" style="display:none;">R</div>
-                <span style="font-weight:800; font-size:16px; letter-spacing:-0.3px; font-family:'Playfair Display',serif;">RoroJonggrang</span>
+                <span style="font-weight:800; font-size:16px; letter-spacing:-0.3px; font-family:'Playfair Display',serif;"><span style="color:var(--brand-roro);">Roro</span><span style="color:var(--brand-jonggrang);">Jonggrang</span></span>
             </a>
             <div class="nav-links" id="navLinks">
                 <a href="{{ url_for('blog.home', lang=lang) }}" class="{% if request.endpoint == 'blog.home' %}active{% endif %}">{{ t.nav_home }}</a>

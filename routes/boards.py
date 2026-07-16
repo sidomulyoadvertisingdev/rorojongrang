@@ -1,5 +1,4 @@
 from datetime import datetime
-from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app
 from flask_login import login_required, current_user
 from models import db
@@ -12,19 +11,9 @@ from models.task_attachment import TaskAttachment
 from models.user_drive_token import UserDriveToken
 from models.business import Business
 from models.user import User
+from utils.helpers import admin_required
 
 boards_bp = Blueprint("boards", __name__)
-
-
-def admin_required(f):
-    @wraps(f)
-    @login_required
-    def decorated(*args, **kwargs):
-        if not current_user.is_admin:
-            flash("Akses ditolak.", "danger")
-            return redirect(url_for("boards.board_list"))
-        return f(*args, **kwargs)
-    return decorated
 
 
 def _log_activity(task_id, action, detail=""):

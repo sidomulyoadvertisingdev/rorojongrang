@@ -180,7 +180,9 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if user.is_admin %}
+                        {% if user.role == 'platform_admin' %}
+                        <span class="status-badge" style="background:rgba(245,158,11,0.15); color:#f59e0b; font-weight:700;">Admin Platform</span>
+                        {% elif user.role == 'admin' %}
                         <span class="status-badge" style="background:rgba(245,158,11,0.12); color:#f59e0b;">Admin</span>
                         {% elif user.google_id %}
                         <span class="status-badge" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Google</span>
@@ -191,7 +193,16 @@
                     <td style="color:var(--text-sec); font-size:13px;">{{ user.created_at.strftime('%d %b %Y') if user.created_at else '-' }}</td>
                     <td style="text-align:right;">
                         <div style="display:flex; gap:6px; justify-content:flex-end; align-items:center;">
-                            {% if user.id != current_user.id and not user.is_admin %}
+                            {% if current_user.is_platform_admin and user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}" style="margin:0;">
+                                <select name="role" onchange="this.form.submit()" style="font-size:12px; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); cursor:pointer;">
+                                    <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                    <option value="platform_admin" {% if user.role == 'platform_admin' %}selected{% endif %}>Admin Platform</option>
+                                </select>
+                            </form>
+                            {% endif %}
+                            {% if user.id != current_user.id and current_user.can_manage(user) %}
                                 {% if user.is_banned %}
                                 <form method="POST" action="{{ url_for('admin.unban_user', user_id=user.id) }}" style="margin:0;">
                                     <button type="submit" class="btn-primary" style="font-size:12px; padding:6px 14px; background:rgba(255,255,255,0.15); color:#ffffff; box-shadow:none;">
@@ -253,7 +264,9 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     @{{ user.username }}
                 </div>
-                {% if user.is_admin %}
+                {% if user.role == 'platform_admin' %}
+                <div class="admin-chip" style="background:rgba(245,158,11,0.1); color:#f59e0b; border-color:rgba(245,158,11,0.3); font-weight:700;">Admin Platform</div>
+                {% elif user.role == 'admin' %}
                 <div class="admin-chip" style="background:rgba(245,158,11,0.08); color:#f59e0b; border-color:rgba(245,158,11,0.2);">Admin</div>
                 {% elif user.google_id %}
                 <div class="admin-chip" style="background:rgba(251,191,36,0.08); color:#fbbf24; border-color:rgba(251,191,36,0.2);">Google</div>
@@ -263,7 +276,16 @@
                     {{ user.created_at.strftime('%d %b %Y') if user.created_at else '' }}
                 </div>
             </div>
-            {% if user.id != current_user.id and not user.is_admin %}
+            {% if current_user.is_platform_admin and user.id != current_user.id %}
+            <form method="POST" action="{{ url_for('admin.change_role', user_id=user.id) }}" style="margin-bottom:10px;">
+                <select name="role" onchange="this.form.submit()" style="width:100%; font-size:13px; padding:9px; border-radius:10px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); cursor:pointer;">
+                    <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                    <option value="platform_admin" {% if user.role == 'platform_admin' %}selected{% endif %}>Admin Platform</option>
+                </select>
+            </form>
+            {% endif %}
+            {% if user.id != current_user.id and current_user.can_manage(user) %}
             <div class="admin-user-actions">
                 {% if user.is_banned %}
                 <form method="POST" action="{{ url_for('admin.unban_user', user_id=user.id) }}">

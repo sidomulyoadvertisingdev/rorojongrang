@@ -30,6 +30,7 @@ BUSINESS_COLUMNS = [
 USER_COLUMNS = [
     ("google_id", "VARCHAR(100) UNIQUE"),
     ("avatar_url", "VARCHAR(500)"),
+    ("role", "VARCHAR(20) NOT NULL DEFAULT 'user'"),
     ("is_banned", "BOOLEAN DEFAULT FALSE"),
     ("banned_at", "DATETIME"),
     ("banned_by", "INT"),
@@ -59,6 +60,7 @@ def seed_default_admin():
     admin_email = os.getenv("DEFAULT_ADMIN_EMAIL", "admin@rorojonggrang.com")
     admin_password = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
     admin_full_name = os.getenv("DEFAULT_ADMIN_FULL_NAME", "Administrator")
+    admin_role = os.getenv("DEFAULT_ADMIN_ROLE", User.ROLE_PLATFORM_ADMIN)
 
     user = User.query.filter(
         (User.username == admin_username) | (User.email == admin_email)
@@ -70,13 +72,13 @@ def seed_default_admin():
         username=admin_username,
         email=admin_email,
         full_name=admin_full_name,
-        is_admin=True,
+        role=admin_role,
     )
     user.set_password(admin_password)
     db.session.add(user)
     db.session.commit()
 
-    logger.info("Seeded default admin user: %s", admin_email)
+    logger.info("Seeded default admin user: %s (role=%s)", admin_email, admin_role)
     return user
 
 
@@ -151,6 +153,17 @@ def migrate_users_schema():
         except Exception as exc:
             db.session.rollback()
             logger.warning("Could not modify password_hash: %s", exc)
+
+    if "is_admin" in existing_columns and "role" in _table_columns("users"):
+        try:
+            db.session.execute(
+                text("UPDATE users SET role = 'admin' WHERE is_admin = 1 AND role = 'user'")
+            )
+            db.session.commit()
+            logger.info("Backfilled role from legacy is_admin column")
+        except Exception as exc:
+            db.session.rollback()
+            logger.warning("Could not backfill role from is_admin: %s", exc)
 
 
 def ensure_activity_logs_table():

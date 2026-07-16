@@ -15,12 +15,16 @@ class User(UserMixin, db.Model):
     avatar_url = db.Column(db.String(500))
     google_id = db.Column(db.String(100), unique=True, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
-    is_admin = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), default="user", nullable=False)
     is_banned = db.Column(db.Boolean, default=False)
     banned_at = db.Column(db.DateTime)
     banned_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
+
+    ROLE_USER = "user"
+    ROLE_ADMIN = "admin"
+    ROLE_PLATFORM_ADMIN = "platform_admin"
 
     tasks = db.relationship("ScrapingTask", backref="user", lazy="dynamic")
 
@@ -29,6 +33,21 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @property
+    def is_admin(self):
+        return self.role in (self.ROLE_ADMIN, self.ROLE_PLATFORM_ADMIN)
+
+    @property
+    def is_platform_admin(self):
+        return self.role == self.ROLE_PLATFORM_ADMIN
+
+    def can_manage(self, target):
+        if not self.is_admin:
+            return False
+        if self.is_platform_admin:
+            return True
+        return not target.is_admin
 
     def get_task_count(self):
         return self.tasks.count()
