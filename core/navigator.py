@@ -55,65 +55,118 @@ class MapNavigator:
             self._screenshot("timeout")
             return False
 
-    def get_result_links(self) -> list:
+    @staticmethod
+    def _dedupe_preserve_order(items: list) -> list:
+        seen = set()
+        ordered = []
+        for item in items:
+            if item and item not in seen:
+                seen.add(item)
+                ordered.append(item)
+        return ordered
+
+    def _extract_href_links(self) -> list:
+        """Extract place URLs from <a href> anchors (older Google Maps layouts)."""
         links = []
 
-        # Retry loop: Google Maps renders <a> tags inside Nv2PK asynchronously
-        for attempt in range(4):
-            links = []
-            try:
-                nv2pk_elements = self.driver.find_elements(By.CSS_SELECTOR, 'div.Nv2PK')
-                logger.info(f"Nv2PK elements: {len(nv2pk_elements)}")
-                for el in nv2pk_elements:
-                    try:
-                        a_tags = el.find_elements(By.TAG_NAME, 'a')
-                        for a in a_tags:
-                            href = a.get_attribute('href')
-                            if href and '/maps/place/' in href:
-                                links.append(href)
-                    except Exception:
-                        continue
-                if links:
-                    links = list(set(links))
-                    logger.info(f"Found {len(links)} result links (Nv2PK, attempt {attempt + 1})")
-                    return links
-            except Exception:
-                pass
+        # Anchor-based layout: <a class="hfpxzc" href="/maps/place/...">
+        try:
+            js_links = self.driver.execute_script("""
+                var results = [];
+                var scope = document.querySelector('div[role="feed"]') || document;
+                var anchors = scope.querySelectorAll('a[href*="/maps/place/"]');
+                anchors.forEach(function(a) { results.push(a.href); });
+                if (results.length === 0) {
+                    document.querySelectorAll('a[href*="/maps/place/"]')
+                        .forEach(function(a) { results.push(a.href); });
+                }
+                return results;
+            """)
+            if js_links:
+                logger.info(f"JS place anchors: {len(js_links)}")
+                return self._dedupe_preserve_order(js_links)
+        except Exception as e:
+            logger.warning(f"JS link extraction failed: {e}")
 
-            # Fallback: querySelectorAll across whole page
+        return self._dedupe_preserve_order(links)
+
+    def _collect_links_by_clicking(self) -> list:
+        """Newer Google Maps layout: cards are <button class="hfpxzc"> without an
+        href. We must click each card to reveal its /maps/place/ URL, capture it,
+        then navigate back to the results feed and continue with the next card."""
+        links = []
+        try:
+            card_count = len(self.driver.find_elements(By.CSS_SELECTOR, "button.hfpxzc"))
+        except Exception:
+            card_count = 0
+
+        if not card_count:
+            return links
+
+        logger.info(f"Collecting links by clicking {card_count} result buttons")
+        seen = set()
+
+        for idx in range(card_count):
             try:
-                js_links = self.driver.execute_script("""
-                    var results = [];
-                    var anchors = document.querySelectorAll('a[href*="/maps/place/"]');
-                    anchors.forEach(function(a) { results.push(a.href); });
-                    return results;
-                """)
-                if js_links:
-                    links = list(set(js_links))
-                    logger.info(f"Found {len(links)} result links (JS, attempt {attempt + 1})")
-                    return links
+                buttons = self.driver.find_elements(By.CSS_SELECTOR, "button.hfpxzc")
+                if idx >= len(buttons):
+                    break
+                button = buttons[idx]
+                self.driver.execute_script(
+                    "arguments[0].scrollIntoView({block: 'center'});", button
+                )
+                time.sleep(0.4)
+                self.driver.execute_script("arguments[0].click();", button)
+
+                url = None
+                for _ in range(10):
+                    time.sleep(0.6)
+                    current = self.driver.current_url
+                    if "/maps/place/" in current:
+                        url = current
+                        break
+
+                if url and url not in seen:
+                    seen.add(url)
+                    links.append(url)
+
+                # Return to the results feed for the next card
+                self.driver.back()
+                for _ in range(10):
+                    time.sleep(0.5)
+                    if self.driver.find_elements(By.CSS_SELECTOR, "button.hfpxzc"):
+                        break
+            except StaleElementReferenceException:
+                time.sleep(1)
+                continue
             except Exception as e:
-                logger.warning(f"JS link extraction failed: {e}")
+                logger.warning(f"Click-collect failed on card #{idx + 1}: {e}")
+                try:
+                    self.driver.back()
+                    time.sleep(1)
+                except Exception:
+                    pass
+                continue
 
-            if attempt < 3:
+        logger.info(f"Collected {len(links)} links via clicking")
+        return links
+
+    def get_result_links(self) -> list:
+        # First try href-based extraction (fast, older layouts)
+        for attempt in range(3):
+            links = self._extract_href_links()
+            if links:
+                logger.info(f"Found {len(links)} result links via href (attempt {attempt + 1})")
+                return links
+            if attempt < 2:
                 wait = 2.0 * (attempt + 1)
-                logger.info(f"No links on attempt {attempt + 1}, waiting {wait}s...")
+                logger.info(f"No href links on attempt {attempt + 1}, waiting {wait}s...")
                 time.sleep(wait)
 
-        # Final fallback: all <a> tags
-        try:
-            all_links = self.driver.find_elements(By.TAG_NAME, "a")
-            logger.info(f"Total <a> tags on page: {len(all_links)}")
-            for link in all_links:
-                href = link.get_attribute("href")
-                if href and "/maps/place/" in href:
-                    links.append(href)
-            if links:
-                links = list(set(links))
-                logger.info(f"Found {len(links)} result links (final fallback)")
-                return links
-        except Exception:
-            pass
+        # Newer layout: buttons without href — click each card to collect URLs
+        links = self._collect_links_by_clicking()
+        if links:
+            return links
 
         logger.warning("No result links found after retries")
         return []
