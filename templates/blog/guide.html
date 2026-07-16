@@ -10,9 +10,10 @@
     </div>
 </section>
 
-<!-- Steps -->
-<section class="section" style="padding-top: 0;">
-    <div class="container" style="max-width: 800px;">
+<!-- Guide Content -->
+<div class="dark-section">
+    <!-- Steps -->
+    <section class="section" style="padding-top: 0;">
 
         <!-- Step 1 -->
         <div class="card fade-in" style="margin-bottom: 24px;">
@@ -319,17 +320,5 @@ with name: toko_besi_kab_bandung_[date].csv{% endif %}</pre>
     </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-    <div class="container">
-        <div class="cta-box fade-in">
-            <h2>{% if lang == 'id' %}Siap Memulai?{% else %}Ready to Start?{% endif %}</h2>
-            <p>{% if lang == 'id' %}Daftar sekarang dan mulai kumpulkan data Google Maps.{% else %}Sign up now and start collecting Google Maps data.{% endif %}</p>
-            <a href="{{ url_for('auth.register') }}" class="btn-white">
-                {% if lang == 'id' %}Daftar Gratis{% else %}Register Free{% endif %}
-            </a>
-        </div>
-    </div>
-</section>
-
+</div>
 {% endblock %}

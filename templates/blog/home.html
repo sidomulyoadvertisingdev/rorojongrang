@@ -1,6 +1,49 @@
 {% extends "blog/base.html" %}
 {% block title %}Roro Jonggrang - Digital Marketing Lengkap untuk UMKM Indonesia{% endblock %}
+{% block body_class %}page-home{% endblock %}
+{% block extra_head %}
+<style>
+    .video-bg {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .video-bg video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .video-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(14,13,19,0.75) 0%, rgba(14,13,19,0.5) 50%, rgba(14,13,19,0.75) 100%);
+        pointer-events: none;
+    }
+    .hero { z-index: 1; position: relative; background: transparent !important; }
+    .hero::before, .hero::after { display: none !important; }
+    .stats-bar { z-index: 1; position: relative; }
+    section.section { z-index: 1; position: relative; }
+    .cta-section { z-index: 1; position: relative; }
+</style>
+    .hero-title {
+        transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .hero-title:hover {
+        color: var(--accent) !important;
+        text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+    }
+</style>
+{% endblock %}
+{% block html_class %}page-home{% endblock %}
 {% block content %}
+<div class="video-bg" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto" poster="{{ url_for('static', filename='img/hero-bg.png') }}">
+        <source src="{{ url_for('static', filename='img/bg-loop.mp4') }}" type="video/mp4">
+    </video>
+</div>
 
 <!-- Hero -->
 <section class="hero">
@@ -9,7 +52,7 @@
             <span class="dot"></span>
             {% if lang == 'id' %}Platform #1 untuk UMKM Indonesia{% else %}#1 Platform for Indonesian SMEs{% endif %}
         </div>
-        <h1 class="fade-in fade-in-delay-1">
+        <h1 class="fade-in fade-in-delay-1 hero-title">
             {% if lang == 'id' %}
             Digital Marketing Lengkap<br>untuk UMKM Indonesia
             {% else %}
@@ -57,11 +100,12 @@
 </div>
 
 <!-- Why Roro Jonggrang -->
-<section class="section">
+<div class="dark-section">
+    <section class="section">
     <div class="container">
         <div class="section-header">
             <h2>{% if lang == 'id' %}Kenapa Roro Jonggrang?{% else %}Why Roro Jonggrang?{% endif %}</h2>
-            <p>{% if lang == 'id' %}Dirancang khusus untuk kebutuhan digital marketing yang membutuhkan data akurat dan cepat.{% else %}Designed specifically for digital marketing needs that require accurate and fast data.{% endif %}</p>
+            <p style="color: var(--accent);">{% if lang == 'id' %}Dirancang khusus untuk kebutuhan digital marketing yang membutuhkan data akurat dan cepat.{% else %}Designed specifically for digital marketing needs that require accurate and fast data.{% endif %}</p>
         </div>
         <div class="card-grid">
             <div class="card fade-in">
@@ -216,4 +260,5 @@
     </div>
 </section>
 
+</div>
 {% endblock %}

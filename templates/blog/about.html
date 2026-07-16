@@ -1,9 +1,9 @@
 {% extends "blog/base.html" %}
 {% block title %}Tentang - Roro Jonggrang{% endblock %}
 {% block content %}
-
-<!-- Page Header -->
-<section class="page-header">
+<div class="dark-section">
+    <!-- Page Header -->
+    <section class="page-header">
     <div class="container">
         <h1 style="color: var(--accent);">{% if lang == 'id' %}Tentang Roro Jonggrang{% else %}About Roro Jonggrang{% endif %}</h1>
         <p>{% if lang == 'id' %}Platform digital marketing lengkap untuk UMKM Indonesia — scraping, analytics, WhatsApp, dan kolaborasi tim dalam satu dashboard.{% else %}Complete digital marketing platform for Indonesian SMEs — scraping, analytics, WhatsApp, and team collaboration in one dashboard.{% endif %}</p>
@@ -147,4 +147,5 @@
     </div>
 </section>
 
+</div>
 {% endblock %}

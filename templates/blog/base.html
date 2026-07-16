@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}" data-theme="light">
+<html lang="{{ lang }}" data-theme="light" class="{% block html_class %}{% endblock %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,6 +35,9 @@
             --brand-roro: #f59e0b; --brand-jonggrang: #f59e0b;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
+        html, body {
+            height: 100%;
+        }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
@@ -43,6 +46,24 @@
             transition: background 0.4s ease, color 0.4s ease;
             position: relative;
             overflow-x: hidden;
+        }
+        html.page-home, body.page-home {
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+        body.page-home::before,
+        body.page-home::after {
+            display: none !important;
+        }
+        body.page-home .hero {
+            background-image: none !important;
+        }
+        body.page-home .hero::before,
+        body.page-home .hero::after {
+            display: none !important;
+        }
+        body.page-home .hero .container {
+            z-index: 1;
         }
         a { text-decoration: none; color: inherit; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
@@ -301,12 +322,9 @@
         .stat-number {
             font-size: 36px; font-weight: 800;
             font-family: 'Playfair Display', serif;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
         }
-        .stat-label { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+        .stat-label { font-size: 14px; color: #ffffff; margin-top: 4px; opacity: 0.9; }
 
         /* ═══ Section ═══ */
         .section { padding: 100px 0; position: relative; z-index: 1; }
@@ -318,6 +336,58 @@
             margin-bottom: 16px;
         }
         .section-header p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+
+        /* ═══ Dark Section (for blog content) ═══ */
+        .dark-section {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg) 100%);
+            position: relative;
+            z-index: 1;
+        }
+        [data-theme="dark"] .dark-section {
+            background: linear-gradient(180deg, var(--bg) 0%, #0e0d13 100%);
+        }
+        .dark-section .card {
+            background: rgba(255,255,255,0.03);
+            border-color: rgba(255,255,255,0.08);
+        }
+        [data-theme="dark"] .dark-section .card {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+        }
+        .dark-section .card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(245,158,11,0.2);
+        }
+        [data-theme="dark"] .dark-section .card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(245,158,11,0.25);
+        }
+        /* Light mode text colors */
+        .dark-section .section-header h2,
+        .dark-section .section-header p,
+        .dark-section .card h3,
+        .dark-section .card p,
+        .dark-section .step-content h3,
+        .dark-section .step-content p {
+            color: var(--text);
+        }
+        .dark-section .stat-number,
+        .dark-section .stat-label {
+            color: var(--text);
+        }
+        /* Dark mode text colors (explicit white) */
+        [data-theme="dark"] .dark-section .section-header h2,
+        [data-theme="dark"] .dark-section .section-header p,
+        [data-theme="dark"] .dark-section .card h3,
+        [data-theme="dark"] .dark-section .card p,
+        [data-theme="dark"] .dark-section .step-content h3,
+        [data-theme="dark"] .dark-section .step-content p {
+            color: #ffffff !important;
+        }
+        [data-theme="dark"] .dark-section .stat-number,
+        [data-theme="dark"] .dark-section .stat-label {
+            color: #ffffff !important;
+        }
 
         /* ═══ Cards ═══ */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
@@ -440,6 +510,8 @@
             padding: 60px 0;
             border-bottom: 1px solid var(--border);
             position: relative; z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .feature-row:last-child { border-bottom: none; }
         .feature-row.reverse { direction: rtl; }
@@ -516,9 +588,10 @@
             padding: 40px 0;
             border-top: 1px solid var(--border);
             text-align: center;
-            color: var(--text-muted);
+            color: var(--text);
             font-size: 14px;
             position: relative; z-index: 1;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-secondary) 100%);
         }
         .footer-links { display: flex; gap: 24px; justify-content: center; margin-top: 12px; }
         .footer-links a { color: var(--text-secondary); transition: color 0.2s; }
@@ -579,8 +652,9 @@
             .cta-box h2 { font-size: 28px; }
         }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <nav class="blog-nav">
         <div class="container">
             <a href="{{ url_for('blog.home', lang=lang) }}" class="nav-logo">
